@@ -32,6 +32,7 @@ function prepare() {
     }
 
     require_once PATH . '/src/LayoutResolver.php';
+    require_once PATH . '/src/MegaMenuConfig.php';
     require_once PATH . '/src/LayoutsModule.php';
 
     add_action( 'itk_commerce_register_modules', __NAMESPACE__ . '\\register_module' );
