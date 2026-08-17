@@ -10,25 +10,14 @@ defined( 'ABSPATH' ) || exit;
 
 add_action( 'wp_enqueue_scripts', __NAMESPACE__ . '\\enqueue_assets' );
 
-/**
- * Return a cache-busting version for a theme asset.
- *
- * @param string $relative_path Relative path inside the theme.
- * @return string
- */
 function asset_version( $relative_path ) {
     $path = DIR . '/' . ltrim( $relative_path, '/' );
-
     if ( is_readable( $path ) ) {
         return (string) filemtime( $path );
     }
-
     return VERSION;
 }
 
-/**
- * Load the small, layered theme asset set.
- */
 function enqueue_assets() {
     wp_enqueue_style(
         'itk-commerce-theme',
@@ -45,7 +34,8 @@ function enqueue_assets() {
         'commerce'               => array( 'itk-commerce-layout-models' ),
         'commerce-models'        => array( 'itk-commerce-commerce' ),
         'product-cards'          => array( 'itk-commerce-commerce-models' ),
-        'responsive'             => array( 'itk-commerce-product-cards' ),
+        'integrations'           => array( 'itk-commerce-product-cards' ),
+        'responsive'             => array( 'itk-commerce-integrations' ),
         'commerce-grid-contract' => array( 'itk-commerce-responsive' ),
         'commerce-block-models'  => array( 'itk-commerce-commerce-grid-contract' ),
     );
@@ -53,7 +43,6 @@ function enqueue_assets() {
     foreach ( $styles as $name => $dependencies ) {
         $handle = 'itk-commerce-' . $name;
         $path   = 'assets/css/' . $name . '.css';
-
         wp_enqueue_style(
             $handle,
             get_template_directory_uri() . '/' . $path,
