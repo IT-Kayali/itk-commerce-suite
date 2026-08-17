@@ -7,6 +7,7 @@
   <link rel="stylesheet" href="/packages/itk-commerce-theme/assets/css/base.css">
   <link rel="stylesheet" href="/packages/itk-commerce-theme/assets/css/commerce.css">
   <link rel="stylesheet" href="/packages/itk-commerce-theme/assets/css/commerce-models.css">
+  <link rel="stylesheet" href="/packages/itk-commerce-theme/assets/css/product-cards.css">
   <link rel="stylesheet" href="/packages/itk-commerce-theme/assets/css/responsive.css">
   <link rel="stylesheet" href="/packages/itk-commerce-theme/assets/css/commerce-grid-contract.css">
   <link rel="stylesheet" href="/packages/itk-commerce-theme/assets/css/commerce-block-models.css">
@@ -36,6 +37,10 @@
     .fixture-card { min-height: 130px; border: 1px solid var(--itk-color-border); background: var(--itk-color-surface-alt); }
     .fixture-area ul.products { list-style: none; padding: 0; }
     .fixture-area ul.products li.product { min-width: 0; }
+    .fixture-product-image { display: block; width: 100%; height: auto; background: #e9eef5; object-fit: cover; }
+    .fixture-product-link { display: block; color: inherit; text-decoration: none; }
+    .fixture-product-link h2, .fixture-product-link .price { display: block; margin: 10px 12px 0; }
+    .fixture-area ul.products li.product > .button { display: inline-block; margin: 12px; padding: 9px 12px; border-radius: 8px; background: #111827; color: #fff; text-decoration: none; }
     .fixture-gallery { min-height: 360px; background: #e9eef5; border-radius: 12px; }
     .fixture-summary { min-height: 340px; padding: 20px; background: #f8fafc; border: 1px solid var(--itk-color-border); border-radius: 12px; }
     .fixture-tabs, .fixture-related { min-height: 120px; padding: 16px; border: 1px solid var(--itk-color-border); border-radius: 12px; }
@@ -45,7 +50,7 @@
     .fixture-native-block { min-height: 140px; display: grid; place-items: center; background: #f8fafc; border-radius: 10px; }
   </style>
 </head>
-<body class="woocommerce-page itk-commerce-area-shop itk-shop-model-sidebar itk-commerce-columns-5 itk-shop-density-comfortable itk-shop-sidebar-right">
+<body class="woocommerce-page itk-commerce-area-shop itk-shop-model-sidebar itk-commerce-columns-5 itk-shop-density-comfortable itk-shop-sidebar-right itk-card-model-classic itk-card-image-portrait itk-card-order-title-price itk-card-align-left itk-card-price-standard itk-card-action-button itk-card-hover-lift itk-card-badges-pill itk-card-state-badges-enabled">
   <main class="itk-commerce-main">
     <div class="itk-container">
       <section class="fixture-area" data-fixture-area="shop">
@@ -53,12 +58,17 @@
           <aside class="itk-shop-sidebar" data-shop-sidebar><strong>Filters</strong></aside>
           <div class="itk-shop-shell__content" data-shop-content>
             <ul class="products" data-shop-grid>
-              <li class="product"><div class="fixture-card">1</div></li>
-              <li class="product"><div class="fixture-card">2</div></li>
-              <li class="product"><div class="fixture-card">3</div></li>
-              <li class="product"><div class="fixture-card">4</div></li>
-              <li class="product"><div class="fixture-card">5</div></li>
-              <li class="product"><div class="fixture-card">6</div></li>
+              <li class="product" data-product-card>
+                <span class="onsale">Sale</span>
+                <a class="fixture-product-link woocommerce-LoopProduct-link woocommerce-loop-product__link" href="#"><img class="fixture-product-image" src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///ywAAAAAAQABAAACAUwAOw==" alt=""><h2 class="woocommerce-loop-product__title">Product 1</h2><span class="price">€29.00</span></a>
+                <div class="itk-product-badges"><span class="itk-product-badge itk-product-badge--new">New</span><span class="itk-product-badge itk-product-badge--featured">Featured</span></div>
+                <a class="button" href="#">Add to cart</a>
+              </li>
+              <li class="product"><a class="fixture-product-link woocommerce-LoopProduct-link woocommerce-loop-product__link" href="#"><img class="fixture-product-image" src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///ywAAAAAAQABAAACAUwAOw==" alt=""><h2 class="woocommerce-loop-product__title">Product 2</h2><span class="price">€39.00</span></a><a class="button" href="#">Add to cart</a></li>
+              <li class="product"><a class="fixture-product-link woocommerce-LoopProduct-link woocommerce-loop-product__link" href="#"><img class="fixture-product-image" src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///ywAAAAAAQABAAACAUwAOw==" alt=""><h2 class="woocommerce-loop-product__title">Product 3</h2><span class="price">€49.00</span></a><a class="button" href="#">Add to cart</a></li>
+              <li class="product"><a class="fixture-product-link woocommerce-LoopProduct-link woocommerce-loop-product__link" href="#"><img class="fixture-product-image" src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///ywAAAAAAQABAAACAUwAOw==" alt=""><h2 class="woocommerce-loop-product__title">Product 4</h2><span class="price">€59.00</span></a><a class="button" href="#">Add to cart</a></li>
+              <li class="product"><a class="fixture-product-link woocommerce-LoopProduct-link woocommerce-loop-product__link" href="#"><img class="fixture-product-image" src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///ywAAAAAAQABAAACAUwAOw==" alt=""><h2 class="woocommerce-loop-product__title">Product 5</h2><span class="price">€69.00</span></a><a class="button" href="#">Add to cart</a></li>
+              <li class="product"><a class="fixture-product-link woocommerce-LoopProduct-link woocommerce-loop-product__link" href="#"><img class="fixture-product-image" src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///ywAAAAAAQABAAACAUwAOw==" alt=""><h2 class="woocommerce-loop-product__title">Product 6</h2><span class="price">€79.00</span></a><a class="button" href="#">Add to cart</a></li>
             </ul>
           </div>
         </div>

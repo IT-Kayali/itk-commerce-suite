@@ -38,15 +38,16 @@ function enqueue_assets() {
     );
 
     $styles = array(
-        'base'                  => array(),
-        'layout'                => array( 'itk-commerce-base' ),
-        'components'            => array( 'itk-commerce-layout' ),
-        'layout-models'         => array( 'itk-commerce-components' ),
-        'commerce'              => array( 'itk-commerce-layout-models' ),
-        'commerce-models'       => array( 'itk-commerce-commerce' ),
-        'responsive'            => array( 'itk-commerce-commerce-models' ),
-        'commerce-grid-contract'=> array( 'itk-commerce-responsive' ),
-        'commerce-block-models' => array( 'itk-commerce-commerce-grid-contract' ),
+        'base'                   => array(),
+        'layout'                 => array( 'itk-commerce-base' ),
+        'components'             => array( 'itk-commerce-layout' ),
+        'layout-models'          => array( 'itk-commerce-components' ),
+        'commerce'               => array( 'itk-commerce-layout-models' ),
+        'commerce-models'        => array( 'itk-commerce-commerce' ),
+        'product-cards'          => array( 'itk-commerce-commerce-models' ),
+        'responsive'             => array( 'itk-commerce-product-cards' ),
+        'commerce-grid-contract' => array( 'itk-commerce-responsive' ),
+        'commerce-block-models'  => array( 'itk-commerce-commerce-grid-contract' ),
     );
 
     foreach ( $styles as $name => $dependencies ) {

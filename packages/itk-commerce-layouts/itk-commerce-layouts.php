@@ -43,6 +43,7 @@ function prepare() {
     if ( is_admin() ) {
         require_once PATH . '/src/Admin/LayoutBuilderPage.php';
         require_once PATH . '/src/Admin/CommerceTemplatePage.php';
+        require_once PATH . '/src/Admin/ProductCardPage.php';
         require_once PATH . '/src/Admin/MegaMenuFields.php';
         require_once PATH . '/src/Admin/MegaMenuContentPage.php';
     }
