@@ -33,6 +33,8 @@ final class LanguageSwitcher {
 
     /**
      * Return normalized switcher rows for the current/supplied storefront URL.
+     * Entity-aware permalink services can refine the generic directory URL via
+     * the shared itk_commerce_language_url contract.
      *
      * @param string $source_url Optional same-origin URL.
      * @return array<int,array<string,mixed>>
@@ -46,7 +48,9 @@ final class LanguageSwitcher {
             }
 
             $code = (string) $language['code'];
-            $url  = $this->router->url_for( $code, $source_url );
+            $url  = function_exists( 'apply_filters' )
+                ? apply_filters( 'itk_commerce_language_url', '', $code, $source_url )
+                : $this->router->url_for( $code, $source_url );
             if ( '' === $url ) {
                 continue;
             }
@@ -129,7 +133,7 @@ final class LanguageSwitcher {
 
         ob_start();
         ?>
-        <nav class="<?php echo esc_attr( implode( ' ', array_values( array_unique( $classes ) ) ) ); ?>" aria-label="<?php echo esc_attr__( 'Language', 'itk-commerce-multilingual' ); ?>" data-itk-language-switcher>
+        <nav class="<?php echo esc_attr( implode( ' ', array_values( array_unique( $classes ) ) ); ?>" aria-label="<?php echo esc_attr__( 'Language', 'itk-commerce-multilingual' ); ?>" data-itk-language-switcher>
             <ul class="itk-language-switcher__list" role="list">
                 <?php foreach ( $items as $item ) : ?>
                     <?php
