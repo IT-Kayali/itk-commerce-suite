@@ -1,15 +1,46 @@
 /*
- * Shop grid contract.
+ * Commerce grid contracts.
  *
- * WooCommerce/themes may apply strong generic product-grid declarations. These
- * model-specific rules intentionally own the final configured column count.
+ * WooCommerce/themes may apply strong generic product/catalog declarations.
+ * These model-specific rules intentionally own the final configured Shop and
+ * Product column contracts after the generic responsive layer.
  */
 
+/* Shop */
 .itk-commerce-area-shop.itk-commerce-columns-2.woocommerce-page ul.products { grid-template-columns: repeat(2, minmax(0, 1fr)) !important; }
 .itk-commerce-area-shop.itk-commerce-columns-3.woocommerce-page ul.products { grid-template-columns: repeat(3, minmax(0, 1fr)) !important; }
 .itk-commerce-area-shop.itk-commerce-columns-4.woocommerce-page ul.products { grid-template-columns: repeat(4, minmax(0, 1fr)) !important; }
 .itk-commerce-area-shop.itk-commerce-columns-5.woocommerce-page ul.products { grid-template-columns: repeat(5, minmax(0, 1fr)) !important; }
 .itk-commerce-area-shop.itk-commerce-columns-6.woocommerce-page ul.products { grid-template-columns: repeat(6, minmax(0, 1fr)) !important; }
+
+/* Product */
+.itk-commerce-area-product.woocommerce-page div.product,
+.itk-commerce-area-product.itk-product-model-classic.woocommerce-page div.product,
+.itk-commerce-area-product.itk-product-model-gallery-left.woocommerce-page div.product,
+.itk-commerce-area-product.itk-product-model-gallery-right.woocommerce-page div.product,
+.itk-commerce-area-product.itk-product-model-compact.woocommerce-page div.product {
+  display: grid !important;
+  align-items: start;
+}
+
+.itk-commerce-area-product.itk-product-model-classic.woocommerce-page div.product,
+.itk-commerce-area-product.itk-product-model-gallery-left.woocommerce-page div.product {
+  grid-template-columns: minmax(0, var(--itk-product-gallery-fr, 1fr)) minmax(320px, 1fr) !important;
+}
+
+.itk-commerce-area-product.itk-product-model-gallery-right.woocommerce-page div.product {
+  grid-template-columns: minmax(320px, 1fr) minmax(0, var(--itk-product-gallery-fr, 1fr)) !important;
+}
+
+.itk-commerce-area-product.itk-product-model-compact.woocommerce-page div.product {
+  grid-template-columns: minmax(0, .9fr) minmax(320px, 1fr) !important;
+}
+
+.itk-commerce-area-product.itk-product-model-centered.woocommerce-page div.product {
+  display: grid !important;
+  grid-template-columns: minmax(0, 820px) !important;
+  justify-content: center;
+}
 
 @media (max-width: 1100px) {
   .itk-commerce-area-shop.itk-commerce-columns-4.woocommerce-page ul.products {
@@ -29,6 +60,15 @@
   .itk-commerce-area-shop.itk-commerce-columns-5.woocommerce-page ul.products,
   .itk-commerce-area-shop.itk-commerce-columns-6.woocommerce-page ul.products {
     grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  }
+
+  .itk-commerce-area-product.woocommerce-page div.product,
+  .itk-commerce-area-product.itk-product-model-classic.woocommerce-page div.product,
+  .itk-commerce-area-product.itk-product-model-gallery-left.woocommerce-page div.product,
+  .itk-commerce-area-product.itk-product-model-gallery-right.woocommerce-page div.product,
+  .itk-commerce-area-product.itk-product-model-centered.woocommerce-page div.product,
+  .itk-commerce-area-product.itk-product-model-compact.woocommerce-page div.product {
+    grid-template-columns: minmax(0, 1fr) !important;
   }
 }
 
