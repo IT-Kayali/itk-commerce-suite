@@ -26,9 +26,67 @@
       "direction": "ltr"
     }
   ],
-  "layouts": {},
+  "layouts": {
+    "header": {
+      "default": "classic",
+      "contexts": {
+        "shop": "shop",
+        "checkout": "classic"
+      },
+      "rules": {
+        "single_product": {},
+        "product_category": {},
+        "product_type": {}
+      }
+    },
+    "footer": {
+      "default": "columns",
+      "contexts": {
+        "checkout": "compact"
+      }
+    },
+    "mobile_bottom": {
+      "enabled": true,
+      "items": [
+        {
+          "label": "Home",
+          "target": "home",
+          "icon": "home"
+        },
+        {
+          "label": "Shop",
+          "target": "shop",
+          "icon": "shop"
+        },
+        {
+          "label": "Cart",
+          "target": "cart",
+          "icon": "cart",
+          "badge": true
+        },
+        {
+          "label": "Account",
+          "target": "myaccount",
+          "icon": "user"
+        }
+      ]
+    },
+    "mega_menu": {
+      "definitions": {
+        "catalog": {
+          "label": "Catalog",
+          "width": "full",
+          "columns": 4,
+          "content_type": "menu",
+          "content_key": "catalog"
+        }
+      }
+    }
+  },
   "modules": {
-    "enabled": [],
+    "enabled": [
+      "itk-commerce-layouts"
+    ],
     "configuration": {}
   }
 }

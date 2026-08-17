@@ -1,0 +1,30 @@
+{
+  "schema_version": 1,
+  "package": "itk-commerce-layouts",
+  "type": "wordpress-plugin",
+  "version": "0.1.0-dev",
+  "status": "development",
+  "minimum": {
+    "php": "8.1",
+    "wordpress": "6.6",
+    "woocommerce": null,
+    "itk_commerce_core": "0.1.0-dev"
+  },
+  "tested_up_to": {
+    "wordpress": null,
+    "woocommerce": null,
+    "itk_commerce_core": "0.1.0-dev"
+  },
+  "features": {
+    "header_models": ["classic", "centered", "shop"],
+    "footer_models": ["classic", "compact", "columns"],
+    "profile_assignments": "implemented",
+    "mobile_bottom_navigation": "profile bridge implemented",
+    "mega_menu": "portable definition and responsive submenu foundation implemented"
+  },
+  "notes": [
+    "WooCommerce version ranges remain unset until the Phase 0 environment audit and compatibility matrix are completed.",
+    "The module extends public Theme hooks and does not patch Theme source at runtime.",
+    "Rich mega-menu panels and browser-based visual regression testing remain Phase 2 follow-up work."
+  ]
+}
