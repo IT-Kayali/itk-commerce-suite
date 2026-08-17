@@ -22,6 +22,7 @@ require_once DIR . '/inc/product-cards.php';
 require_once DIR . '/inc/mini-cart.php';
 require_once DIR . '/inc/account.php';
 require_once DIR . '/inc/component-contracts.php';
+require_once DIR . '/inc/elementor.php';
 require_once DIR . '/inc/mobile-navigation.php';
 
 /**
