@@ -86,7 +86,9 @@ test.describe('Search Filter progressive UI', () => {
       });
     });
 
-    await page.locator('input[name="filter_category[]"][value="gifts"]').check();
+    const giftsChip = page.locator('.itk-filter-option--chip', { hasText: 'Gifts' });
+    await giftsChip.click();
+    await expect(giftsChip.locator('input')).toBeChecked();
     await page.locator('.itk-filter-form').evaluate((form) => form.requestSubmit());
 
     await expect(page.locator('[data-product-state="filtered"]')).toBeVisible();
