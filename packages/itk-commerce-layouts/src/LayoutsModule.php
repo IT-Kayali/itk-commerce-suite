@@ -71,6 +71,7 @@ final class LayoutsModule implements ModuleInterface {
         add_filter( 'itk_commerce_template_options', array( $this->commerce_resolver, 'resolve_options' ), 10, 2 );
         add_filter( 'itk_commerce_product_card_model', array( $this->commerce_resolver, 'resolve_product_card_model' ), 10 );
         add_filter( 'itk_commerce_product_card_options', array( $this->commerce_resolver, 'resolve_product_card_options' ), 10 );
+        add_filter( 'itk_commerce_mini_cart_options', array( $this->commerce_resolver, 'resolve_mini_cart_options' ), 10 );
 
         add_filter( 'nav_menu_css_class', array( $this->mega_menu, 'menu_item_classes' ), 10, 4 );
         add_filter( 'nav_menu_link_attributes', array( $this->mega_menu, 'menu_link_attributes' ), 10, 4 );
