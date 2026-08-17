@@ -30,15 +30,26 @@ test.describe('Commerce mini-cart drawer', () => {
     await expect(trigger).toBeFocused();
   });
 
-  test('backdrop close works and mobile drawer remains bounded without horizontal overflow', async ({ page }) => {
+  test('backdrop closes the drawer on desktop', async ({ page }) => {
+    await page.setViewportSize({ width: 1280, height: 900 });
+    await page.goto(fixture);
+
+    const drawer = page.locator('[data-itk-mini-cart]');
+    await page.locator('.itk-header-action--cart').click();
+    await expect(drawer).toHaveClass(/is-open/);
+
+    await page.locator('[data-itk-mini-cart-backdrop]').click({ position: { x: 20, y: 450 } });
+    await expect(drawer).not.toHaveClass(/is-open/);
+  });
+
+  test('mobile drawer remains bounded without horizontal overflow', async ({ page }) => {
     await page.setViewportSize({ width: 390, height: 844 });
     await page.goto(fixture);
 
-    const trigger = page.locator('.itk-header-action--cart');
     const drawer = page.locator('[data-itk-mini-cart]');
     const panel = page.locator('[data-itk-mini-cart-panel]');
 
-    await trigger.click();
+    await page.locator('.itk-header-action--cart').click();
     await expect(drawer).toHaveClass(/is-open/);
 
     const panelBox = await panel.boundingBox();
@@ -46,7 +57,7 @@ test.describe('Commerce mini-cart drawer', () => {
     const overflow = await page.evaluate(() => document.documentElement.scrollWidth - window.innerWidth);
     expect(overflow).toBeLessThanOrEqual(1);
 
-    await page.locator('[data-itk-mini-cart-backdrop]').click({ position: { x: 5, y: 5 } });
+    await page.locator('[data-itk-mini-cart-close]').click();
     await expect(drawer).not.toHaveClass(/is-open/);
   });
 
