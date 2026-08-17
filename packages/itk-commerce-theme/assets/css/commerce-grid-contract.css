@@ -1,0 +1,43 @@
+/*
+ * Shop grid contract.
+ *
+ * WooCommerce/themes may apply strong generic product-grid declarations. These
+ * model-specific rules intentionally own the final configured column count.
+ */
+
+.itk-commerce-area-shop.itk-commerce-columns-2.woocommerce-page ul.products { grid-template-columns: repeat(2, minmax(0, 1fr)) !important; }
+.itk-commerce-area-shop.itk-commerce-columns-3.woocommerce-page ul.products { grid-template-columns: repeat(3, minmax(0, 1fr)) !important; }
+.itk-commerce-area-shop.itk-commerce-columns-4.woocommerce-page ul.products { grid-template-columns: repeat(4, minmax(0, 1fr)) !important; }
+.itk-commerce-area-shop.itk-commerce-columns-5.woocommerce-page ul.products { grid-template-columns: repeat(5, minmax(0, 1fr)) !important; }
+.itk-commerce-area-shop.itk-commerce-columns-6.woocommerce-page ul.products { grid-template-columns: repeat(6, minmax(0, 1fr)) !important; }
+
+@media (max-width: 1100px) {
+  .itk-commerce-area-shop.itk-commerce-columns-4.woocommerce-page ul.products {
+    grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+  }
+
+  .itk-commerce-area-shop.itk-commerce-columns-5.woocommerce-page ul.products,
+  .itk-commerce-area-shop.itk-commerce-columns-6.woocommerce-page ul.products {
+    grid-template-columns: repeat(4, minmax(0, 1fr)) !important;
+  }
+}
+
+@media (max-width: 980px) {
+  .itk-commerce-area-shop.itk-commerce-columns-2.woocommerce-page ul.products,
+  .itk-commerce-area-shop.itk-commerce-columns-3.woocommerce-page ul.products,
+  .itk-commerce-area-shop.itk-commerce-columns-4.woocommerce-page ul.products,
+  .itk-commerce-area-shop.itk-commerce-columns-5.woocommerce-page ul.products,
+  .itk-commerce-area-shop.itk-commerce-columns-6.woocommerce-page ul.products {
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  }
+}
+
+@media (max-width: 640px) {
+  .itk-commerce-area-shop.itk-commerce-columns-2.woocommerce-page ul.products,
+  .itk-commerce-area-shop.itk-commerce-columns-3.woocommerce-page ul.products,
+  .itk-commerce-area-shop.itk-commerce-columns-4.woocommerce-page ul.products,
+  .itk-commerce-area-shop.itk-commerce-columns-5.woocommerce-page ul.products,
+  .itk-commerce-area-shop.itk-commerce-columns-6.woocommerce-page ul.products {
+    grid-template-columns: 1fr !important;
+  }
+}
