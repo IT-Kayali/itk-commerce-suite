@@ -25,6 +25,13 @@ final class CatalogAsyncNavigation {
             return;
         }
 
+        wp_enqueue_style(
+            'itk-commerce-search-filter-async',
+            plugins_url( 'assets/css/catalog-async.css', \ITK\Commerce\SearchFilter\FILE ),
+            array( 'itk-commerce-search-filter-ui' ),
+            \ITK\Commerce\SearchFilter\VERSION
+        );
+
         wp_enqueue_script(
             'itk-commerce-search-filter-async',
             plugins_url( 'assets/js/catalog-async.js', \ITK\Commerce\SearchFilter\FILE ),
