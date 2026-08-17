@@ -15,6 +15,7 @@ defined( 'ABSPATH' ) || exit;
 add_filter( 'body_class', __NAMESPACE__ . '\\commerce_template_body_classes' );
 add_filter( 'loop_shop_columns', __NAMESPACE__ . '\\commerce_loop_columns', 30 );
 add_filter( 'woocommerce_output_related_products_args', __NAMESPACE__ . '\\commerce_related_product_args', 30 );
+add_filter( 'render_block', __NAMESPACE__ . '\\commerce_block_shell', 20, 2 );
 add_action( 'woocommerce_before_cart', __NAMESPACE__ . '\\commerce_cart_shell_start', 1 );
 add_action( 'woocommerce_after_cart', __NAMESPACE__ . '\\commerce_cart_shell_end', 999 );
 
@@ -334,8 +335,40 @@ function commerce_shop_sidebar_active() {
 }
 
 /**
- * Wrap cart form/collaterals so split/compact models can be expressed without
- * overriding WooCommerce cart templates.
+ * Wrap current Cart/Checkout blocks at their public block boundary instead of
+ * targeting WooCommerce's private internal component markup. The native block
+ * remains responsible for its own internal responsive and payment behavior.
+ *
+ * @param string              $block_content Rendered block content.
+ * @param array<string,mixed> $block         Parsed block data.
+ * @return string
+ */
+function commerce_block_shell( $block_content, $block ) {
+    if ( ! is_array( $block ) || empty( $block['blockName'] ) || ! is_string( $block_content ) || '' === $block_content ) {
+        return $block_content;
+    }
+
+    $map = array(
+        'woocommerce/cart'     => 'cart',
+        'woocommerce/checkout' => 'checkout',
+    );
+
+    if ( ! isset( $map[ $block['blockName'] ] ) ) {
+        return $block_content;
+    }
+
+    $area = $map[ $block['blockName'] ];
+    if ( $area !== commerce_template_area() ) {
+        return $block_content;
+    }
+
+    $model = commerce_template_model( $area );
+    return '<div class="itk-commerce-block-shell itk-commerce-block-shell--' . esc_attr( $area ) . ' itk-commerce-block-shell--model-' . esc_attr( $model ) . '">' . $block_content . '</div>';
+}
+
+/**
+ * Wrap classic cart form/collaterals so split/compact models can be expressed
+ * without overriding WooCommerce cart templates.
  *
  * @return void
  */
@@ -349,7 +382,7 @@ function commerce_cart_shell_start() {
 }
 
 /**
- * Close the cart model shell.
+ * Close the classic cart model shell.
  *
  * @return void
  */
