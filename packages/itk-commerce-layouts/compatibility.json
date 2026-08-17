@@ -18,17 +18,24 @@
   "features": {
     "header_models": ["classic", "centered", "shop", "transparent", "dark", "luxury", "sticky", "vertical"],
     "footer_models": ["classic", "compact", "columns", "simple", "luxury", "newsletter", "branches"],
-    "visual_builder": "Header/Footer/context/mobile/Mega-menu editor implemented",
-    "live_preview": "authenticated desktop/tablet/mobile storefront preview implemented",
+    "shop_models": ["grid", "sidebar", "editorial", "compact"],
+    "product_models": ["classic", "gallery-left", "gallery-right", "centered", "compact"],
+    "cart_models": ["classic", "split", "compact"],
+    "checkout_models": ["classic", "split", "focused"],
+    "visual_builder": "Header/Footer/context/mobile/Mega-menu and Shop/Product/Cart/Checkout editors implemented",
+    "live_preview": "authenticated desktop/tablet/mobile storefront and commerce-page preview implemented",
     "profile_assignments": "implemented",
     "mobile_bottom_navigation": "profile bridge implemented",
     "mega_menu": "portable definitions, menu-item binding, rich panel editor and accessible responsive renderer implemented",
-    "mega_menu_blocks": ["menu", "categories", "products", "image", "banner", "elementor"]
+    "mega_menu_blocks": ["menu", "categories", "products", "image", "banner", "elementor"],
+    "commerce_template_options": "bounded profile-driven options implemented",
+    "cart_checkout_blocks": "public render_block outer-shell integration; native block internals remain untouched"
   },
   "notes": [
     "WooCommerce version ranges remain unset until the Phase 0 environment audit and compatibility matrix are completed.",
-    "The module extends public Theme hooks and does not patch Theme source at runtime.",
-    "Rich mega-menu content is stored in the versioned customer profile under the Layouts module configuration and contains no executable PHP or JavaScript.",
-    "Browser-based responsive/RTL/accessibility regression testing and full Shop/Product/Cart/Checkout visual template editing remain Phase 2 follow-up work."
+    "The module extends public Theme hooks and does not patch Theme or WooCommerce source at runtime.",
+    "Rich mega-menu content and Commerce page-model choices are stored in the versioned customer profile and contain no executable PHP or JavaScript.",
+    "Cart and Checkout block internals are intentionally not targeted; model styling uses an IT-Kayali wrapper added at the public WordPress block-render boundary.",
+    "Responsive/RTL/accessibility browser coverage includes the Commerce page-model slice."
   ]
 }
