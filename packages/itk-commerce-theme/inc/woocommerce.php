@@ -46,6 +46,21 @@ function commerce_wrapper_start() {
 
     echo '<main id="primary" class="' . esc_attr( implode( ' ', $classes ) ) . '"><div class="itk-container">';
 
+    /**
+     * Public presentation region before the Theme-owned WooCommerce content.
+     * Elementor or other presentation modules may attach without overriding the
+     * WooCommerce wrapper or Theme templates.
+     *
+     * @param array<string,mixed> $context Commerce component context.
+     */
+    do_action(
+        'itk_commerce_before_content',
+        function_exists( __NAMESPACE__ . '\\commerce_component_context' ) ? commerce_component_context() : array(
+            'area'  => sanitize_key( (string) $area ),
+            'model' => sanitize_key( (string) $model ),
+        )
+    );
+
     if ( function_exists( __NAMESPACE__ . '\\commerce_shop_sidebar_active' ) && commerce_shop_sidebar_active() ) {
         $options  = commerce_template_options( 'shop' );
         $position = isset( $options['sidebar_position'] ) ? sanitize_html_class( $options['sidebar_position'] ) : 'left';
@@ -64,6 +79,16 @@ function commerce_wrapper_end() {
     if ( function_exists( __NAMESPACE__ . '\\commerce_shop_sidebar_active' ) && commerce_shop_sidebar_active() ) {
         echo '</div></div>';
     }
+
+    /**
+     * Public presentation region after the Theme-owned WooCommerce content.
+     *
+     * @param array<string,mixed> $context Commerce component context.
+     */
+    do_action(
+        'itk_commerce_after_content',
+        function_exists( __NAMESPACE__ . '\\commerce_component_context' ) ? commerce_component_context() : array()
+    );
 
     echo '</div></main>';
 }

@@ -45,7 +45,8 @@ function enqueue_assets() {
         'commerce'               => array( 'itk-commerce-layout-models' ),
         'commerce-models'        => array( 'itk-commerce-commerce' ),
         'product-cards'          => array( 'itk-commerce-commerce-models' ),
-        'responsive'             => array( 'itk-commerce-product-cards' ),
+        'component-contracts'    => array( 'itk-commerce-product-cards' ),
+        'responsive'             => array( 'itk-commerce-component-contracts' ),
         'commerce-grid-contract' => array( 'itk-commerce-responsive' ),
         'commerce-block-models'  => array( 'itk-commerce-commerce-grid-contract' ),
     );
