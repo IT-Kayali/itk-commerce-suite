@@ -177,7 +177,7 @@
     if (typeof category.count !== 'undefined') {
       var count = document.createElement('span');
       count.className = 'itk-live-search__option-meta';
-      count.textContent = String(category.count) + ' products';
+      count.textContent = '(' + String(category.count) + ')';
       content.appendChild(count);
     }
 
