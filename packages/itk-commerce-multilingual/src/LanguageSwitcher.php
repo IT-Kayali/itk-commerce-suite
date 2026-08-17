@@ -50,7 +50,11 @@ final class LanguageSwitcher {
             $code = (string) $language['code'];
             $url  = function_exists( 'apply_filters' )
                 ? apply_filters( 'itk_commerce_language_url', '', $code, $source_url )
-                : $this->router->url_for( $code, $source_url );
+                : '';
+
+            if ( ! is_string( $url ) || '' === $url ) {
+                $url = $this->router->url_for( $code, $source_url );
+            }
             if ( '' === $url ) {
                 continue;
             }
