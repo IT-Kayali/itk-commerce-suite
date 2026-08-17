@@ -1,0 +1,180 @@
+/* Header/Footer model variants. Customer branding continues to come from tokens/profile values. */
+
+.itk-header-centered__inner {
+  min-height: var(--itk-header-height);
+  display: grid;
+  grid-template-columns: minmax(120px, 1fr) auto minmax(120px, 1fr);
+  align-items: center;
+  gap: var(--itk-content-gap);
+}
+
+.itk-header-centered__start {
+  display: flex;
+  align-items: center;
+  gap: .35rem;
+  justify-self: start;
+}
+
+.itk-header-centered__brand {
+  justify-self: center;
+  text-align: center;
+}
+
+.itk-site-header--centered .itk-header-actions {
+  justify-self: end;
+}
+
+.itk-primary-navigation--centered .itk-primary-navigation__menu {
+  justify-content: center;
+}
+
+.itk-header-search--centered {
+  padding-block: .75rem;
+  border-block-start: 1px solid var(--itk-color-border);
+  background: var(--itk-color-surface-alt);
+}
+
+.itk-header-search--centered form,
+.itk-shop-header-search form {
+  width: 100%;
+  margin: 0;
+}
+
+.itk-shop-header-main__inner {
+  min-height: var(--itk-header-height);
+  display: grid;
+  grid-template-columns: auto minmax(280px, 1fr) auto;
+  align-items: center;
+  gap: clamp(1rem, 3vw, 2.5rem);
+}
+
+.itk-shop-header-search {
+  min-width: 0;
+}
+
+.itk-shop-header-search form {
+  display: flex;
+  align-items: center;
+}
+
+.itk-shop-header-search input[type="search"] {
+  min-width: 0;
+  width: 100%;
+}
+
+.itk-shop-navigation-row {
+  display: flex;
+  align-items: center;
+  gap: clamp(1rem, 3vw, 2.5rem);
+}
+
+.itk-shop-categories {
+  flex: 0 0 auto;
+}
+
+.itk-shop-categories__menu {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  gap: .75rem;
+}
+
+.itk-shop-categories__menu a {
+  display: inline-flex;
+  min-height: 44px;
+  align-items: center;
+  text-decoration: none;
+  font-weight: 700;
+}
+
+.itk-shop-navigation-row .itk-primary-navigation {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.itk-site-footer--compact {
+  padding-block: 1.5rem;
+}
+
+.itk-footer-compact__inner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem 2rem;
+  flex-wrap: wrap;
+}
+
+.itk-site-footer--compact .itk-footer-copyright,
+.itk-site-footer--compact .itk-footer-legal {
+  margin-block: 0;
+}
+
+.itk-footer-columns__intro {
+  display: flex;
+  align-items: start;
+  justify-content: space-between;
+  gap: 2rem;
+  padding-block-end: 2rem;
+  border-block-end: 1px solid rgb(255 255 255 / .15);
+}
+
+.itk-footer-columns__grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: clamp(1.5rem, 3vw, 3rem);
+  padding-block: 2rem;
+}
+
+@media (max-width: 980px) {
+  .itk-header-centered__inner,
+  .itk-shop-header-main__inner {
+    grid-template-columns: auto minmax(0, 1fr) auto;
+  }
+
+  .itk-header-centered__brand,
+  .itk-shop-header-main .itk-site-branding {
+    justify-self: center;
+  }
+
+  .itk-shop-header-search {
+    grid-column: 1 / -1;
+    padding-block-end: .75rem;
+  }
+
+  .itk-shop-categories {
+    display: none;
+  }
+
+  .itk-footer-columns__grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 640px) {
+  .itk-header-centered__start .itk-header-action,
+  .itk-site-header--centered .itk-header-action__label,
+  .itk-site-header--shop .itk-header-action__label {
+    display: none;
+  }
+
+  .itk-header-centered__inner,
+  .itk-shop-header-main__inner {
+    gap: .5rem;
+  }
+
+  .itk-header-search--centered {
+    display: none;
+  }
+
+  .itk-footer-compact__inner,
+  .itk-footer-columns__intro {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .itk-footer-columns__grid {
+    grid-template-columns: 1fr;
+  }
+}
