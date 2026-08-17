@@ -1,13 +1,15 @@
 <?php
 /**
- * Multi-column footer model.
+ * Multi-column Footer model and rich content variants.
  *
  * @package ITK_Commerce_Theme
  */
 
 defined( 'ABSPATH' ) || exit;
+
+$layout_model = isset( $args['itk_layout_model'] ) ? sanitize_key( $args['itk_layout_model'] ) : 'columns';
 ?>
-<footer class="itk-site-footer itk-site-footer--columns" data-itk-layout-model="columns">
+<footer class="itk-site-footer itk-site-footer--columns itk-site-footer--<?php echo esc_attr( $layout_model ); ?>" data-itk-layout-model="<?php echo esc_attr( $layout_model ); ?>">
     <?php do_action( 'itk_commerce_before_footer' ); ?>
     <div class="itk-container">
         <div class="itk-footer-columns__intro">
@@ -19,8 +21,18 @@ defined( 'ABSPATH' ) || exit;
                     <p><?php bloginfo( 'description' ); ?></p>
                 <?php endif; ?>
             </div>
-            <?php do_action( 'itk_commerce_footer_columns_intro' ); ?>
+            <?php do_action( 'itk_commerce_footer_columns_intro', $layout_model ); ?>
         </div>
+
+        <?php if ( 'newsletter' === $layout_model ) : ?>
+            <div class="itk-footer-feature itk-footer-feature--newsletter">
+                <?php do_action( 'itk_commerce_footer_newsletter' ); ?>
+            </div>
+        <?php elseif ( 'branches' === $layout_model ) : ?>
+            <div class="itk-footer-feature itk-footer-feature--branches">
+                <?php do_action( 'itk_commerce_footer_branches' ); ?>
+            </div>
+        <?php endif; ?>
 
         <div class="itk-footer-columns__grid">
             <?php for ( $column = 1; $column <= 4; $column++ ) : ?>
