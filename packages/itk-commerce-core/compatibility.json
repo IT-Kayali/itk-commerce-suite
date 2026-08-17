@@ -1,0 +1,24 @@
+{
+  "schema_version": 1,
+  "package": "itk-commerce-core",
+  "type": "wordpress-plugin",
+  "version": "0.1.0-dev",
+  "status": "development",
+  "minimum": {
+    "php": "8.1",
+    "wordpress": "6.6",
+    "woocommerce": null
+  },
+  "tested_up_to": {
+    "wordpress": null,
+    "woocommerce": null
+  },
+  "features": {
+    "hpos": "designed-for-supported-apis; declaration pending integration test",
+    "cart_checkout_blocks": "core-does-not-modify-checkout; declaration pending integration test"
+  },
+  "notes": [
+    "WooCommerce minimum and tested-up-to versions are intentionally unset until the Phase 0 environment audit and compatibility test matrix are completed.",
+    "A release must not claim a tested version that has not passed the documented compatibility suite."
+  ]
+}
