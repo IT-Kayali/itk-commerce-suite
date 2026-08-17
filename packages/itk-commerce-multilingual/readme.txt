@@ -31,9 +31,14 @@ The current development foundation provides:
 * WooCommerce customer-session language persistence for localized storefront requests;
 * explicit session-language restore for AJAX and Store API requests;
 * classic Checkout and Checkout Block/Store API order-language capture through WC_Order CRUD meta;
-* historical order snapshots for public language code, WordPress locale and text direction.
+* historical order snapshots for public language code, WordPress locale and text direction;
+* isolated order-language rendering scopes for WooCommerce transactional order emails;
+* manual order-email resend language scoping;
+* programmatic order-language run(order, callback) scope for future invoice/delivery/return document generators;
+* guaranteed previous-locale/context restoration, including renderer exceptions;
+* historical disabled-language translation lookup during order rendering.
 
-WooCommerce email/document language rendering, hreflang/canonical policy, translator admin/capabilities and translation import/export remain separate follow-up slices.
+Hreflang/canonical policy, translator admin/capabilities and translation import/export remain separate follow-up slices.
 
 == Architecture ==
 
@@ -94,7 +99,19 @@ These values are language context only. They do not duplicate or replace WooComm
 
 The current persisted session language is exposed through itk_commerce_woocommerce_session_language. Historical order context is exposed through itk_commerce_order_language_context and remains readable even if a language is later disabled, because locale and direction are frozen with the order.
 
-WooCommerce email and Commerce document rendering will consume this order snapshot in the next isolated slice and restore the previous WordPress locale after each rendering scope.
+== Order email and document rendering ==
+
+WooCommerce transactional order notification events are wrapped in the frozen order language before the email trigger runs. While that explicit scope is active, WooCommerce's own customer-email store-locale switch/restore is disabled so it cannot overwrite the order locale. The previous WordPress locale and Commerce request language are restored after the notification.
+
+The WooCommerce admin resend path is wrapped through its public before/after resend hooks. Non-order emails keep normal WooCommerce locale behavior.
+
+Future invoice, delivery-note, return-slip and pack-list renderers can obtain the service through:
+
+itk_commerce_order_language_scope
+
+The returned service exposes run($order, $callback). The callback receives the normalized order language context and always executes inside the frozen locale/translation language. Restoration uses a finally block, so an exception does not leak the order language into later requests/renderers.
+
+For historical orders whose language was later disabled, the stored locale still controls WordPress/WooCommerce strings and the stored public code temporarily overrides Commerce translation lookup only inside that order scope. The language is not globally re-enabled.
 
 == Development status ==
 
