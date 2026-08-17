@@ -16,7 +16,7 @@
 </head>
 <body class="itk-mini-cart-enabled itk-mini-cart-position-end itk-mini-cart-width-standard">
   <header class="fixture-header">
-    <a class="itk-header-action--cart fixture-cart-trigger" href="/cart/">Cart <span data-itk-cart-count>2</span></a>
+    <a class="itk-header-action--cart fixture-cart-trigger" href="/cart/">Cart <span class="itk-cart-count" data-itk-cart-count>2</span></a>
   </header>
 
   <main class="fixture-content">
@@ -44,7 +44,28 @@
     </section>
   </div>
 
-  <script>window.ITKCommerceMiniCart = { openAfterAdd: true, closeOnBackdrop: true };</script>
+  <script>
+    window.__itkMiniCartRefreshes = 0;
+    window.ITKCommerceMiniCart = {
+      openAfterAdd: true,
+      closeOnBackdrop: true,
+      refreshUrl: '/?wc-ajax=get_refreshed_fragments'
+    };
+    window.fetch = function () {
+      window.__itkMiniCartRefreshes += 1;
+      return Promise.resolve({
+        ok: true,
+        json: function () {
+          return Promise.resolve({
+            fragments: {
+              'div[data-itk-mini-cart-content]': '<div class="itk-mini-cart__content" data-itk-mini-cart-content aria-live="polite"><p data-refreshed-cart>Refreshed cart</p></div>',
+              'span[data-itk-cart-count]': '<span class="itk-cart-count" data-itk-cart-count>3</span>'
+            }
+          });
+        }
+      });
+    };
+  </script>
   <script src="/packages/itk-commerce-theme/assets/js/mini-cart.js"></script>
 </body>
 </html>
