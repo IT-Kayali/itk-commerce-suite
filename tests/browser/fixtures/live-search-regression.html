@@ -1,0 +1,45 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Live Search regression fixture</title>
+  <link rel="stylesheet" href="/packages/itk-commerce-theme/assets/css/base.css">
+  <link rel="stylesheet" href="/packages/itk-commerce-theme/assets/css/component-contracts.css">
+  <link rel="stylesheet" href="/packages/itk-commerce-search-filter/assets/css/live-search.css">
+  <style>body{margin:0}.fixture{max-width:1180px;margin:0 auto;padding:32px 20px}.itk-catalog-toolbar{display:flex;flex-wrap:wrap;gap:12px;align-items:center}</style>
+  <script>
+    window.ITKCommerceLiveSearch={
+      endpoints:{
+        products:'/wp-json/wc/store/v1/products',
+        categories:'/wp-json/wc/store/v1/products/categories'
+      },
+      searchUrl:'/tests/browser/fixtures/live-search-regression.html',
+      options:{minChars:2,productLimit:6,categoryLimit:4,showCategories:true,skuMatching:true,debounceMs:80},
+      messages:{placeholder:'Search products…',button:'Search',products:'Products',categories:'Categories',allResults:'View all results',loading:'Searching…',empty:'No matching products or categories found.',error:'Live results are unavailable. Press Enter to search normally.',resultCount:'%d live results available.',sku:'SKU: %s'}
+    };
+  </script>
+  <script defer src="/packages/itk-commerce-search-filter/assets/js/live-search.js"></script>
+</head>
+<body>
+  <main class="fixture">
+    <div class="itk-catalog-toolbar" data-itk-catalog-toolbar>
+      <div class="itk-live-search" data-itk-live-search>
+        <form class="itk-live-search__form" role="search" method="get" action="/tests/browser/fixtures/live-search-regression.html" data-itk-live-search-form>
+          <label class="screen-reader-text" for="itk-commerce-live-search">Search products</label>
+          <div class="itk-live-search__control">
+            <input id="itk-commerce-live-search" class="itk-live-search__input" type="search" name="s" autocomplete="off" dir="auto" role="combobox" aria-autocomplete="list" aria-expanded="false" aria-controls="itk-commerce-live-search-results">
+            <input type="hidden" name="post_type" value="product">
+            <button class="itk-live-search__submit" type="submit">Search</button>
+          </div>
+          <div class="itk-live-search__panel" data-itk-live-search-panel hidden>
+            <p class="screen-reader-text" role="status" aria-live="polite" aria-atomic="true" data-itk-live-search-status></p>
+            <div id="itk-commerce-live-search-results" class="itk-live-search__results" role="listbox" data-itk-live-search-results></div>
+          </div>
+        </form>
+      </div>
+      <p class="woocommerce-result-count">Showing products</p>
+    </div>
+  </main>
+</body>
+</html>
