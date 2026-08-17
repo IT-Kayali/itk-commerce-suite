@@ -24,7 +24,8 @@
     "directory_routing": "directory-style storefront routing and safe current-path language URLs implemented",
     "wordpress_locale_switching": "public locale filters and switch_to_locale bridge implemented for storefront requests",
     "language_switcher": "accessible style-neutral shortcode/public filter surface implemented",
-    "translation_repository": "planned follow-up slice",
+    "translation_repository": "versioned entry/revision tables with published lookup and source hashes implemented",
+    "translation_workflow": "append-only draft/review/published workflow with published-revision isolation implemented",
     "woocommerce_language_context": "planned follow-up slice",
     "seo_hreflang": "planned follow-up slice",
     "import_export": "planned follow-up slice"
@@ -34,8 +35,10 @@
     "Language directories are resolved before normal WordPress route parsing so WordPress and WooCommerce remain authoritative for the internal storefront route.",
     "Unprefixed storefront routes remain valid and use the configured default language context; canonical redirect policy is deferred to the SEO slice.",
     "Language-switcher URLs preserve same-origin storefront paths and non-action query state while dropping nonce/action parameters.",
+    "Translation storage is module-owned and versioned independently from the Theme and customer profile configuration.",
+    "Published revisions remain customer-facing while newer draft/review revisions are edited; publishing archives only the previous published revision.",
+    "Translation lookup falls back to the configured fallback language and then the caller-provided source string.",
     "Customer-specific language lists live in the versioned customer profile rather than generic package code.",
-    "The Theme consumes language and direction through public contracts and does not become the translation data store.",
     "WooCommerce commercial data ownership is unchanged."
   ]
 }
