@@ -20,10 +20,11 @@
     "footer_models": ["classic", "compact", "columns"],
     "profile_assignments": "implemented",
     "mobile_bottom_navigation": "profile bridge implemented",
-    "mega_menu": "planned"
+    "mega_menu": "portable definition and responsive submenu foundation implemented"
   },
   "notes": [
     "WooCommerce version ranges remain unset until the Phase 0 environment audit and compatibility matrix are completed.",
-    "The module extends public Theme hooks and does not patch Theme source at runtime."
+    "The module extends public Theme hooks and does not patch Theme source at runtime.",
+    "Rich mega-menu panels and browser-based visual regression testing remain Phase 2 follow-up work."
   ]
 }
