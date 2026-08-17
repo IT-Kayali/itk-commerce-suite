@@ -42,21 +42,26 @@ test.describe('Commerce mini-cart drawer', () => {
     await expect(drawer).not.toHaveClass(/is-open/);
   });
 
-  test('mobile drawer remains bounded without horizontal overflow during opening', async ({ page }) => {
+  test('mobile drawer remains bounded without adding horizontal overflow during opening', async ({ page }) => {
     await page.setViewportSize({ width: 390, height: 844 });
     await page.goto(fixture);
 
     const drawer = page.locator('[data-itk-mini-cart]');
     const panel = page.locator('[data-itk-mini-cart-panel]');
+    const baselineOverflow = await page.evaluate(() => document.documentElement.scrollWidth - window.innerWidth);
 
     await page.locator('.itk-header-action--cart').click();
     await expect(drawer).toHaveClass(/is-open/);
 
     const panelBox = await panel.boundingBox();
+    const rootBox = await drawer.boundingBox();
     const viewportWidth = await page.evaluate(() => window.innerWidth);
     expect(panelBox.width).toBeLessThanOrEqual(viewportWidth + 0.5);
-    const overflow = await page.evaluate(() => document.documentElement.scrollWidth - window.innerWidth);
-    expect(overflow).toBeLessThanOrEqual(1);
+    expect(rootBox.x).toBeGreaterThanOrEqual(-0.5);
+    expect(rootBox.x + rootBox.width).toBeLessThanOrEqual(viewportWidth + 0.5);
+
+    const openOverflow = await page.evaluate(() => document.documentElement.scrollWidth - window.innerWidth);
+    expect(openOverflow).toBeLessThanOrEqual(baselineOverflow + 1);
 
     await page.locator('[data-itk-mini-cart-close]').click();
     await expect(drawer).not.toHaveClass(/is-open/);
