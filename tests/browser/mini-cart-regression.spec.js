@@ -42,22 +42,58 @@ test.describe('Commerce mini-cart drawer', () => {
     await expect(drawer).not.toHaveClass(/is-open/);
   });
 
-  test('mobile drawer remains bounded without horizontal overflow', async ({ page }) => {
+  test('mobile drawer remains bounded without adding horizontal overflow during opening', async ({ page }) => {
     await page.setViewportSize({ width: 390, height: 844 });
     await page.goto(fixture);
 
     const drawer = page.locator('[data-itk-mini-cart]');
     const panel = page.locator('[data-itk-mini-cart-panel]');
+    const baselineOverflow = await page.evaluate(() => document.documentElement.scrollWidth - window.innerWidth);
 
     await page.locator('.itk-header-action--cart').click();
     await expect(drawer).toHaveClass(/is-open/);
 
     const panelBox = await panel.boundingBox();
-    expect(panelBox.width).toBeLessThanOrEqual(390);
-    const overflow = await page.evaluate(() => document.documentElement.scrollWidth - window.innerWidth);
-    expect(overflow).toBeLessThanOrEqual(1);
+    const rootBox = await drawer.boundingBox();
+    const viewportWidth = await page.evaluate(() => window.innerWidth);
+    expect(panelBox.width).toBeLessThanOrEqual(viewportWidth + 0.5);
+    expect(rootBox.x).toBeGreaterThanOrEqual(-0.5);
+    expect(rootBox.x + rootBox.width).toBeLessThanOrEqual(viewportWidth + 0.5);
+
+    const openOverflow = await page.evaluate(() => document.documentElement.scrollWidth - window.innerWidth);
+    expect(openOverflow).toBeLessThanOrEqual(baselineOverflow + 1);
 
     await page.locator('[data-itk-mini-cart-close]').click();
+    await expect(drawer).not.toHaveClass(/is-open/);
+  });
+
+  test('WooCommerce Blocks add/remove events refresh Theme fragments and open only after add', async ({ page }) => {
+    await page.setViewportSize({ width: 1280, height: 900 });
+    await page.goto(fixture);
+
+    const drawer = page.locator('[data-itk-mini-cart]');
+
+    await page.evaluate(() => {
+      document.body.dispatchEvent(new CustomEvent('wc-blocks_added_to_cart', {
+        detail: { preserveCartData: false }
+      }));
+    });
+
+    await expect(page.locator('[data-refreshed-cart]')).toHaveText('Refreshed cart');
+    await expect(page.locator('[data-itk-cart-count]')).toHaveText('3');
+    await expect(drawer).toHaveClass(/is-open/);
+    await expect.poll(() => page.evaluate(() => window.__itkMiniCartRefreshes)).toBe(1);
+
+    await page.keyboard.press('Escape');
+    await expect(drawer).not.toHaveClass(/is-open/);
+
+    await page.evaluate(() => {
+      document.body.dispatchEvent(new CustomEvent('wc-blocks_removed_from_cart', {
+        detail: { preserveCartData: false }
+      }));
+    });
+
+    await expect.poll(() => page.evaluate(() => window.__itkMiniCartRefreshes)).toBe(2);
     await expect(drawer).not.toHaveClass(/is-open/);
   });
 

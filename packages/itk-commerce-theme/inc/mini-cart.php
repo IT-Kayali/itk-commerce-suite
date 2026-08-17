@@ -18,11 +18,6 @@ add_action( 'wp_enqueue_scripts', __NAMESPACE__ . '\\enqueue_mini_cart_assets', 
 add_action( 'wp_footer', __NAMESPACE__ . '\\render_mini_cart', 20 );
 add_filter( 'woocommerce_add_to_cart_fragments', __NAMESPACE__ . '\\mini_cart_fragment' );
 
-/**
- * Return bounded mini-cart presentation options.
- *
- * @return array<string,mixed>
- */
 function mini_cart_options() {
     $defaults = array(
         'enabled'           => true,
@@ -33,116 +28,73 @@ function mini_cart_options() {
         'show_thumbnails'   => true,
         'show_subtotal'     => true,
     );
-
-    /**
-     * Filter mini-cart options before final Theme validation.
-     *
-     * @param array<string,mixed> $defaults Current/default options.
-     */
     $filtered = apply_filters( 'itk_commerce_mini_cart_options', $defaults );
     $options  = is_array( $filtered ) ? array_merge( $defaults, $filtered ) : $defaults;
-
     $options['enabled'] = ! empty( $options['enabled'] );
-    $options['position'] = in_array( $options['position'], array( 'start', 'end' ), true )
-        ? $options['position']
-        : 'end';
-    $options['width'] = in_array( $options['width'], array( 'compact', 'standard', 'wide' ), true )
-        ? $options['width']
-        : 'standard';
+    $options['position'] = in_array( $options['position'], array( 'start', 'end' ), true ) ? $options['position'] : 'end';
+    $options['width'] = in_array( $options['width'], array( 'compact', 'standard', 'wide' ), true ) ? $options['width'] : 'standard';
     $options['open_after_add']    = ! empty( $options['open_after_add'] );
     $options['close_on_backdrop'] = ! empty( $options['close_on_backdrop'] );
     $options['show_thumbnails']   = ! empty( $options['show_thumbnails'] );
     $options['show_subtotal']     = ! empty( $options['show_subtotal'] );
-
     return $options;
 }
 
-/**
- * Whether the Theme mini-cart can be rendered for this request.
- *
- * @return bool
- */
 function mini_cart_enabled() {
     $options = mini_cart_options();
-
     return $options['enabled'] && class_exists( 'WooCommerce' ) && function_exists( 'woocommerce_mini_cart' );
 }
 
-/**
- * Add stable state/configuration classes without touching WooCommerce markup.
- *
- * @param string[] $classes Existing classes.
- * @return string[]
- */
 function mini_cart_body_classes( $classes ) {
     $classes = is_array( $classes ) ? $classes : array();
-
     if ( ! mini_cart_enabled() ) {
         return $classes;
     }
-
     $options   = mini_cart_options();
     $classes[] = 'itk-mini-cart-enabled';
     $classes[] = 'itk-mini-cart-position-' . sanitize_html_class( $options['position'] );
     $classes[] = 'itk-mini-cart-width-' . sanitize_html_class( $options['width'] );
-
     if ( ! $options['show_thumbnails'] ) {
         $classes[] = 'itk-mini-cart-hide-thumbnails';
     }
     if ( ! $options['show_subtotal'] ) {
         $classes[] = 'itk-mini-cart-hide-subtotal';
     }
-
     return array_values( array_unique( $classes ) );
 }
 
-/**
- * Mark WordPress menu links that point to the WooCommerce Cart as progressive-
- * enhancement mini-cart triggers. Without JavaScript they remain normal links.
- *
- * @param array<string,string> $atts Menu-link attributes.
- * @param object               $menu_item Menu item.
- * @param object               $args Menu arguments.
- * @param int                  $depth Menu depth.
- * @return array<string,string>
- */
 function mini_cart_menu_link_attributes( $atts, $menu_item, $args, $depth ) {
     unset( $menu_item, $args, $depth );
-
     if ( ! mini_cart_enabled() || empty( $atts['href'] ) ) {
         return $atts;
     }
-
     $cart_url = commerce_page_url( 'cart' );
     if ( untrailingslashit( (string) $atts['href'] ) !== untrailingslashit( $cart_url ) ) {
         return $atts;
     }
-
     $atts['data-itk-mini-cart-trigger'] = '1';
     $atts['aria-controls']              = 'itk-mini-cart';
-    $atts['aria-haspopup']               = 'dialog';
-    $atts['aria-expanded']               = 'false';
-
+    $atts['aria-haspopup']              = 'dialog';
+    $atts['aria-expanded']              = 'false';
     return $atts;
 }
 
 /**
- * Load mini-cart assets only when WooCommerce and the component are enabled.
- *
- * @return void
+ * Load assets and WooCommerce's supported classic fragment runtime while the
+ * Theme drawer is active. The localized refresh endpoint is also used to bridge
+ * public WooCommerce Blocks cart events back to the Woo-owned mini-cart markup.
  */
 function enqueue_mini_cart_assets() {
     if ( ! mini_cart_enabled() ) {
         return;
     }
-
     wp_enqueue_style(
         'itk-commerce-mini-cart',
         get_template_directory_uri() . '/assets/css/mini-cart.css',
         array( 'itk-commerce-components' ),
         asset_version( 'assets/css/mini-cart.css' )
     );
-
+    wp_enqueue_script( 'wc-cart-fragments' );
     wp_enqueue_script(
         'itk-commerce-mini-cart',
         get_template_directory_uri() . '/assets/js/mini-cart.js',
@@ -150,28 +102,25 @@ function enqueue_mini_cart_assets() {
         asset_version( 'assets/js/mini-cart.js' ),
         true
     );
-
     $options = mini_cart_options();
+    $refresh_url = class_exists( 'WC_AJAX' )
+        ? \WC_AJAX::get_endpoint( 'get_refreshed_fragments' )
+        : add_query_arg( 'wc-ajax', 'get_refreshed_fragments', home_url( '/' ) );
     wp_localize_script(
         'itk-commerce-mini-cart',
         'ITKCommerceMiniCart',
         array(
             'openAfterAdd'    => (bool) $options['open_after_add'],
             'closeOnBackdrop' => (bool) $options['close_on_backdrop'],
+            'refreshUrl'      => esc_url_raw( $refresh_url ),
         )
     );
 }
 
-/**
- * Render the off-canvas shell once near the end of the document.
- *
- * @return void
- */
 function render_mini_cart() {
     if ( ! mini_cart_enabled() ) {
         return;
     }
-
     $options = mini_cart_options();
     $classes = array(
         'itk-mini-cart',
@@ -197,11 +146,6 @@ function render_mini_cart() {
     <?php
 }
 
-/**
- * Render the WooCommerce-owned mini-cart inside one replaceable fragment shell.
- *
- * @return void
- */
 function mini_cart_content() {
     ?>
     <div class="itk-mini-cart__content" data-itk-mini-cart-content aria-live="polite">
@@ -211,19 +155,16 @@ function mini_cart_content() {
 }
 
 /**
- * Keep line items/totals synchronized after WooCommerce AJAX add/remove events.
- *
- * @param array<string,string> $fragments Existing fragments.
- * @return array<string,string>
+ * Synchronize the WooCommerce-owned drawer content through the public fragment
+ * contract. The Theme-wide cart_count_fragment() callback in woocommerce.php
+ * owns the stable `span[data-itk-cart-count]` fragment separately.
  */
 function mini_cart_fragment( $fragments ) {
     if ( ! mini_cart_enabled() ) {
         return $fragments;
     }
-
     ob_start();
     mini_cart_content();
     $fragments['div[data-itk-mini-cart-content]'] = ob_get_clean();
-
     return $fragments;
 }
