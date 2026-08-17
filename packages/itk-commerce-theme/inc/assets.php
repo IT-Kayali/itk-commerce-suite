@@ -38,13 +38,14 @@ function enqueue_assets() {
     );
 
     $styles = array(
-        'base'            => array(),
-        'layout'          => array( 'itk-commerce-base' ),
-        'components'      => array( 'itk-commerce-layout' ),
-        'layout-models'   => array( 'itk-commerce-components' ),
-        'commerce'        => array( 'itk-commerce-layout-models' ),
-        'commerce-models' => array( 'itk-commerce-commerce' ),
-        'responsive'      => array( 'itk-commerce-commerce-models' ),
+        'base'                  => array(),
+        'layout'                => array( 'itk-commerce-base' ),
+        'components'            => array( 'itk-commerce-layout' ),
+        'layout-models'         => array( 'itk-commerce-components' ),
+        'commerce'              => array( 'itk-commerce-layout-models' ),
+        'commerce-models'       => array( 'itk-commerce-commerce' ),
+        'commerce-block-models' => array( 'itk-commerce-commerce-models' ),
+        'responsive'            => array( 'itk-commerce-commerce-block-models' ),
     );
 
     foreach ( $styles as $name => $dependencies ) {
