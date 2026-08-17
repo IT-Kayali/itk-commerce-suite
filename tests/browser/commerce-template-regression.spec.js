@@ -22,16 +22,18 @@ test.describe('Commerce page template models', () => {
     await setArea(page, 'shop', ['itk-shop-model-sidebar', 'itk-commerce-columns-5', 'itk-shop-density-comfortable', 'itk-shop-sidebar-right']);
 
     const grid = page.locator('[data-shop-grid]');
+    const shell = page.locator('[data-shop-shell]');
     const sidebar = page.locator('[data-shop-sidebar]');
     const content = page.locator('[data-shop-content]');
 
     expect(await gridColumnCount(grid)).toBe(5);
+    expect(await gridColumnCount(shell)).toBe(2);
     expect(await sidebar.evaluate((element) => getComputedStyle(element).order)).toBe('2');
     expect(await content.evaluate((element) => getComputedStyle(element).order)).toBe('1');
 
     await page.setViewportSize({ width: 820, height: 1000 });
     expect(await gridColumnCount(grid)).toBe(2);
-    expect(await page.locator('[data-shop-shell]').evaluate((element) => gridColumnCountFromStyle(element))).toBe(1);
+    expect(await gridColumnCount(shell)).toBe(1);
 
     await page.setViewportSize({ width: 390, height: 844 });
     expect(await gridColumnCount(grid)).toBe(1);
@@ -98,8 +100,3 @@ test.describe('Commerce page template models', () => {
     expect(await blockShell.evaluate((element) => getComputedStyle(element).maxWidth)).toBe('100%');
   });
 });
-
-function gridColumnCountFromStyle(element) {
-  const value = getComputedStyle(element).gridTemplateColumns.trim();
-  return value && value !== 'none' ? value.split(/\s+/).length : 0;
-}
