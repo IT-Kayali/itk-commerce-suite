@@ -40,8 +40,8 @@ final class WooQueryAdapter {
      */
     public function filter_tax_query( $tax_query, $query ) {
         unset( $query );
-        $tax_query = is_array( $tax_query ) ? $tax_query : array();
-        $state     = $this->current_state();
+        $tax_query   = is_array( $tax_query ) ? $tax_query : array();
+        $state       = $this->current_state();
         $definitions = $this->definitions_by_id();
 
         foreach ( $state as $id => $value ) {
@@ -161,7 +161,7 @@ final class WooQueryAdapter {
             return;
         }
 
-        $sale_ids = array_values( array_unique( array_map( 'absint', wc_get_product_ids_on_sale() ) ) );
+        $sale_ids = array_values( array_unique( array_filter( array_map( 'absint', wc_get_product_ids_on_sale() ) ) ) );
         if ( empty( $sale_ids ) ) {
             $query->set( 'post__in', array( 0 ) );
             return;
@@ -169,7 +169,14 @@ final class WooQueryAdapter {
 
         $existing = $query->get( 'post__in' );
         $existing = is_array( $existing ) ? array_values( array_filter( array_map( 'absint', $existing ) ) ) : array();
-        $query->set( 'post__in', $existing ? array_values( array_intersect( $existing, $sale_ids ) ) ?: array( 0 ) : $sale_ids );
+
+        if ( $existing ) {
+            $intersection = array_values( array_intersect( $existing, $sale_ids ) );
+            $query->set( 'post__in', $intersection ? $intersection : array( 0 ) );
+            return;
+        }
+
+        $query->set( 'post__in', $sale_ids );
     }
 
     /**
