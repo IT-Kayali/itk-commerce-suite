@@ -42,6 +42,9 @@ jobs:
       - name: Core activation smoke test
         run: php tests/core/activation-smoke.php
 
+      - name: Core admin hub contract smoke test
+        run: php tests/core/admin-hub-contract-smoke.php
+
       - name: Layouts module contract smoke test
         run: php tests/layouts/module-contract-smoke.php
 

@@ -30,6 +30,7 @@ require_once PATH . '/src/Security/Capabilities.php';
 require_once PATH . '/src/Lifecycle/Installer.php';
 require_once PATH . '/src/Modules/ModuleRegistry.php';
 require_once PATH . '/src/Core.php';
+require_once PATH . '/src/Admin/AdminHub.php';
 
 \register_activation_hook( FILE, array( Lifecycle\Installer::class, 'activate' ) );
 \register_deactivation_hook( FILE, array( Lifecycle\Installer::class, 'deactivate' ) );
@@ -37,10 +38,16 @@ require_once PATH . '/src/Core.php';
 add_action( 'plugins_loaded', __NAMESPACE__ . '\\bootstrap', 20 );
 
 /**
- * Bootstrap the core after plugins have had an opportunity to register hooks.
+ * Bootstrap the Core and register the central admin control center.
  *
  * @return void
  */
 function bootstrap() {
-    Core::instance()->boot();
+    $core = Core::instance();
+    $core->boot();
+
+    if ( is_admin() ) {
+        $admin = new Admin\AdminHub( $core );
+        $admin->register();
+    }
 }
