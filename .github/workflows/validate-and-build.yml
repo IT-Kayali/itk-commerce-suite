@@ -66,6 +66,9 @@ jobs:
       - name: Search Filter foundation smoke test
         run: php tests/search-filter/foundation-smoke.php
 
+      - name: Search Filter UI contract smoke test
+        run: php tests/search-filter/ui-contract-smoke.php
+
       - name: Guard generic packages from reference-customer coupling
         run: |
           if grep -RniE 'Al-Lord|al-lord' packages; then
