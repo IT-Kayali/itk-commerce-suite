@@ -126,6 +126,7 @@
           "model": "classic",
           "options": {
             "image_ratio": "portrait",
+            "content_order": "title-price",
             "content_align": "left",
             "price_treatment": "standard",
             "action_treatment": "button",
