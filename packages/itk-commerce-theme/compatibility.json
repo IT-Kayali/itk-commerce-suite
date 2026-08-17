@@ -1,0 +1,28 @@
+{
+  "schema_version": 1,
+  "package": "itk-commerce-theme",
+  "type": "wordpress-theme",
+  "version": "0.1.0-dev",
+  "status": "development",
+  "minimum": {
+    "php": "8.1",
+    "wordpress": "6.6",
+    "woocommerce": null,
+    "elementor": null
+  },
+  "tested_up_to": {
+    "wordpress": null,
+    "woocommerce": null,
+    "elementor": null
+  },
+  "features": {
+    "woocommerce": "baseline integration implemented",
+    "cart_checkout_blocks": "visual baseline only; full compatibility matrix pending",
+    "rtl": "baseline implemented",
+    "elementor": "optional module not yet implemented"
+  },
+  "notes": [
+    "WooCommerce and Elementor version ranges remain unset until the Phase 0 audit and dedicated compatibility testing are completed.",
+    "The theme remains usable without Elementor."
+  ]
+}
