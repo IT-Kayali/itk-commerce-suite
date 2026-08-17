@@ -31,6 +31,7 @@ require_once PATH . '/src/Lifecycle/Installer.php';
 require_once PATH . '/src/Modules/ModuleRegistry.php';
 require_once PATH . '/src/Core.php';
 require_once PATH . '/src/Admin/AdminHub.php';
+require_once PATH . '/src/Admin/LegacyAdminRoutes.php';
 
 \register_activation_hook( FILE, array( Lifecycle\Installer::class, 'activate' ) );
 \register_deactivation_hook( FILE, array( Lifecycle\Installer::class, 'deactivate' ) );
@@ -47,6 +48,9 @@ function bootstrap() {
     $core->boot();
 
     if ( is_admin() ) {
+        $routes = new Admin\LegacyAdminRoutes();
+        $routes->register();
+
         $admin = new Admin\AdminHub( $core );
         $admin->register();
     }
