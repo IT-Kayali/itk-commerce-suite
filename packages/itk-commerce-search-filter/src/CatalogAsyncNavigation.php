@@ -39,6 +39,17 @@ final class CatalogAsyncNavigation {
             \ITK\Commerce\SearchFilter\VERSION,
             true
         );
+
+        wp_localize_script(
+            'itk-commerce-search-filter-async',
+            'ITKCommerceCatalogAsync',
+            array(
+                'messages' => array(
+                    'updated' => __( 'Products updated.', 'itk-commerce-search-filter' ),
+                    'loading' => __( 'Updating products…', 'itk-commerce-search-filter' ),
+                ),
+            )
+        );
     }
 
     /**
