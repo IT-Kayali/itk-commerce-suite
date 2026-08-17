@@ -15,10 +15,14 @@
   },
   "features": {
     "hpos": "designed-for-supported-apis; declaration pending integration test",
-    "cart_checkout_blocks": "core-does-not-modify-checkout; declaration pending integration test"
+    "cart_checkout_blocks": "core-does-not-modify-checkout; declaration pending integration test",
+    "admin_control_center": "overview, settings, modules, customer profiles, design launchpad and system status implemented",
+    "profile_management": "create, duplicate, activate and JSON export implemented",
+    "module_management": "installed-module registry state and active-profile enablement implemented"
   },
   "notes": [
     "WooCommerce minimum and tested-up-to versions are intentionally unset until the Phase 0 environment audit and compatibility test matrix are completed.",
-    "A release must not claim a tested version that has not passed the documented compatibility suite."
+    "A release must not claim a tested version that has not passed the documented compatibility suite.",
+    "The central admin UI writes only bounded Core settings and customer-profile configuration; products, customers, orders and media remain untouched."
   ]
 }
