@@ -18,11 +18,14 @@ final class LayoutsModule implements ModuleInterface {
     /** @var MegaMenuConfig|null */
     private $mega_menu = null;
 
+    /** @var LivePreview|null */
+    private $preview = null;
+
     /**
      * @return string
      */
     public function id() {
-        return 'itk-commerce-layouts';
+        return MODULE_ID;
     }
 
     /**
@@ -45,7 +48,7 @@ final class LayoutsModule implements ModuleInterface {
     }
 
     /**
-     * Register profile-driven layout extension points.
+     * Register profile-driven layout extension points and isolated admin tools.
      *
      * @return void
      */
@@ -56,6 +59,7 @@ final class LayoutsModule implements ModuleInterface {
 
         $this->resolver  = new LayoutResolver();
         $this->mega_menu = new MegaMenuConfig();
+        $this->preview   = new LivePreview();
 
         add_filter( 'itk_commerce_theme_layout_model', array( $this->resolver, 'resolve_theme_model' ), 10, 2 );
         add_filter( 'itk_commerce_mobile_bottom_enabled', array( $this->resolver, 'mobile_bottom_enabled' ) );
@@ -65,12 +69,22 @@ final class LayoutsModule implements ModuleInterface {
         add_filter( 'nav_menu_css_class', array( $this->mega_menu, 'menu_item_classes' ), 10, 4 );
         add_filter( 'nav_menu_link_attributes', array( $this->mega_menu, 'menu_link_attributes' ), 10, 4 );
 
+        add_filter( 'itk_commerce_theme_layout_model', array( $this->preview, 'layout_model' ), 999, 2 );
+        add_filter( 'itk_commerce_mobile_bottom_enabled', array( $this->preview, 'mobile_bottom_enabled' ), 999 );
+        add_filter( 'wp_robots', array( $this->preview, 'robots' ) );
+
+        if ( is_admin() ) {
+            ( new Admin\LayoutBuilderPage() )->register();
+            ( new Admin\MegaMenuFields() )->register();
+        }
+
         /**
          * Fires after the Layouts module has attached its public extension points.
          *
          * @param LayoutResolver $resolver  Active resolver.
          * @param MegaMenuConfig $mega_menu Mega-menu configuration service.
+         * @param LivePreview    $preview   Authenticated preview service.
          */
-        do_action( 'itk_commerce_layouts_loaded', $this->resolver, $this->mega_menu );
+        do_action( 'itk_commerce_layouts_loaded', $this->resolver, $this->mega_menu, $this->preview );
     }
 }
