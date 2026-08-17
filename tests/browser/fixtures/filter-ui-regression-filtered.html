@@ -1,0 +1,51 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Filtered catalog fixture</title>
+</head>
+<body>
+  <main class="fixture">
+    <div class="itk-catalog-toolbar" data-toolbar data-itk-catalog-toolbar>
+      <p class="woocommerce-result-count">Showing 1–2 of 2 results</p>
+      <div class="itk-filter-ui" data-itk-filter-ui>
+        <details class="itk-filter-popover" open>
+          <summary class="itk-filter-trigger"><span>Filters</span><span class="itk-filter-trigger__count">3</span></summary>
+          <div class="itk-filter-popover__panel">
+            <form class="itk-filter-form" method="get" action="/tests/browser/fixtures/filter-ui-regression.html">
+              <div class="itk-filter-groups">
+                <details class="itk-filter-group itk-filter-group--taxonomy itk-filter-group--display-chips" open>
+                  <summary>Category</summary>
+                  <div class="itk-filter-group__content"><div class="itk-filter-options"><label class="itk-filter-option itk-filter-option--chip"><input type="checkbox" name="filter_category[]" value="fragrance" checked><span>Fragrance</span></label><label class="itk-filter-option itk-filter-option--chip"><input type="checkbox" name="filter_category[]" value="gifts" checked><span>Gifts</span></label></div></div>
+                </details>
+                <details class="itk-filter-group itk-filter-group--price itk-filter-group--display-range" open>
+                  <summary>Price</summary>
+                  <div class="itk-filter-group__content"><div class="itk-filter-price"><label><span>Min</span><input type="number" name="filter_price[min]" value="20"></label><span>–</span><label><span>Max</span><input type="number" name="filter_price[max]" value="150"></label></div></div>
+                </details>
+                <details class="itk-filter-group itk-filter-group--rating itk-filter-group--display-radio" open>
+                  <summary>Rating</summary><div class="itk-filter-group__content"><div class="itk-filter-options"><label class="itk-filter-option"><input type="radio" name="filter_rating" value="4" checked><span>4 stars & up</span></label></div></div>
+                </details>
+              </div>
+              <div class="itk-filter-form__actions"><button class="button itk-filter-apply" type="submit">Apply filters</button><a class="itk-filter-clear" href="/tests/browser/fixtures/filter-ui-regression.html">Clear all</a></div>
+            </form>
+          </div>
+        </details>
+        <div class="itk-active-filters">
+          <a class="itk-active-filter" href="/tests/browser/fixtures/filter-ui-regression.html?filter_price=20-150&filter_rating=4"><span>Category: Fragrance, Gifts</span><span>×</span></a>
+          <a class="itk-active-filter" href="/tests/browser/fixtures/filter-ui-regression.html?filter_category=fragrance,gifts&filter_rating=4"><span>Price: €20–€150</span><span>×</span></a>
+          <a class="itk-active-filter" href="/tests/browser/fixtures/filter-ui-regression.html?filter_category=fragrance,gifts&filter_price=20-150"><span>Rating: 4+ stars</span><span>×</span></a>
+          <a class="itk-active-filter itk-active-filter--clear" href="/tests/browser/fixtures/filter-ui-regression.html">Clear all</a>
+        </div>
+      </div>
+      <form class="woocommerce-ordering"><select><option>Default sorting</option></select></form>
+    </div>
+
+    <div class="itk-catalog-results" data-itk-catalog-results aria-busy="false">
+      <p class="screen-reader-text" role="status" aria-live="polite" aria-atomic="true" data-itk-catalog-live-status></p>
+      <ul class="products"><li class="product" data-product-state="filtered">Filtered gift fragrance A</li><li class="product">Filtered gift fragrance B</li></ul>
+      <nav class="woocommerce-pagination" aria-label="Product pagination"><a href="/tests/browser/fixtures/filter-ui-regression.html?filter_category=fragrance,gifts&filter_price=20-150&filter_rating=4&product-page=2">2</a></nav>
+    </div>
+  </main>
+</body>
+</html>
