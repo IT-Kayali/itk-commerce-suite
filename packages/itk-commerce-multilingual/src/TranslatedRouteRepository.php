@@ -86,7 +86,17 @@ final class TranslatedRouteRepository implements TranslatedRouteStoreInterface {
         $row['translated_slug'] = isset( $row['alias_slug'] ) ? (string) $row['alias_slug'] : $slug;
         $row['alias']           = true;
         $current                = $this->current( $code, $type, isset( $row['object_id'] ) ? (int) $row['object_id'] : 0, $taxonomy );
-        $row['current_slug']    = is_array( $current ) && isset( $current['translated_slug'] ) ? (string) $current['translated_slug'] : '';
+
+        if ( is_array( $current ) ) {
+            $row['current_slug']    = isset( $current['translated_slug'] ) ? (string) $current['translated_slug'] : '';
+            $row['source_slug']     = isset( $current['source_slug'] ) ? (string) $current['source_slug'] : '';
+            $row['translation_key'] = isset( $current['translation_key'] ) ? (string) $current['translation_key'] : '';
+        } else {
+            $row['current_slug']    = '';
+            $row['source_slug']     = '';
+            $row['translation_key'] = '';
+        }
+
         return $row;
     }
 
