@@ -11,7 +11,7 @@ defined( 'ABSPATH' ) || exit;
 
 final class TranslationInstaller {
     const DB_VERSION_OPTION = 'itk_commerce_multilingual_translation_db_version';
-    const DB_VERSION        = '1';
+    const DB_VERSION        = '2';
 
     /** @return void */
     public static function maybe_install() {
@@ -41,7 +41,7 @@ final class TranslationInstaller {
      * Return deterministic table names for the current site prefix.
      *
      * @param object|null $database Optional wpdb-compatible object.
-     * @return array{entries:string,revisions:string}
+     * @return array{entries:string,revisions:string,routes:string,route_aliases:string}
      */
     public static function table_names( $database = null ) {
         global $wpdb;
@@ -49,8 +49,10 @@ final class TranslationInstaller {
         $prefix   = is_object( $database ) && isset( $database->prefix ) ? (string) $database->prefix : 'wp_';
 
         return array(
-            'entries'   => $prefix . 'itk_commerce_translation_entries',
-            'revisions' => $prefix . 'itk_commerce_translation_revisions',
+            'entries'       => $prefix . 'itk_commerce_translation_entries',
+            'revisions'     => $prefix . 'itk_commerce_translation_revisions',
+            'routes'        => $prefix . 'itk_commerce_translation_routes',
+            'route_aliases' => $prefix . 'itk_commerce_translation_route_aliases',
         );
     }
 
@@ -102,6 +104,39 @@ final class TranslationInstaller {
  KEY workflow_status (workflow_status)
 ) {$collate};";
 
-        return array( $entries, $revisions );
+        $routes = "CREATE TABLE {$tables['routes']} (
+ id bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+ language_code varchar(32) NOT NULL,
+ entity_type varchar(32) NOT NULL,
+ object_id bigint(20) unsigned NOT NULL,
+ taxonomy varchar(64) NOT NULL DEFAULT '',
+ source_slug varchar(200) NOT NULL DEFAULT '',
+ translated_slug varchar(200) NOT NULL,
+ route_hash char(64) NOT NULL,
+ translation_key varchar(191) NOT NULL,
+ created_at datetime NOT NULL,
+ updated_at datetime NOT NULL,
+ PRIMARY KEY  (id),
+ UNIQUE KEY entity_language (language_code,entity_type,object_id,taxonomy),
+ UNIQUE KEY route_identity (language_code,entity_type,route_hash),
+ KEY object_lookup (entity_type,object_id,taxonomy),
+ KEY translation_key (translation_key)
+) {$collate};";
+
+        $route_aliases = "CREATE TABLE {$tables['route_aliases']} (
+ id bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+ language_code varchar(32) NOT NULL,
+ entity_type varchar(32) NOT NULL,
+ object_id bigint(20) unsigned NOT NULL,
+ taxonomy varchar(64) NOT NULL DEFAULT '',
+ alias_slug varchar(200) NOT NULL,
+ route_hash char(64) NOT NULL,
+ created_at datetime NOT NULL,
+ PRIMARY KEY  (id),
+ UNIQUE KEY alias_identity (language_code,entity_type,route_hash),
+ KEY object_lookup (entity_type,object_id,taxonomy)
+) {$collate};";
+
+        return array( $entries, $revisions, $routes, $route_aliases );
     }
 }
