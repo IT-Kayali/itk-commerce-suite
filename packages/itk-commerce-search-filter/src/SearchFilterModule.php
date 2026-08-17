@@ -87,6 +87,10 @@ final class SearchFilterModule implements ModuleInterface {
         $this->query_adapter->register();
         $this->renderer->register();
 
+        if ( is_admin() ) {
+            ( new Admin\FilterBuilderPage( $this->schema ) )->register();
+        }
+
         /**
          * Fires after the Search/Filter foundation and progressive UI are ready.
          *
@@ -121,7 +125,9 @@ final class SearchFilterModule implements ModuleInterface {
 
     /**
      * Load filter definitions from the active profile while retaining neutral
-     * defaults when the module has not yet been configured for that customer.
+     * defaults only when the module has never been configured. An explicitly
+     * saved empty definition list means the customer intentionally wants no
+     * catalog filters and is therefore preserved.
      *
      * @return array<int,array<string,mixed>>
      */
@@ -134,14 +140,21 @@ final class SearchFilterModule implements ModuleInterface {
         $profile_id = $core->settings()->active_profile_id();
         $profile    = $profile_id ? $core->profiles()->get( $profile_id ) : null;
 
-        if (
-            ! is_array( $profile ) ||
-            empty( $profile['modules']['configuration'][ MODULE_ID ]['filters']['definitions'] ) ||
-            ! is_array( $profile['modules']['configuration'][ MODULE_ID ]['filters']['definitions'] )
-        ) {
+        if ( ! is_array( $profile ) ) {
             return $this->schema->defaults();
         }
 
-        return $profile['modules']['configuration'][ MODULE_ID ]['filters']['definitions'];
+        $configuration = isset( $profile['modules']['configuration'][ MODULE_ID ] ) && is_array( $profile['modules']['configuration'][ MODULE_ID ] )
+            ? $profile['modules']['configuration'][ MODULE_ID ]
+            : array();
+        $filters = isset( $configuration['filters'] ) && is_array( $configuration['filters'] )
+            ? $configuration['filters']
+            : array();
+
+        if ( ! array_key_exists( 'definitions', $filters ) || ! is_array( $filters['definitions'] ) ) {
+            return $this->schema->defaults();
+        }
+
+        return $filters['definitions'];
     }
 }
