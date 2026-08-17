@@ -5,6 +5,7 @@
 
 define( 'ABSPATH', __DIR__ . '/wordpress/' );
 define( 'ITK\\Commerce\\Layouts\\VERSION', '0.1.0-dev' );
+define( 'ITK\\Commerce\\Layouts\\MODULE_ID', 'itk-commerce-layouts' );
 
 require dirname( __DIR__, 2 ) . '/packages/itk-commerce-core/src/Contracts/ModuleInterface.php';
 require dirname( __DIR__, 2 ) . '/packages/itk-commerce-layouts/src/LayoutsModule.php';
