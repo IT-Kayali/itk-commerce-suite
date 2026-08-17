@@ -60,30 +60,18 @@ Theme, Elementor or other presentation packages may style the stable `itk-langua
 
 ## Translation repository
 
-Translations are **not** stored in the Theme and are not packed into one growing serialized customer-profile option. The Multilingual module owns two versioned WordPress-prefixed tables:
+Translations are not stored in the Theme and are not packed into one growing serialized customer-profile option. The Multilingual module owns two versioned WordPress-prefixed tables:
 
 ```text
 {prefix}itk_commerce_translation_entries
 {prefix}itk_commerce_translation_revisions
 ```
 
-An entry represents one stable machine translation key + public language code. Example keys:
-
-```text
-commerce.checkout.pay
-commerce.header.welcome
-customer.footer.tagline
-```
-
-Each entry stores a deterministic hash of its current source/default string plus pointers to its current and published revisions. Revisions are append-only and contain the translated value, revision number, workflow status, author/reviewer IDs and timestamps.
-
-The storage schema is installed with an independent database schema version. Plugin updates check that version again because WordPress plugin activation hooks are not an update migration mechanism.
+An entry represents one stable machine translation key + public language code. Each entry stores a deterministic source hash plus current/published revision pointers. Revisions are append-only and contain translated value, revision number, workflow status, author/reviewer IDs and timestamps.
 
 ## Draft / review / published workflow
 
-Customer-facing lookup reads **published revisions only**. Editing a live translation therefore creates a new draft revision without replacing the existing published value.
-
-Supported workflow:
+Customer-facing lookup reads **published revisions only**. Editing a live translation creates a new draft without replacing the current published value.
 
 ```text
 draft -> review -> published
@@ -91,19 +79,9 @@ draft -> review -> published
           +-> draft
 ```
 
-Published revisions are immutable. When a newer reviewed revision is published, the previous published revision becomes archived history and the entry pointer switches to the newly published revision.
-
-This means:
-
-- an unfinished draft never appears in the storefront;
-- a review revision never appears in the storefront;
-- rejecting/returning a review does not alter the current live translation;
-- revision history remains available instead of overwriting previous text;
-- the previous live revision is archived only when the replacement successfully publishes.
+Published revisions are immutable. Publishing a newer reviewed revision archives the previous published revision and switches the live pointer only after the replacement is ready.
 
 ## Public translation lookup
-
-Reusable components can request a published translation without depending on repository internals:
 
 ```php
 $text = apply_filters(
@@ -114,38 +92,103 @@ $text = apply_filters(
 );
 ```
 
-An empty language argument uses the current Commerce request language. Lookup order is:
+Lookup order is requested/current language, configured fallback language, then the caller-provided source text. Programmatic integrations can obtain the repository/workflow through `itk_commerce_translation_repository` and `itk_commerce_translation_workflow`.
 
-1. published translation for the requested/current language;
-2. published translation for the configured fallback language;
-3. caller-provided source/default string.
+## WooCommerce entity translation mapping
 
-Programmatic integrations can obtain the repository/workflow through `itk_commerce_translation_repository` and `itk_commerce_translation_workflow`. Workflow events are emitted when drafts are created, submitted for review, returned to draft and published.
+The module maps **display text onto existing WooCommerce identities** instead of creating a separate product per language.
 
-Persistence deliberately does not apply display-context escaping to translation values because the consuming component owns its output context. Consumers must escape/sanitize according to whether the value is plain text, controlled HTML, an attribute, JSON, email text, etc.
+### Product text
 
-## Source-change tracking
+WooCommerce product/variation view getters are mapped for:
 
-Each translation entry stores a SHA-256 `source_hash`. This does not silently invalidate or remove a published translation. It provides a stable foundation for a later translation-management UI to flag translations as potentially stale when the source string changes.
+```text
+name
+short description
+description
+```
 
-## Data ownership boundary
+Stable keys use the existing WooCommerce object ID:
 
-This translation repository is currently for Commerce Suite strings and customer-owned textual values. Product/category/attribute translation mapping is the next isolated slice.
+```text
+woocommerce.product.42.name
+woocommerce.product.42.short-description
+woocommerce.product.42.description
+```
 
-The current repository does **not** duplicate or take ownership of WooCommerce commercial data. Price, SKU, stock, tax, cart and order state remain WooCommerce-owned.
+The same convention works for a variation because a variation already has its own WooCommerce ID. No translated copy of the product object is created.
+
+### Categories, tags and attribute terms
+
+Product category/tag and global attribute-option terms use the original taxonomy + term ID:
+
+```text
+woocommerce.term.product_cat.7.name
+woocommerce.term.product_cat.7.description
+woocommerce.term.product_tag.11.name
+woocommerce.term.pa_color.13.name
+```
+
+Term objects are cloned before the translated `name` / `description` is applied. That avoids mutating the shared WordPress term object/cache instance when a process later changes language context. Term IDs and slugs stay unchanged in this slice.
+
+### Attribute labels
+
+Global attribute labels use the original taxonomy name:
+
+```text
+woocommerce.attribute.pa_color.label
+```
+
+Product-local attribute labels include the existing product ID:
+
+```text
+woocommerce.product.42.attribute.bottle-size.label
+```
+
+Attribute taxonomy names, option IDs/term IDs and variation identity are not replaced.
+
+### Public WooCommerce mapper
+
+The active mapper is available through:
+
+```php
+$mapper = apply_filters( 'itk_commerce_woocommerce_translation_mapper', null );
+```
+
+This allows later admin/import integrations to generate exactly the same entity translation keys without coupling to Theme templates.
+
+## Commercial-data boundary
+
+The mapping layer deliberately does **not** translate or copy:
+
+- product/variation IDs;
+- SKU;
+- regular/sale/active price;
+- stock quantity/status;
+- tax classes/rates;
+- product/category/attribute slugs;
+- cart/order/payment state.
+
+WooCommerce remains authoritative for all of those values. The mapper runs only on customer-facing textual view surfaces.
+
+Admin, AJAX and REST entity mapping is intentionally skipped for now. The next WooCommerce language-context slice will persist the selected language into the customer session/order so AJAX, Store API, cart and emails can use an explicit language instead of guessing from the default request context.
+
+## Output safety
+
+Translation persistence does not apply one global HTML sanitizer because output contexts differ. The consuming WooCommerce/Theme component remains responsible for escaping/sanitizing translated content correctly for plain text, controlled HTML, attributes, JSON, email text and documents.
 
 ## Remaining Phase 5 boundaries
 
 The current implementation does **not** yet:
 
-- map product/category/attribute translation fields;
 - persist cart/session language or capture order language;
+- translate AJAX/Store API responses using explicit persisted customer language;
 - switch WooCommerce email/document generation into stored order language;
-- emit canonical/hreflang tags;
+- emit translated slugs/canonical/hreflang policy;
 - import/export CSV/JSON/XLIFF translations;
 - create the translator role/capability/admin UI boundary;
 - provide final end-to-end RTL/accessibility browser coverage for translated commerce content.
 
 ## Next slice
 
-The next workstream adds product/category/attribute translation mapping while preserving one shared WooCommerce commercial identity for stock, SKU and price.
+The next workstream adds WooCommerce cart/session/order language persistence and an explicit email/document language context while preserving HPOS/WooCommerce CRUD ownership.
