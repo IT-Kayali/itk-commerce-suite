@@ -60,22 +60,24 @@ final class WooQueryAdapter {
             }
         }
 
-        if ( ! empty( $state['stock'] ) && function_exists( 'wc_get_product_visibility_term_ids' ) ) {
+        $stock = $this->active_value_by_type( 'stock' );
+        if ( null !== $stock && function_exists( 'wc_get_product_visibility_term_ids' ) ) {
             $visibility = wc_get_product_visibility_term_ids();
             if ( ! empty( $visibility['outofstock'] ) ) {
                 $tax_query[] = array(
                     'taxonomy'         => 'product_visibility',
                     'field'            => 'term_taxonomy_id',
                     'terms'            => array( absint( $visibility['outofstock'] ) ),
-                    'operator'         => 'in-stock' === $state['stock'] ? 'NOT IN' : 'IN',
+                    'operator'         => 'in-stock' === $stock ? 'NOT IN' : 'IN',
                     'include_children' => false,
                 );
             }
         }
 
-        if ( ! empty( $state['rating'] ) && function_exists( 'wc_get_product_visibility_term_ids' ) ) {
+        $rating = $this->active_value_by_type( 'rating' );
+        if ( null !== $rating && function_exists( 'wc_get_product_visibility_term_ids' ) ) {
             $visibility = wc_get_product_visibility_term_ids();
-            $rating     = absint( $state['rating'] );
+            $rating     = absint( $rating );
             $terms      = array();
 
             for ( $value = $rating; $value <= 5; $value++ ) {
@@ -111,14 +113,14 @@ final class WooQueryAdapter {
     public function filter_meta_query( $meta_query, $query ) {
         unset( $query );
         $meta_query = is_array( $meta_query ) ? $meta_query : array();
-        $state      = $this->current_state();
+        $price      = $this->active_value_by_type( 'price' );
 
-        if ( empty( $state['price'] ) || ! is_array( $state['price'] ) ) {
+        if ( ! is_array( $price ) ) {
             return $meta_query;
         }
 
-        $min = array_key_exists( 'min', $state['price'] ) ? $state['price']['min'] : null;
-        $max = array_key_exists( 'max', $state['price'] ) ? $state['price']['max'] : null;
+        $min = array_key_exists( 'min', $price ) ? $price['min'] : null;
+        $max = array_key_exists( 'max', $price ) ? $price['max'] : null;
 
         if ( null !== $min && null !== $max ) {
             $meta_query[] = array(
@@ -155,9 +157,9 @@ final class WooQueryAdapter {
      */
     public function filter_product_query( $query, $wc_query = null ) {
         unset( $wc_query );
-        $state = $this->current_state();
+        $sale = $this->active_value_by_type( 'sale' );
 
-        if ( empty( $state['sale'] ) || ! function_exists( 'wc_get_product_ids_on_sale' ) || ! is_object( $query ) || ! method_exists( $query, 'get' ) || ! method_exists( $query, 'set' ) ) {
+        if ( true !== $sale || ! function_exists( 'wc_get_product_ids_on_sale' ) || ! is_object( $query ) || ! method_exists( $query, 'get' ) || ! method_exists( $query, 'set' ) ) {
             return;
         }
 
@@ -193,6 +195,31 @@ final class WooQueryAdapter {
         $this->state = $this->url_state->parse( $request );
 
         return $this->state;
+    }
+
+    /**
+     * Resolve a scalar filter by its normalized schema type rather than assuming
+     * a customer-visible filter ID such as `price` or `stock`.
+     *
+     * @param string $type Filter type.
+     * @return mixed|null
+     */
+    private function active_value_by_type( $type ) {
+        $type  = sanitize_key( $type );
+        $state = $this->current_state();
+
+        foreach ( $this->url_state->definitions() as $definition ) {
+            if ( empty( $definition['enabled'] ) || empty( $definition['id'] ) || $type !== $definition['type'] ) {
+                continue;
+            }
+
+            $id = $definition['id'];
+            if ( array_key_exists( $id, $state ) ) {
+                return $state[ $id ];
+            }
+        }
+
+        return null;
     }
 
     /**
