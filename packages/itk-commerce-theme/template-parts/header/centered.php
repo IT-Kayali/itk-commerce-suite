@@ -1,6 +1,6 @@
 <?php
 /**
- * Centered header model.
+ * Centered header model and compatible centered visual variants.
  *
  * @package ITK_Commerce_Theme
  */
@@ -11,8 +11,10 @@ use function ITK\Commerce\Theme\icon;
 use function ITK\Commerce\Theme\site_branding;
 
 defined( 'ABSPATH' ) || exit;
+
+$layout_model = isset( $args['itk_layout_model'] ) ? sanitize_key( $args['itk_layout_model'] ) : 'centered';
 ?>
-<header class="itk-site-header itk-site-header--centered" data-itk-site-header data-itk-layout-model="centered">
+<header class="itk-site-header itk-site-header--centered itk-site-header--<?php echo esc_attr( $layout_model ); ?>" data-itk-site-header data-itk-layout-model="<?php echo esc_attr( $layout_model ); ?>">
     <?php if ( has_nav_menu( 'secondary' ) ) : ?>
         <div class="itk-topbar">
             <div class="itk-container">

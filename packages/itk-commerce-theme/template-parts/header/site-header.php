@@ -1,6 +1,6 @@
 <?php
 /**
- * Default reusable header model.
+ * Default reusable header model and compatible visual variants.
  *
  * @package ITK_Commerce_Theme
  */
@@ -11,8 +11,10 @@ use function ITK\Commerce\Theme\icon;
 use function ITK\Commerce\Theme\site_branding;
 
 defined( 'ABSPATH' ) || exit;
+
+$layout_model = isset( $args['itk_layout_model'] ) ? sanitize_key( $args['itk_layout_model'] ) : 'classic';
 ?>
-<header class="itk-site-header" data-itk-site-header>
+<header class="itk-site-header itk-site-header--<?php echo esc_attr( $layout_model ); ?>" data-itk-site-header data-itk-layout-model="<?php echo esc_attr( $layout_model ); ?>">
     <?php if ( has_nav_menu( 'secondary' ) ) : ?>
         <div class="itk-topbar">
             <div class="itk-container">

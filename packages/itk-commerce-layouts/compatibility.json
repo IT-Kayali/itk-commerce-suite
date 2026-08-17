@@ -16,15 +16,17 @@
     "itk_commerce_core": "0.1.0-dev"
   },
   "features": {
-    "header_models": ["classic", "centered", "shop"],
-    "footer_models": ["classic", "compact", "columns"],
+    "header_models": ["classic", "centered", "shop", "transparent", "dark", "luxury", "sticky", "vertical"],
+    "footer_models": ["classic", "compact", "columns", "simple", "luxury", "newsletter", "branches"],
+    "visual_builder": "Header/Footer/context/mobile/Mega-menu editor implemented",
+    "live_preview": "authenticated desktop/tablet/mobile storefront preview implemented",
     "profile_assignments": "implemented",
     "mobile_bottom_navigation": "profile bridge implemented",
-    "mega_menu": "portable definition and responsive submenu foundation implemented"
+    "mega_menu": "portable definitions, menu-item binding and responsive submenu foundation implemented"
   },
   "notes": [
     "WooCommerce version ranges remain unset until the Phase 0 environment audit and compatibility matrix are completed.",
     "The module extends public Theme hooks and does not patch Theme source at runtime.",
-    "Rich mega-menu panels and browser-based visual regression testing remain Phase 2 follow-up work."
+    "Rich Mega-menu product/banner panels and browser-based visual regression testing remain Phase 2 follow-up work."
   ]
 }

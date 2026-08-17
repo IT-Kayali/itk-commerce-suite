@@ -6,8 +6,10 @@
  */
 
 defined( 'ABSPATH' ) || exit;
+
+$layout_model = isset( $args['itk_layout_model'] ) ? sanitize_key( $args['itk_layout_model'] ) : 'classic';
 ?>
-<footer class="itk-site-footer">
+<footer class="itk-site-footer itk-site-footer--<?php echo esc_attr( $layout_model ); ?>" data-itk-layout-model="<?php echo esc_attr( $layout_model ); ?>">
     <?php do_action( 'itk_commerce_before_footer' ); ?>
     <div class="itk-container">
         <div class="itk-footer-grid">
@@ -37,12 +39,12 @@ defined( 'ABSPATH' ) || exit;
                 <?php
                 wp_nav_menu(
                     array(
-                        'theme_location' => 'footer-legal',
-                        'container'      => 'nav',
+                        'theme_location'       => 'footer-legal',
+                        'container'            => 'nav',
                         'container_aria_label' => __( 'Legal Navigation', 'itk-commerce' ),
-                        'menu_class'     => 'itk-footer-legal',
-                        'depth'          => 1,
-                        'fallback_cb'    => false,
+                        'menu_class'           => 'itk-footer-legal',
+                        'depth'                => 1,
+                        'fallback_cb'          => false,
                     )
                 );
                 ?>
