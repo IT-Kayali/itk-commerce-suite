@@ -29,7 +29,9 @@
     "woocommerce_entity_mapping": "product text, product category/tag/attribute term text and attribute labels mapped to translation keys without commercial-data duplication",
     "woocommerce_language_context": "localized storefront language persisted in WooCommerce session and captured through WC_Order CRUD meta for classic and Store API checkout",
     "async_translation_context": "AJAX/REST entity translation allowed only when a valid WooCommerce session language is restored",
-    "order_language_snapshot": "language code, WordPress locale and text direction frozen on the order for later email/document rendering",
+    "order_language_snapshot": "language code, WordPress locale and text direction frozen on the order for later rendering",
+    "order_language_rendering_scope": "isolated locale/translation scope implemented for WooCommerce transactional order notifications, manual resend and programmatic document rendering",
+    "historical_language_rendering": "stored order locale and translation code can render historical orders even after a language is disabled",
     "seo_hreflang": "planned follow-up slice",
     "import_export": "planned follow-up slice"
   },
@@ -37,10 +39,13 @@
     "WordPress minimum/tested ranges will be finalized with the Phase 0 environment audit and compatibility matrix.",
     "Language directories are resolved before normal WordPress route parsing so WordPress and WooCommerce remain authoritative for the internal storefront route.",
     "WooCommerce session state carries the explicit storefront language into AJAX and Store API requests; invalid/unknown session codes are ignored.",
-    "Classic checkout uses the WC_Order object before save and Store API checkout uses its public order-meta hook; no direct post/order-table writes are used.",
-    "Order language metadata stores a historical locale/direction snapshot so later configuration changes do not erase the order's original language context.",
+    "Classic checkout and Store API checkout persist language context only through WC_Order CRUD metadata; no direct post/order-table writes are used.",
+    "WooCommerce order notification actions are wrapped before the email trigger so the order is known before WC_Email::setup_locale runs; the previous locale is restored after notification rendering.",
+    "WooCommerce's own site-locale setup/restore is disabled only while an explicit order-language scope is active.",
+    "Manual order-email resend uses WooCommerce's before/after resend hooks; arbitrary integrations can use the public order-language scope service.",
+    "Programmatic document renderers can obtain itk_commerce_order_language_scope and call run(order, callback) with guaranteed finally-based restoration.",
+    "Historical disabled languages retain their frozen order locale and scoped translation lookup code without being globally re-enabled.",
     "WooCommerce product IDs, variation IDs, taxonomy/term IDs, SKU, prices, stock, tax, slugs, cart and order state remain WooCommerce-owned.",
-    "Email/document locale switching is a separate follow-up slice and will consume the frozen order-language contract.",
     "Customer-specific language lists live in the versioned customer profile rather than generic package code."
   ]
 }

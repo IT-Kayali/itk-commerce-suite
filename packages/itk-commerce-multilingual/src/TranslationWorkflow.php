@@ -63,6 +63,23 @@ final class TranslationWorkflow {
             $code = $this->context->code();
         }
 
+        /**
+         * Filter the effective lookup language for an isolated rendering scope.
+         * OrderLanguageScope uses this to render historical orders in their
+         * frozen language even when that language is no longer enabled globally.
+         *
+         * @param string $code Effective public language code.
+         * @param string $key Translation key.
+         * @param string $source Source/default text.
+         */
+        $scoped_code = function_exists( 'apply_filters' )
+            ? apply_filters( 'itk_commerce_translation_language_code', $code, $key, $source )
+            : $code;
+        $scoped_code = $this->schema->normalize_language_code( $scoped_code );
+        if ( '' !== $scoped_code ) {
+            $code = $scoped_code;
+        }
+
         $published = $this->repository->published( $key, $code );
         if ( is_array( $published ) ) {
             return (string) $published['translation_value'];
