@@ -34,6 +34,9 @@ final class SearchFilterModule implements ModuleInterface {
     /** @var MobileFilterDrawer|null */
     private $mobile_drawer = null;
 
+    /** @var LiveProductSearch|null */
+    private $live_search = null;
+
     /** @return string */
     public function id() {
         return MODULE_ID;
@@ -57,8 +60,8 @@ final class SearchFilterModule implements ModuleInterface {
 
     /**
      * Build the bounded schema/query layer, progressive server-rendered UI,
-     * Fetch/History enhancement and mobile off-canvas presentation. The normal
-     * server-rendered GET flow remains authoritative when JavaScript is absent.
+     * Fetch/History navigation, mobile drawer and WooCommerce Store API live
+     * search. Server-rendered GET flows remain authoritative fallbacks.
      *
      * @return void
      */
@@ -95,12 +98,14 @@ final class SearchFilterModule implements ModuleInterface {
         $this->async_navigation   = new CatalogAsyncNavigation();
         $this->no_results_toolbar = new CatalogNoResultsToolbar( $this->renderer );
         $this->mobile_drawer      = new MobileFilterDrawer();
+        $this->live_search        = new LiveProductSearch();
 
         $this->query_adapter->register();
         $this->renderer->register();
         $this->async_navigation->register();
         $this->no_results_toolbar->register();
         $this->mobile_drawer->register();
+        $this->live_search->register();
 
         if ( is_admin() ) {
             ( new Admin\FilterBuilderPage( $this->schema ) )->register();
@@ -116,8 +121,9 @@ final class SearchFilterModule implements ModuleInterface {
          * @param FilterRenderer         $renderer Progressive filter renderer.
          * @param CatalogAsyncNavigation $async_navigation Fetch/History enhancement.
          * @param MobileFilterDrawer     $mobile_drawer Responsive off-canvas enhancement.
+         * @param LiveProductSearch      $live_search WooCommerce Store API live search.
          */
-        do_action( 'itk_commerce_search_filter_loaded', $this, $this->schema, $this->url_state, $this->query_adapter, $this->renderer, $this->async_navigation, $this->mobile_drawer );
+        do_action( 'itk_commerce_search_filter_loaded', $this, $this->schema, $this->url_state, $this->query_adapter, $this->renderer, $this->async_navigation, $this->mobile_drawer, $this->live_search );
     }
 
     /** @return array<int,array<string,mixed>> */
@@ -148,6 +154,11 @@ final class SearchFilterModule implements ModuleInterface {
     /** @return MobileFilterDrawer|null */
     public function mobile_drawer() {
         return $this->mobile_drawer;
+    }
+
+    /** @return LiveProductSearch|null */
+    public function live_search() {
+        return $this->live_search;
     }
 
     /**
