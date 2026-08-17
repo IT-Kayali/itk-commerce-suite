@@ -1,0 +1,37 @@
+{
+  "schema_version": 1,
+  "package": "itk-commerce-search-filter",
+  "type": "wordpress-plugin",
+  "version": "0.1.0-dev",
+  "status": "development",
+  "minimum": {
+    "php": "8.1",
+    "wordpress": "6.6",
+    "woocommerce": null,
+    "itk_commerce_core": "0.1.0-dev"
+  },
+  "tested_up_to": {
+    "wordpress": null,
+    "woocommerce": null,
+    "itk_commerce_core": "0.1.0-dev"
+  },
+  "features": {
+    "filter_schema_version": 1,
+    "filter_types": ["taxonomy", "price", "stock", "sale", "rating"],
+    "attribute_filters": "supported through pa_* taxonomy definitions",
+    "profile_configuration": "foundation implemented",
+    "shareable_url_state": "bounded parser and serializer implemented",
+    "woocommerce_query_adapter": "taxonomy, price, stock, sale and rating foundation implemented",
+    "server_rendered_ui": "planned",
+    "ajax_catalog": "planned",
+    "mobile_offcanvas": "planned",
+    "ajax_search": "planned",
+    "cache_index": "planned"
+  },
+  "notes": [
+    "WooCommerce minimum/tested ranges remain unset until the Phase 0 environment audit and compatibility matrix are completed.",
+    "Public URL parameters are allow-listed from the normalized filter definition schema; arbitrary request keys are not converted into product queries.",
+    "The first query adapter slice uses public WooCommerce/WordPress tax and meta query APIs. Price lookup optimization is deferred to the Phase 4 cache/index workstream.",
+    "The module does not patch WooCommerce or Theme source and remains optional/installable independently from presentation packages."
+  ]
+}
