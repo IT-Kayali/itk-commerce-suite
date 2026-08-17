@@ -43,19 +43,68 @@ test.describe('Search Filter progressive UI', () => {
     await expect(stock.locator('.itk-filter-select')).toBeVisible();
   });
 
-  test('mobile filter UI collapses to one column without horizontal overflow', async ({ page }) => {
+  test('mobile filter opens as accessible off-canvas drawer without horizontal overflow', async ({ page }) => {
+    await page.emulateMedia({ reducedMotion: 'reduce' });
     await page.setViewportSize({ width: 390, height: 844 });
     await page.goto(fixture);
 
+    const details = page.locator('[data-filter-popover]');
+    const trigger = page.locator('.itk-filter-trigger');
+    const panel = page.locator('[data-filter-panel]');
+    const close = page.locator('.itk-filter-drawer__close');
+
+    await expect(page.locator('html')).toHaveClass(/itk-filter-offcanvas-ready/);
+    await expect(details).not.toHaveAttribute('open', '');
+
+    await trigger.click();
+
+    await expect(details).toHaveClass(/is-drawer-open/);
+    await expect(panel).toHaveAttribute('role', 'dialog');
+    await expect(panel).toHaveAttribute('aria-modal', 'true');
+    await expect(trigger).toHaveAttribute('aria-expanded', 'true');
+    await expect(page.locator('body')).toHaveClass(/itk-filter-drawer-open/);
+    await expect(close).toBeFocused();
     expect(await gridColumnCount(page.locator('[data-filter-groups]'))).toBe(1);
-    const panelBox = await page.locator('[data-filter-panel]').boundingBox();
-    expect(panelBox.width).toBeLessThanOrEqual(350);
+
+    const panelBox = await panel.boundingBox();
+    expect(panelBox.width).toBeLessThanOrEqual(390);
+    expect(panelBox.x).toBeGreaterThanOrEqual(0);
 
     const overflow = await page.evaluate(() => document.documentElement.scrollWidth - window.innerWidth);
     expect(overflow).toBeLessThanOrEqual(1);
+
+    await page.keyboard.press('Escape');
+    await expect(details).not.toHaveClass(/is-drawer-open/);
+    await expect(page.locator('body')).not.toHaveClass(/itk-filter-drawer-open/);
+    await expect(trigger).toBeFocused();
   });
 
-  test('RTL keeps toolbar, filter panel and chips bounded', async ({ page }) => {
+  test('mobile drawer backdrop closes and logical end follows LTR and RTL', async ({ page }) => {
+    await page.emulateMedia({ reducedMotion: 'reduce' });
+    await page.setViewportSize({ width: 700, height: 900 });
+    await page.goto(fixture);
+
+    const details = page.locator('[data-filter-popover]');
+    const trigger = page.locator('.itk-filter-trigger');
+    const panel = page.locator('[data-filter-panel]');
+
+    await trigger.click();
+    await expect(details).toHaveClass(/is-drawer-open/);
+    let box = await panel.boundingBox();
+    expect(box.width).toBeGreaterThan(300);
+    expect(box.x).toBeGreaterThanOrEqual(275);
+
+    await page.locator('.itk-filter-drawer__backdrop').click({ position: { x: 20, y: 450 } });
+    await expect(details).not.toHaveClass(/is-drawer-open/);
+
+    await page.evaluate(() => document.documentElement.setAttribute('dir', 'rtl'));
+    await trigger.click();
+    await expect(details).toHaveClass(/is-drawer-open/);
+    box = await panel.boundingBox();
+    expect(box.x).toBeLessThanOrEqual(1);
+  });
+
+  test('RTL desktop keeps toolbar, filter panel and chips bounded', async ({ page }) => {
     await page.setViewportSize({ width: 1024, height: 900 });
     await page.goto(fixture);
     await page.evaluate(() => document.documentElement.setAttribute('dir', 'rtl'));

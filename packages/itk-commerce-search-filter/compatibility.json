@@ -24,7 +24,7 @@
     "woocommerce_query_adapter": "taxonomy, price, stock, sale and rating foundation implemented",
     "server_rendered_ui": "GET fallback, active chips, select/chips/radio/checkbox/range/toggle presentation and responsive UI implemented",
     "ajax_catalog": "same-origin Fetch plus History progressive enhancement implemented for filters, active chips and pagination",
-    "mobile_offcanvas": "planned",
+    "mobile_offcanvas": "progressive accessible off-canvas drawer implemented at <=760px with focus trap, Escape, backdrop, scroll lock, RTL and reduced-motion support",
     "ajax_search": "planned",
     "cache_index": "planned"
   },
@@ -32,6 +32,7 @@
     "WooCommerce minimum/tested ranges remain unset until the Phase 0 environment audit and compatibility matrix are completed.",
     "Public URL parameters are allow-listed from the normalized filter definition schema; arbitrary request keys are not converted into product queries.",
     "Server-rendered public catalog GET URLs remain authoritative. The browser enhancement fetches those same same-origin URLs, replaces only module-owned result/toolbar boundaries, updates History and falls back to normal navigation on failure.",
+    "The mobile drawer is a progressive presentation enhancement over the existing details/GET filter UI; filtering remains usable when JavaScript is disabled.",
     "No custom admin-ajax product-query endpoint is introduced for read-only filtering, so WooCommerce visibility and the existing server query adapter remain the single query implementation.",
     "The module does not patch WooCommerce or Theme source and remains optional/installable independently from presentation packages."
   ]

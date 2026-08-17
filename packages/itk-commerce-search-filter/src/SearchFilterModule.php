@@ -31,6 +31,9 @@ final class SearchFilterModule implements ModuleInterface {
     /** @var CatalogNoResultsToolbar|null */
     private $no_results_toolbar = null;
 
+    /** @var MobileFilterDrawer|null */
+    private $mobile_drawer = null;
+
     /** @return string */
     public function id() {
         return MODULE_ID;
@@ -53,9 +56,9 @@ final class SearchFilterModule implements ModuleInterface {
     }
 
     /**
-     * Build the bounded schema/query layer, progressive server-rendered UI and
-     * optional Fetch/History enhancement. Server-rendered GET navigation remains
-     * authoritative whenever JavaScript or async navigation is unavailable.
+     * Build the bounded schema/query layer, progressive server-rendered UI,
+     * Fetch/History enhancement and mobile off-canvas presentation. The normal
+     * server-rendered GET flow remains authoritative when JavaScript is absent.
      *
      * @return void
      */
@@ -91,11 +94,13 @@ final class SearchFilterModule implements ModuleInterface {
         $this->renderer           = new FilterRenderer( $definitions, $this->url_state );
         $this->async_navigation   = new CatalogAsyncNavigation();
         $this->no_results_toolbar = new CatalogNoResultsToolbar( $this->renderer );
+        $this->mobile_drawer      = new MobileFilterDrawer();
 
         $this->query_adapter->register();
         $this->renderer->register();
         $this->async_navigation->register();
         $this->no_results_toolbar->register();
+        $this->mobile_drawer->register();
 
         if ( is_admin() ) {
             ( new Admin\FilterBuilderPage( $this->schema ) )->register();
@@ -110,8 +115,9 @@ final class SearchFilterModule implements ModuleInterface {
          * @param WooQueryAdapter        $query_adapter Query adapter.
          * @param FilterRenderer         $renderer Progressive filter renderer.
          * @param CatalogAsyncNavigation $async_navigation Fetch/History enhancement.
+         * @param MobileFilterDrawer     $mobile_drawer Responsive off-canvas enhancement.
          */
-        do_action( 'itk_commerce_search_filter_loaded', $this, $this->schema, $this->url_state, $this->query_adapter, $this->renderer, $this->async_navigation );
+        do_action( 'itk_commerce_search_filter_loaded', $this, $this->schema, $this->url_state, $this->query_adapter, $this->renderer, $this->async_navigation, $this->mobile_drawer );
     }
 
     /** @return array<int,array<string,mixed>> */
@@ -137,6 +143,11 @@ final class SearchFilterModule implements ModuleInterface {
     /** @return CatalogAsyncNavigation|null */
     public function async_navigation() {
         return $this->async_navigation;
+    }
+
+    /** @return MobileFilterDrawer|null */
+    public function mobile_drawer() {
+        return $this->mobile_drawer;
     }
 
     /**
