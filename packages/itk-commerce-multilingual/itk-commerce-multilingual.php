@@ -49,6 +49,7 @@ function prepare() {
     require_once PATH . '/src/TranslationWorkflow.php';
     require_once PATH . '/src/WooCommerceLanguageContext.php';
     require_once PATH . '/src/OrderLanguageScope.php';
+    require_once PATH . '/src/OrderTranslationLanguageBridge.php';
     require_once PATH . '/src/WooCommerceTranslationMapper.php';
     require_once PATH . '/src/MultilingualModule.php';
 
