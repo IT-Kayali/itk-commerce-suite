@@ -111,7 +111,7 @@ final class ProductCardPage {
                         <section class="itk-template-panel is-active">
                             <div class="itk-template-panel__heading">
                                 <h2><?php esc_html_e( 'Card model', 'itk-commerce-layouts' ); ?></h2>
-                                <p><?php esc_html_e( 'Choose a reusable visual base, then fine-tune image, price, action, hover and label treatment.', 'itk-commerce-layouts' ); ?></p>
+                                <p><?php esc_html_e( 'Choose a reusable visual base, then fine-tune image, content order, price, action, hover and label treatment.', 'itk-commerce-layouts' ); ?></p>
                             </div>
 
                             <?php $this->render_model_cards( $models, $config['model'] ); ?>
@@ -122,6 +122,10 @@ final class ProductCardPage {
                                     <option value="portrait" <?php selected( $options['image_ratio'], 'portrait' ); ?>><?php esc_html_e( 'Portrait 4:5', 'itk-commerce-layouts' ); ?></option>
                                     <option value="square" <?php selected( $options['image_ratio'], 'square' ); ?>><?php esc_html_e( 'Square 1:1', 'itk-commerce-layouts' ); ?></option>
                                     <option value="landscape" <?php selected( $options['image_ratio'], 'landscape' ); ?>><?php esc_html_e( 'Landscape 4:3', 'itk-commerce-layouts' ); ?></option>
+                                </select></label>
+                                <label><span><?php esc_html_e( 'Content order', 'itk-commerce-layouts' ); ?></span><select name="product_card[content_order]" data-itk-card-option="content_order">
+                                    <option value="title-price" <?php selected( $options['content_order'], 'title-price' ); ?>><?php esc_html_e( 'Title then price', 'itk-commerce-layouts' ); ?></option>
+                                    <option value="price-title" <?php selected( $options['content_order'], 'price-title' ); ?>><?php esc_html_e( 'Price then title', 'itk-commerce-layouts' ); ?></option>
                                 </select></label>
                                 <label><span><?php esc_html_e( 'Content alignment', 'itk-commerce-layouts' ); ?></span><select name="product_card[content_align]" data-itk-card-option="content_align">
                                     <option value="left" <?php selected( $options['content_align'], 'left' ); ?>><?php esc_html_e( 'Left', 'itk-commerce-layouts' ); ?></option>
@@ -306,6 +310,7 @@ final class ProductCardPage {
             'model'   => 'classic',
             'options' => array(
                 'image_ratio'       => 'portrait',
+                'content_order'     => 'title-price',
                 'content_align'     => 'left',
                 'price_treatment'   => 'standard',
                 'action_treatment'  => 'button',
@@ -347,6 +352,7 @@ final class ProductCardPage {
             'model'   => $model,
             'options' => array(
                 'image_ratio'       => $this->choice( $raw, 'image_ratio', array( 'portrait', 'square', 'landscape' ), 'portrait' ),
+                'content_order'     => $this->choice( $raw, 'content_order', array( 'title-price', 'price-title' ), 'title-price' ),
                 'content_align'     => $this->choice( $raw, 'content_align', array( 'left', 'center' ), 'left' ),
                 'price_treatment'   => $this->choice( $raw, 'price_treatment', array( 'standard', 'emphasis', 'muted' ), 'standard' ),
                 'action_treatment'  => $this->choice( $raw, 'action_treatment', array( 'button', 'outline', 'text' ), 'button' ),
