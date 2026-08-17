@@ -46,10 +46,12 @@ itk_sf_ui_assert( 19.95 === $state['cost']['min'], 'Progressive GET price minimu
 itk_sf_ui_assert( 125.0 === $state['cost']['max'], 'Progressive GET price maximum should parse from array input.' );
 itk_sf_ui_assert( '19.95-125' === $state_service->serialize( $state )['catalog_cost'], 'Progressive price input should serialize back to canonical scalar URL state.' );
 
-$root     = dirname( __DIR__, 2 ) . '/packages/itk-commerce-search-filter/';
-$renderer = file_get_contents( $root . 'src/FilterRenderer.php' );
-$builder  = file_get_contents( $root . 'src/Admin/FilterBuilderPage.php' );
-$module   = file_get_contents( $root . 'src/SearchFilterModule.php' );
+$root       = dirname( __DIR__, 2 ) . '/packages/itk-commerce-search-filter/';
+$renderer   = file_get_contents( $root . 'src/FilterRenderer.php' );
+$builder    = file_get_contents( $root . 'src/Admin/FilterBuilderPage.php' );
+$module     = file_get_contents( $root . 'src/SearchFilterModule.php' );
+$bootstrap  = file_get_contents( $root . 'itk-commerce-search-filter.php' );
+$normalizer = file_get_contents( $root . 'src/Admin/PostedDefinitionNormalizer.php' );
 
 itk_sf_ui_assert( false !== strpos( $renderer, "add_action( 'itk_commerce_catalog_toolbar'" ), 'Filter UI must attach through the Phase 3 public catalog toolbar contract.' );
 itk_sf_ui_assert( false !== strpos( $renderer, 'method="get"' ), 'Catalog filtering must retain a normal GET fallback.' );
@@ -59,5 +61,9 @@ itk_sf_ui_assert( false !== strpos( $builder, "check_admin_referer( 'itk_commerc
 itk_sf_ui_assert( false !== strpos( $builder, '$this->schema->normalize( $raw )' ), 'Builder saves must pass through the bounded filter schema.' );
 itk_sf_ui_assert( false !== strpos( $module, 'new Admin\\FilterBuilderPage' ), 'Search Filter module must register the profile-driven builder.' );
 itk_sf_ui_assert( false !== strpos( $module, "array_key_exists( 'definitions', \$filters )" ), 'Explicitly empty customer filter definitions must remain distinguishable from never-configured defaults.' );
+itk_sf_ui_assert( false !== strpos( $bootstrap, 'PostedDefinitionNormalizer.php' ), 'Bootstrap must load the unchecked-checkbox normalizer.' );
+itk_sf_ui_assert( false !== strpos( $bootstrap, "admin_post_itk_commerce_save_search_filters" ), 'Unchecked-checkbox normalization must run on the builder save action.' );
+itk_sf_ui_assert( false !== strpos( $normalizer, "\$definition['enabled'] = ! empty" ), 'Unchecked Enabled controls must be normalized to explicit false values.' );
+itk_sf_ui_assert( false !== strpos( $normalizer, "\$definition['multiple'] = ! empty" ), 'Unchecked taxonomy Multiple controls must be normalized to explicit false values.' );
 
 echo "Search/Filter UI contract smoke test passed.\n";
