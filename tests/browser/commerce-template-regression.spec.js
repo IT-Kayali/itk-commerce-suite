@@ -66,6 +66,54 @@ test.describe('Commerce page template models', () => {
     expect(overflow).toBeLessThanOrEqual(1);
   });
 
+  test('Product-card models and bounded options remain responsive without replacing loop markup', async ({ page }) => {
+    await page.setViewportSize({ width: 1280, height: 900 });
+    await page.goto(fixture);
+    await setArea(page, 'shop', [
+      'itk-shop-model-grid',
+      'itk-commerce-columns-4',
+      'itk-card-model-minimal',
+      'itk-card-image-square',
+      'itk-card-align-center',
+      'itk-card-price-emphasis',
+      'itk-card-action-outline',
+      'itk-card-hover-none',
+      'itk-card-badges-corner',
+      'itk-card-state-badges-enabled'
+    ]);
+
+    const card = page.locator('[data-product-card]');
+    const image = card.locator('img');
+    const price = card.locator('.price');
+    const button = card.locator('.button');
+    const badge = card.locator('.itk-product-badge').first();
+
+    expect(await image.evaluate((element) => getComputedStyle(element).aspectRatio)).toBe('1 / 1');
+    expect(await card.evaluate((element) => getComputedStyle(element).textAlign)).toBe('center');
+    expect(Number(await price.evaluate((element) => getComputedStyle(element).fontWeight))).toBeGreaterThanOrEqual(800);
+    expect(await button.evaluate((element) => getComputedStyle(element).backgroundColor)).toBe('rgba(0, 0, 0, 0)');
+    expect(await badge.evaluate((element) => getComputedStyle(element).borderRadius)).toBe('8px');
+
+    await setArea(page, 'shop', [
+      'itk-shop-model-grid',
+      'itk-commerce-columns-4',
+      'itk-card-model-overlay',
+      'itk-card-image-landscape',
+      'itk-card-align-left',
+      'itk-card-price-standard',
+      'itk-card-action-button',
+      'itk-card-hover-lift',
+      'itk-card-badges-pill',
+      'itk-card-state-badges-enabled'
+    ]);
+    expect(await button.evaluate((element) => getComputedStyle(element).position)).toBe('absolute');
+
+    await page.setViewportSize({ width: 390, height: 844 });
+    expect(await button.evaluate((element) => getComputedStyle(element).position)).toBe('static');
+    const overflow = await page.evaluate(() => document.documentElement.scrollWidth - window.innerWidth);
+    expect(overflow).toBeLessThanOrEqual(1);
+  });
+
   test('Product gallery-right model reverses desktop order and collapses safely on tablet', async ({ page }) => {
     await page.setViewportSize({ width: 1280, height: 900 });
     await page.goto(fixture);
