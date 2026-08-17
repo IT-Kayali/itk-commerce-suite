@@ -289,17 +289,22 @@
     .itk-filter-ui {
         order: 3;
         flex-basis: 100%;
+        max-width: 100%;
     }
 
     .itk-filter-popover {
         position: static;
+        max-width: 100%;
     }
 
     .itk-filter-popover__panel {
+        position: static;
         inset: auto;
         width: min(100%, 680px);
+        max-width: 100%;
         max-height: none;
         margin-block-start: .55rem;
+        box-sizing: border-box;
         box-shadow: none;
     }
 
@@ -313,6 +318,8 @@
     .itk-filter-popover,
     .itk-filter-popover__panel {
         width: 100%;
+        max-width: 100%;
+        box-sizing: border-box;
     }
 
     .itk-filter-price {
