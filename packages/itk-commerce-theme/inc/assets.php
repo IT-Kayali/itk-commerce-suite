@@ -44,8 +44,9 @@ function enqueue_assets() {
         'layout-models'         => array( 'itk-commerce-components' ),
         'commerce'              => array( 'itk-commerce-layout-models' ),
         'commerce-models'       => array( 'itk-commerce-commerce' ),
-        'commerce-block-models' => array( 'itk-commerce-commerce-models' ),
-        'responsive'            => array( 'itk-commerce-commerce-block-models' ),
+        'responsive'            => array( 'itk-commerce-commerce-models' ),
+        'commerce-grid-contract'=> array( 'itk-commerce-responsive' ),
+        'commerce-block-models' => array( 'itk-commerce-commerce-grid-contract' ),
     );
 
     foreach ( $styles as $name => $dependencies ) {
