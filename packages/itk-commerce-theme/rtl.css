@@ -1,0 +1,9 @@
+/*
+ * RTL support layer.
+ * Most layout uses logical CSS properties; this file only handles directional exceptions.
+ */
+
+body.rtl { direction: rtl; }
+.rtl .woocommerce .star-rating { float: left; }
+.rtl .woocommerce div.product div.images,
+.rtl .woocommerce div.product div.summary { direction: rtl; }
