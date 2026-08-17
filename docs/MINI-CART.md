@@ -47,7 +47,7 @@ A Layouts customer profile can store the same values under:
 
 ## Progressive enhancement
 
-Header Cart links and WordPress menu links that point to the WooCommerce Cart remain real links. JavaScript intercepts a normal unmodified click only when the Theme mini-cart is rendered. If JavaScript is unavailable, the links continue to the normal Cart page.
+Header Cart links and WordPress menu links that point to the WooCommerce Cart remain real links. JavaScript intercepts only a normal unmodified same-window click when the Theme mini-cart is rendered. Download links, modified clicks and links targeting another browsing context keep their native browser behavior. If JavaScript is unavailable, Cart links continue to the normal Cart page.
 
 The component supports:
 
@@ -60,11 +60,18 @@ The component supports:
 - logical start/end positioning for LTR and RTL;
 - full-width mobile behavior.
 
-## WooCommerce AJAX compatibility
+## WooCommerce fragments and Blocks compatibility
 
-The Theme adds only its replaceable `div[data-itk-mini-cart-content]` shell to `woocommerce_add_to_cart_fragments`. The contents are rendered by `woocommerce_mini_cart()` so WooCommerce remains authoritative for products, quantities, prices, removal links, subtotal and native fragment refresh behavior.
+The Theme explicitly enqueues WooCommerce's registered `wc-cart-fragments` script while the drawer is enabled, matching the supported classic mini-cart refresh flow. It adds only two Theme-owned selectors to `woocommerce_add_to_cart_fragments`:
 
-When WooCommerce's `added_to_cart` event fires, the drawer can open automatically. This can be disabled through `open_after_add`.
+- `div[data-itk-mini-cart-content]` for the WooCommerce-rendered mini-cart content;
+- `span[data-itk-cart-count]` for the stable Header/mobile cart-count surface, including zero-to-nonzero transitions.
+
+The drawer contents are always produced by `woocommerce_mini_cart()`, so WooCommerce remains authoritative for products, quantities, prices, removal links, subtotal and the underlying cart session.
+
+Classic AJAX add-to-cart keeps using WooCommerce's `added_to_cart` event and native fragment response. For block-era product/cart interactions, the Theme also listens for WooCommerce's public `wc-blocks_added_to_cart` and `wc-blocks_removed_from_cart` browser events. These events trigger a request to WooCommerce's supported `get_refreshed_fragments` AJAX endpoint; returned fragments are then applied only to selectors that exist on the current page. The drawer may open after a successful add when `open_after_add` is enabled, while removals refresh state without forcing the drawer open.
+
+This bridge deliberately does not read or mutate private WooCommerce Blocks stores or component trees.
 
 ## Public integration contract
 
@@ -85,6 +92,6 @@ The implementation intentionally does not:
 
 - patch WooCommerce core;
 - copy or override WooCommerce mini-cart templates;
-- access private Cart/Checkout Block component trees;
+- access private Cart/Checkout Block component trees or data stores;
 - implement payment, coupon or shipping business logic;
 - persist cart data outside WooCommerce.
