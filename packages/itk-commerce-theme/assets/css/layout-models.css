@@ -94,6 +94,49 @@
   min-width: 0;
 }
 
+/* Mega-menu foundation: existing WordPress submenu content can expand into columns. */
+.itk-primary-navigation__menu {
+  position: relative;
+}
+
+.itk-primary-navigation__menu > .itk-menu-item--mega.itk-mega-menu--full {
+  position: static;
+}
+
+.itk-primary-navigation__menu > .itk-menu-item--mega > .sub-menu {
+  padding: clamp(.75rem, 2vw, 1.5rem);
+}
+
+.itk-primary-navigation__menu > .itk-menu-item--mega.itk-mega-menu--full > .sub-menu {
+  inset-inline: 0;
+  width: 100%;
+}
+
+.itk-primary-navigation__menu > .itk-menu-item--mega > .sub-menu {
+  display: grid;
+  gap: .35rem 1.25rem;
+}
+
+.itk-primary-navigation__menu > .itk-mega-menu-columns-2 > .sub-menu {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.itk-primary-navigation__menu > .itk-mega-menu-columns-3 > .sub-menu {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.itk-primary-navigation__menu > .itk-mega-menu-columns-4 > .sub-menu {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+
+.itk-primary-navigation__menu > .itk-mega-menu-columns-5 > .sub-menu {
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+}
+
+.itk-primary-navigation__menu > .itk-mega-menu-columns-6 > .sub-menu {
+  grid-template-columns: repeat(6, minmax(0, 1fr));
+}
+
 .itk-site-footer--compact {
   padding-block: 1.5rem;
 }
@@ -147,6 +190,10 @@
     display: none;
   }
 
+  .itk-primary-navigation__menu > .itk-menu-item--mega > .sub-menu {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
   .itk-footer-columns__grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
@@ -166,6 +213,11 @@
 
   .itk-header-search--centered {
     display: none;
+  }
+
+  .itk-primary-navigation__menu > .itk-menu-item--mega > .sub-menu {
+    display: block;
+    width: auto;
   }
 
   .itk-footer-compact__inner,
