@@ -40,6 +40,9 @@ final class MultilingualModule implements ModuleInterface {
     /** @var OrderLanguageScope|null */
     private $order_language_scope = null;
 
+    /** @var OrderTranslationLanguageBridge|null */
+    private $order_translation_bridge = null;
+
     /** @var WooCommerceTranslationMapper|null */
     private $woocommerce_mapper = null;
 
@@ -99,6 +102,9 @@ final class MultilingualModule implements ModuleInterface {
 
         $this->woocommerce_language_context = new WooCommerceLanguageContext( $this->context, $this->router );
         $this->woocommerce_language_context->register();
+
+        $this->order_translation_bridge = new OrderTranslationLanguageBridge();
+        $this->order_translation_bridge->register();
 
         $this->order_language_scope = new OrderLanguageScope( $this->context, $this->woocommerce_language_context );
         $this->order_language_scope->register();
