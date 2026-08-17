@@ -74,6 +74,7 @@ test.describe('Commerce page template models', () => {
       'itk-commerce-columns-4',
       'itk-card-model-minimal',
       'itk-card-image-square',
+      'itk-card-order-price-title',
       'itk-card-align-center',
       'itk-card-price-emphasis',
       'itk-card-action-outline',
@@ -84,12 +85,15 @@ test.describe('Commerce page template models', () => {
 
     const card = page.locator('[data-product-card]');
     const image = card.locator('img');
+    const title = card.locator('.woocommerce-loop-product__title');
     const price = card.locator('.price');
     const button = card.locator('.button');
     const badge = card.locator('.itk-product-badge').first();
 
     expect(await image.evaluate((element) => getComputedStyle(element).aspectRatio)).toBe('1 / 1');
     expect(await card.evaluate((element) => getComputedStyle(element).textAlign)).toBe('center');
+    expect(await price.evaluate((element) => getComputedStyle(element).order)).toBe('1');
+    expect(await title.evaluate((element) => getComputedStyle(element).order)).toBe('2');
     expect(Number(await price.evaluate((element) => getComputedStyle(element).fontWeight))).toBeGreaterThanOrEqual(800);
     expect(await button.evaluate((element) => getComputedStyle(element).backgroundColor)).toBe('rgba(0, 0, 0, 0)');
     expect(await badge.evaluate((element) => getComputedStyle(element).borderRadius)).toBe('8px');
@@ -99,6 +103,7 @@ test.describe('Commerce page template models', () => {
       'itk-commerce-columns-4',
       'itk-card-model-overlay',
       'itk-card-image-landscape',
+      'itk-card-order-title-price',
       'itk-card-align-left',
       'itk-card-price-standard',
       'itk-card-action-button',
