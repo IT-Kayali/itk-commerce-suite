@@ -22,6 +22,9 @@ final class SearchFilterModule implements ModuleInterface {
     /** @var WooQueryAdapter|null */
     private $query_adapter = null;
 
+    /** @var FilterRenderer|null */
+    private $renderer = null;
+
     /** @return string */
     public function id() {
         return MODULE_ID;
@@ -44,8 +47,9 @@ final class SearchFilterModule implements ModuleInterface {
     }
 
     /**
-     * Build the bounded filter schema and attach the WooCommerce query adapter.
-     * UI/AJAX/search services are intentionally separate later Phase 4 slices.
+     * Build the bounded filter schema, attach the WooCommerce query adapter and
+     * register a progressive server-rendered filter UI. AJAX remains an optional
+     * enhancement in the next isolated Phase 4 slice.
      *
      * @return void
      */
@@ -78,22 +82,28 @@ final class SearchFilterModule implements ModuleInterface {
 
         $this->url_state     = new UrlState( $definitions );
         $this->query_adapter = new WooQueryAdapter( $this->url_state );
+        $this->renderer      = new FilterRenderer( $definitions, $this->url_state );
+
         $this->query_adapter->register();
+        $this->renderer->register();
+
+        if ( is_admin() ) {
+            ( new Admin\FilterBuilderPage( $this->schema ) )->register();
+        }
 
         /**
-         * Fires after the Search/Filter foundation is ready.
+         * Fires after the Search/Filter foundation and progressive UI are ready.
          *
          * @param SearchFilterModule $module Module instance.
          * @param FilterSchema       $schema Schema service.
          * @param UrlState           $url_state URL-state service.
          * @param WooQueryAdapter    $query_adapter Query adapter.
+         * @param FilterRenderer     $renderer Progressive filter renderer.
          */
-        do_action( 'itk_commerce_search_filter_loaded', $this, $this->schema, $this->url_state, $this->query_adapter );
+        do_action( 'itk_commerce_search_filter_loaded', $this, $this->schema, $this->url_state, $this->query_adapter, $this->renderer );
     }
 
-    /**
-     * @return array<int,array<string,mixed>>
-     */
+    /** @return array<int,array<string,mixed>> */
     public function definitions() {
         return null !== $this->url_state ? $this->url_state->definitions() : array();
     }
@@ -108,9 +118,16 @@ final class SearchFilterModule implements ModuleInterface {
         return $this->query_adapter;
     }
 
+    /** @return FilterRenderer|null */
+    public function renderer() {
+        return $this->renderer;
+    }
+
     /**
      * Load filter definitions from the active profile while retaining neutral
-     * defaults when the module has not yet been configured for that customer.
+     * defaults only when the module has never been configured. An explicitly
+     * saved empty definition list means the customer intentionally wants no
+     * catalog filters and is therefore preserved.
      *
      * @return array<int,array<string,mixed>>
      */
@@ -123,14 +140,21 @@ final class SearchFilterModule implements ModuleInterface {
         $profile_id = $core->settings()->active_profile_id();
         $profile    = $profile_id ? $core->profiles()->get( $profile_id ) : null;
 
-        if (
-            ! is_array( $profile ) ||
-            empty( $profile['modules']['configuration'][ MODULE_ID ]['filters']['definitions'] ) ||
-            ! is_array( $profile['modules']['configuration'][ MODULE_ID ]['filters']['definitions'] )
-        ) {
+        if ( ! is_array( $profile ) ) {
             return $this->schema->defaults();
         }
 
-        return $profile['modules']['configuration'][ MODULE_ID ]['filters']['definitions'];
+        $configuration = isset( $profile['modules']['configuration'][ MODULE_ID ] ) && is_array( $profile['modules']['configuration'][ MODULE_ID ] )
+            ? $profile['modules']['configuration'][ MODULE_ID ]
+            : array();
+        $filters = isset( $configuration['filters'] ) && is_array( $configuration['filters'] )
+            ? $configuration['filters']
+            : array();
+
+        if ( ! array_key_exists( 'definitions', $filters ) || ! is_array( $filters['definitions'] ) ) {
+            return $this->schema->defaults();
+        }
+
+        return $filters['definitions'];
     }
 }
