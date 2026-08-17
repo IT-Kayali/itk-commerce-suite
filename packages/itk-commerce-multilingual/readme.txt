@@ -11,7 +11,7 @@ Reusable language context, translation workflow and RTL/LTR module for the IT-Ka
 
 IT-Kayali Commerce Multilingual is an optional installable Commerce Suite module.
 
-The first development slice provides:
+The current development foundation provides:
 
 * versioned and bounded active-profile language configuration;
 * default and fallback language contracts;
@@ -20,9 +20,14 @@ The first development slice provides:
 * public current-language / locale / direction contracts;
 * stable body language/direction classes;
 * HTML lang/dir alignment through the normal WordPress language-attributes filter;
+* directory-style storefront routes such as /de/, /ar/ and /en/;
+* normal WordPress/WooCommerce route parsing after the language prefix is resolved;
+* storefront locale selection through public WordPress locale APIs;
+* safe same-origin language URLs that preserve non-action storefront query state;
+* accessible, style-neutral [itk_language_switcher] output and public switcher filters;
 * RTL/LTR direction foundation without customer-specific Theme code.
 
-Directory routing, translation storage/workflow, WooCommerce order/email language context, hreflang and import/export are separate follow-up slices.
+Translation storage/workflow, WooCommerce order/email language context, hreflang/canonical policy and import/export remain separate follow-up slices.
 
 == Architecture ==
 
@@ -30,7 +35,15 @@ The module depends on IT-Kayali Commerce Core and registers itself through the C
 
 Customer language lists and language settings belong to the active versioned customer profile. Generic package code contains no customer-specific language configuration.
 
-The Theme remains a presentation consumer. Translation data and language routing do not become Theme-owned state.
+The Theme remains a presentation consumer. Translation data and language routing do not become Theme-owned state. WooCommerce continues to own products, prices, SKU, stock, cart state and order state.
+
+== Language switcher ==
+
+Use the shortcode:
+
+[itk_language_switcher]
+
+Optional display modes are label, code and both. Themes/builders can also consume the public itk_commerce_language_switcher_html / itk_commerce_language_switcher_items filters and style the stable itk-language-switcher classes.
 
 == Development status ==
 

@@ -20,9 +20,9 @@ const PATH           = __DIR__;
 const MODULE_ID      = 'itk-commerce-multilingual';
 const SCHEMA_VERSION = 1;
 
-\register_activation_hook( FILE, __NAMESPACE__ . '\\activate' );
-\register_deactivation_hook( FILE, __NAMESPACE__ . '\\deactivate' );
-add_action( 'plugins_loaded', __NAMESPACE__ . '\\prepare', 7 );
+\register_activation_hook( FILE, __NAMESPACE__ . '\activate' );
+\register_deactivation_hook( FILE, __NAMESPACE__ . '\deactivate' );
+add_action( 'plugins_loaded', __NAMESPACE__ . '\prepare', 7 );
 
 /**
  * Load the module only when Commerce Core is available.
@@ -30,16 +30,18 @@ add_action( 'plugins_loaded', __NAMESPACE__ . '\\prepare', 7 );
  * @return void
  */
 function prepare() {
-    if ( ! interface_exists( '\\ITK\\Commerce\\Core\\Contracts\\ModuleInterface' ) ) {
-        add_action( 'admin_notices', __NAMESPACE__ . '\\render_core_notice' );
+    if ( ! interface_exists( '\ITK\Commerce\Core\Contracts\ModuleInterface' ) ) {
+        add_action( 'admin_notices', __NAMESPACE__ . '\render_core_notice' );
         return;
     }
 
     require_once PATH . '/src/LanguageSchema.php';
     require_once PATH . '/src/LanguageContext.php';
+    require_once PATH . '/src/LanguageRouter.php';
+    require_once PATH . '/src/LanguageSwitcher.php';
     require_once PATH . '/src/MultilingualModule.php';
 
-    add_action( 'itk_commerce_register_modules', __NAMESPACE__ . '\\register_module' );
+    add_action( 'itk_commerce_register_modules', __NAMESPACE__ . '\register_module' );
 }
 
 /** @return void */
@@ -60,7 +62,7 @@ function deactivate() {
  * @return void
  */
 function set_enabled_state( $enable ) {
-    if ( ! class_exists( '\\ITK\\Commerce\\Core\\Core' ) ) {
+    if ( ! class_exists( '\ITK\Commerce\Core\Core' ) ) {
         return;
     }
 
