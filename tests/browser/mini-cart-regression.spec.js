@@ -62,13 +62,19 @@ test.describe('Commerce mini-cart drawer', () => {
   });
 
   test('logical end position follows RTL direction', async ({ page }) => {
+    await page.emulateMedia({ reducedMotion: 'reduce' });
     await page.setViewportSize({ width: 1280, height: 900 });
     await page.goto(fixture);
     await page.evaluate(() => document.documentElement.setAttribute('dir', 'rtl'));
 
-    await page.locator('.itk-header-action--cart').click();
-    const box = await page.locator('[data-itk-mini-cart-panel]').boundingBox();
+    const drawer = page.locator('[data-itk-mini-cart]');
+    const panel = page.locator('[data-itk-mini-cart-panel]');
 
+    await page.locator('.itk-header-action--cart').click();
+    await expect(drawer).toHaveClass(/is-open/);
+    await expect(panel).toBeVisible();
+
+    const box = await panel.boundingBox();
     expect(box.x).toBeLessThanOrEqual(1);
     expect(box.width).toBeGreaterThan(300);
   });
