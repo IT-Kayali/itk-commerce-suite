@@ -157,6 +157,36 @@ final class CommerceTemplateResolver {
     }
 
     /**
+     * Merge profile My Account presentation options into Theme defaults. Account
+     * endpoints and data remain WooCommerce-owned; only visual choices are read.
+     *
+     * @param array<string,mixed> $defaults Theme defaults/current options.
+     * @return array<string,mixed>
+     */
+    public function resolve_account_options( $defaults ) {
+        $defaults = is_array( $defaults ) ? $defaults : array();
+        $profile  = $this->active_profile();
+        $config   = $this->account_config( $profile );
+
+        if ( empty( $config['options'] ) || ! is_array( $config['options'] ) ) {
+            return $defaults;
+        }
+
+        $options = array_merge( $defaults, $config['options'] );
+
+        /**
+         * Filter profile-resolved account options before Theme validation.
+         *
+         * @param array<string,mixed>      $options Profile options merged with defaults.
+         * @param array<string,mixed>      $config  Account configuration.
+         * @param array<string,mixed>|null $profile Active profile.
+         */
+        $filtered = apply_filters( 'itk_commerce_profile_account_options', $options, $config, $profile );
+
+        return is_array( $filtered ) ? $filtered : $defaults;
+    }
+
+    /**
      * Product-card presentation belongs to the Layouts module configuration
      * namespace so the Phase 2 Commerce page editor can continue saving its
      * `layouts.commerce` page areas without erasing component configuration.
@@ -193,6 +223,25 @@ final class CommerceTemplateResolver {
         }
 
         return $profile['modules']['configuration'][ MODULE_ID ]['mini_cart'];
+    }
+
+    /**
+     * My Account presentation is stored independently from commerce-page and
+     * component configuration so updates cannot erase unrelated settings.
+     *
+     * @param array<string,mixed>|null $profile Active profile.
+     * @return array<string,mixed>
+     */
+    private function account_config( $profile ) {
+        if (
+            ! is_array( $profile ) ||
+            empty( $profile['modules']['configuration'][ MODULE_ID ]['account'] ) ||
+            ! is_array( $profile['modules']['configuration'][ MODULE_ID ]['account'] )
+        ) {
+            return array();
+        }
+
+        return $profile['modules']['configuration'][ MODULE_ID ]['account'];
     }
 
     /**

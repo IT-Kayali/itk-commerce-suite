@@ -1,0 +1,51 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Account regression fixture</title>
+  <link rel="stylesheet" href="/packages/itk-commerce-theme/assets/css/base.css">
+  <link rel="stylesheet" href="/packages/itk-commerce-theme/assets/css/components.css">
+  <link rel="stylesheet" href="/packages/itk-commerce-theme/assets/css/account.css">
+  <style>
+    body { margin: 0; }
+    .itk-commerce-main { max-width: 1180px; margin: 0 auto; padding: 32px 20px; }
+    .woocommerce-MyAccount-content > p { line-height: 1.6; }
+  </style>
+</head>
+<body class="woocommerce-account itk-account-enabled itk-account-authenticated itk-account-model-sidebar itk-account-width-wide itk-account-nav-soft itk-account-cards-soft itk-account-orders-comfortable">
+  <main class="itk-commerce-main">
+    <div class="woocommerce" data-account-shell>
+      <div class="woocommerce-notices-wrapper"></div>
+      <nav class="woocommerce-MyAccount-navigation" data-account-nav>
+        <ul>
+          <li class="woocommerce-MyAccount-navigation-link woocommerce-MyAccount-navigation-link--dashboard is-active"><a href="#dashboard">Dashboard</a></li>
+          <li class="woocommerce-MyAccount-navigation-link woocommerce-MyAccount-navigation-link--orders"><a href="#orders">Orders</a></li>
+          <li class="woocommerce-MyAccount-navigation-link woocommerce-MyAccount-navigation-link--downloads"><a href="#downloads">Downloads</a></li>
+          <li class="woocommerce-MyAccount-navigation-link woocommerce-MyAccount-navigation-link--edit-address"><a href="#addresses">Addresses</a></li>
+          <li class="woocommerce-MyAccount-navigation-link woocommerce-MyAccount-navigation-link--edit-account"><a href="#details">Account details</a></li>
+        </ul>
+      </nav>
+      <div class="woocommerce-MyAccount-content" data-account-content>
+        <p>Hello Test Customer. This fixture keeps WooCommerce-like account markup while testing Theme presentation only.</p>
+        <nav class="itk-account-dashboard-cards" aria-label="Account shortcuts" data-account-cards>
+          <a class="itk-account-dashboard-card" href="#orders"><span class="itk-account-dashboard-card__mark"></span><span class="itk-account-dashboard-card__body"><strong>Orders</strong><small>Review current and previous orders.</small></span><span class="itk-account-dashboard-card__arrow">→</span></a>
+          <a class="itk-account-dashboard-card" href="#downloads"><span class="itk-account-dashboard-card__mark"></span><span class="itk-account-dashboard-card__body"><strong>Downloads</strong><small>Access downloadable purchases.</small></span><span class="itk-account-dashboard-card__arrow">→</span></a>
+          <a class="itk-account-dashboard-card" href="#addresses"><span class="itk-account-dashboard-card__mark"></span><span class="itk-account-dashboard-card__body"><strong>Addresses</strong><small>Manage billing and shipping addresses.</small></span><span class="itk-account-dashboard-card__arrow">→</span></a>
+          <a class="itk-account-dashboard-card" href="#details"><span class="itk-account-dashboard-card__mark"></span><span class="itk-account-dashboard-card__body"><strong>Account details</strong><small>Update account details.</small></span><span class="itk-account-dashboard-card__arrow">→</span></a>
+        </nav>
+
+        <table class="woocommerce-orders-table shop_table" data-account-orders>
+          <thead><tr><th>Order</th><th>Date</th><th>Status</th><th>Total</th><th>Actions</th></tr></thead>
+          <tbody><tr><td>#1001</td><td>2026-08-17</td><td>Processing</td><td>€59.00</td><td class="woocommerce-orders-table__cell-order-actions"><a class="button" href="#view">View</a></td></tr></tbody>
+        </table>
+
+        <div class="u-columns woocommerce-Addresses" data-account-addresses>
+          <section class="woocommerce-Address"><header class="woocommerce-Address-title"><h2>Billing address</h2><a href="#edit-billing">Edit</a></header><address>Example Street 1</address></section>
+          <section class="woocommerce-Address"><header class="woocommerce-Address-title"><h2>Shipping address</h2><a href="#edit-shipping">Edit</a></header><address>Example Street 2</address></section>
+        </div>
+      </div>
+    </div>
+  </main>
+</body>
+</html>
