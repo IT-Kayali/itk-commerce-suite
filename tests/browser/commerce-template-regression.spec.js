@@ -8,6 +8,18 @@ async function setArea(page, area, classes) {
   }, { area, classes });
 }
 
+async function setBlockModel(locator, area, model) {
+  await locator.evaluate((element, values) => {
+    Array.from(element.classList).forEach((className) => {
+      if (className.indexOf('itk-commerce-block-shell--model-') === 0) {
+        element.classList.remove(className);
+      }
+    });
+    element.classList.add('itk-commerce-block-shell--' + values.area);
+    element.classList.add('itk-commerce-block-shell--model-' + values.model);
+  }, { area, model });
+}
+
 async function gridColumnCount(locator) {
   return locator.evaluate((element) => {
     const value = getComputedStyle(element).gridTemplateColumns.trim();
@@ -87,6 +99,7 @@ test.describe('Commerce page template models', () => {
     const checkout = page.locator('[data-checkout-classic]');
     const review = page.locator('[data-checkout-review]');
     const blockShell = page.locator('[data-checkout-block-shell]');
+    await setBlockModel(blockShell, 'checkout', 'split');
 
     expect(await gridColumnCount(checkout)).toBe(2);
     expect(await review.evaluate((element) => getComputedStyle(element).position)).toBe('sticky');
@@ -94,6 +107,7 @@ test.describe('Commerce page template models', () => {
     expect(wideMaxWidth).toBeGreaterThanOrEqual(1200);
 
     await setArea(page, 'checkout', ['itk-checkout-model-focused', 'itk-checkout-width-boxed', 'itk-checkout-fields-compact']);
+    await setBlockModel(blockShell, 'checkout', 'focused');
     expect(await blockShell.evaluate((element) => getComputedStyle(element).maxWidth)).toBe('920px');
 
     await page.setViewportSize({ width: 820, height: 1000 });
