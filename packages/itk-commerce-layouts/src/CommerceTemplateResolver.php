@@ -76,6 +76,73 @@ final class CommerceTemplateResolver {
     }
 
     /**
+     * Resolve the profile-selected product-card model. Theme validation remains
+     * authoritative for unknown identifiers.
+     *
+     * @param string $default_model Theme default/current product-card model.
+     * @return string
+     */
+    public function resolve_product_card_model( $default_model ) {
+        $profile = $this->active_profile();
+        $config  = $this->product_card_config( $profile );
+        $model   = ! empty( $config['model'] ) ? sanitize_key( $config['model'] ) : sanitize_key( $default_model );
+
+        /**
+         * Filter the profile-resolved product-card model before Theme validation.
+         *
+         * @param string                   $model   Selected model.
+         * @param array<string,mixed>      $config  Product-card configuration.
+         * @param array<string,mixed>|null $profile Active profile.
+         */
+        return sanitize_key( apply_filters( 'itk_commerce_profile_product_card_model', $model, $config, $profile ) );
+    }
+
+    /**
+     * Merge profile product-card options into Theme defaults. The Theme performs
+     * final bounded validation so portable profiles cannot inject arbitrary CSS.
+     *
+     * @param array<string,mixed> $defaults Theme defaults/current options.
+     * @return array<string,mixed>
+     */
+    public function resolve_product_card_options( $defaults ) {
+        $defaults = is_array( $defaults ) ? $defaults : array();
+        $profile  = $this->active_profile();
+        $config   = $this->product_card_config( $profile );
+
+        if ( empty( $config['options'] ) || ! is_array( $config['options'] ) ) {
+            return $defaults;
+        }
+
+        $options = array_merge( $defaults, $config['options'] );
+
+        /**
+         * Filter profile-resolved product-card options before Theme validation.
+         *
+         * @param array<string,mixed>      $options Profile options merged with defaults.
+         * @param array<string,mixed>|null $profile Active profile.
+         */
+        $filtered = apply_filters( 'itk_commerce_profile_product_card_options', $options, $profile );
+
+        return is_array( $filtered ) ? $filtered : $defaults;
+    }
+
+    /**
+     * @param array<string,mixed>|null $profile Active profile.
+     * @return array<string,mixed>
+     */
+    private function product_card_config( $profile ) {
+        if (
+            ! is_array( $profile ) ||
+            empty( $profile['layouts']['commerce']['components']['product_card'] ) ||
+            ! is_array( $profile['layouts']['commerce']['components']['product_card'] )
+        ) {
+            return array();
+        }
+
+        return $profile['layouts']['commerce']['components']['product_card'];
+    }
+
+    /**
      * @return array<string,mixed>|null
      */
     private function active_profile() {
