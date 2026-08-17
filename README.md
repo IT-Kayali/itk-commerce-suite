@@ -4,7 +4,7 @@ Modular, scalable WooCommerce commerce platform by IT-Kayali with a reusable the
 
 ## Status
 
-Initial foundation. Current development target: Phase 0/1 (audit, specification and technical foundation).
+Foundation / Phase 1. The reusable base theme template is implemented on `foundation/initial-structure`; advanced builders and optional commerce capabilities remain separate packages.
 
 ## Product ownership
 
@@ -21,6 +21,22 @@ The suite is split into clear layers:
 3. **IT-Kayali core** — settings, module management, import/export, roles and update coordination.
 4. **Installable modules** — optional commerce capabilities with explicit dependencies.
 5. **WordPress + WooCommerce** — customer data and commerce data remain in the supported platform APIs.
+
+## Theme baseline (`0.1.0-dev`)
+
+The reusable theme now provides:
+
+- standard page, front-page, single, archive, search and 404 templates;
+- WooCommerce integration and product-gallery support;
+- customer-neutral header and multi-column footer;
+- desktop primary navigation and mobile drawer navigation;
+- configurable mobile bottom navigation with a neutral commerce fallback;
+- responsive WooCommerce product-grid baseline;
+- accessible skip link, focus behavior, search form and keyboard-close navigation;
+- versioned `theme.json` design tokens;
+- RTL-aware logical layout rules;
+- a local-font-only policy by default;
+- layered CSS/JS assets and public extension hooks for future modules.
 
 ## Planned packages
 
@@ -51,6 +67,13 @@ tests/
 tools/
 .github/
 ```
+
+## Validation and development ZIPs
+
+GitHub Actions validates PHP syntax and `theme.json`, then builds development artifacts:
+
+- `itk-commerce-theme.zip`
+- `itk-commerce-core.zip`
 
 ## Engineering rules
 
