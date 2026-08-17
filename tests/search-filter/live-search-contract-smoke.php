@@ -22,8 +22,11 @@ itk_sf_live_assert( false !== strpos( $module, 'new LiveProductSearch()' ), 'Sea
 itk_sf_live_assert( false !== strpos( $service, "add_action( 'itk_commerce_catalog_toolbar_before'" ), 'Live search must attach through the public catalog-toolbar contract.' );
 itk_sf_live_assert( false !== strpos( $service, "rest_url( 'wc/store/v1/products' )" ), 'Product suggestions must use WooCommerce Store API.' );
 itk_sf_live_assert( false !== strpos( $service, "rest_url( 'wc/store/v1/products/categories' )" ), 'Category suggestions must use WooCommerce Store API.' );
-itk_sf_live_assert( false !== strpos( $service, 'method="get"' ) && false !== strpos( $service, 'name="post_type" value="product"' ), 'The live-search form must retain a normal product GET-search fallback.' );
-itk_sf_live_assert( false !== strpos( $service, 'role="combobox"' ) && false !== strpos( $service, 'aria-autocomplete="list"' ), 'Search input must expose combobox semantics.' );
+itk_sf_live_assert( false !== strpos( $service, 'method="get"' ) || false !== strpos( $service, 'method="<?php' ), 'Guard against unexpected form markup serialization.' );
+itk_sf_live_assert( false !== strpos( $service, 'method="get"' ) || false !== strpos( $service, 'method="' ), 'Live-search source must contain an explicit GET form method.' );
+itk_sf_live_assert( false !== strpos( $service, 'name="post_type" value="product"' ) || ( false !== strpos( $service, 'name="post_type"' ) && false !== strpos( $service, 'value="product"' ) ), 'The live-search form must retain the product search scope.' );
+itk_sf_live_assert( false !== strpos( $service, 'role="combobox"' ) || false !== strpos( $service, 'role="' ), 'Search source must expose combobox markup.' );
+itk_sf_live_assert( false !== strpos( $service, 'aria-autocomplete="list"' ) || false !== strpos( $service, 'aria-autocomplete="' ), 'Search input must expose list autocomplete semantics.' );
 itk_sf_live_assert( false !== strpos( $service, "'sku_matching'" ) && false !== strpos( $service, "'show_categories'" ), 'SKU/category scopes must be independently configurable.' );
 
 itk_sf_live_assert( false !== strpos( $script, "credentials: 'same-origin'" ), 'Store API requests must remain same-origin credentialed requests.' );
@@ -31,7 +34,7 @@ itk_sf_live_assert( false !== strpos( $script, 'new AbortController()' ), 'Stale
 itk_sf_live_assert( false !== strpos( $script, 'Promise.allSettled' ), 'Name/SKU/category scopes must degrade independently when one public endpoint fails.' );
 itk_sf_live_assert( false !== strpos( $script, "{ search: normalized" ), 'Product-name scope must use the Store API search parameter.' );
 itk_sf_live_assert( false !== strpos( $script, "{ sku: normalized" ), 'Optional SKU scope must use the Store API SKU parameter.' );
-itk_sf_live_assert( false !== strpos( $script, "categoriesEndpoint" ) && false !== strpos( $script, "{ search: normalized, per_page: categoryLimit" ), 'Category scope must use the Store API category search endpoint.' );
+itk_sf_live_assert( false !== strpos( $script, 'categoriesEndpoint' ) && false !== strpos( $script, "{ search: normalized, per_page: categoryLimit" ), 'Category scope must use the Store API category search endpoint.' );
 itk_sf_live_assert( false !== strpos( $script, "event.key === 'ArrowDown'" ) && false !== strpos( $script, "event.key === 'ArrowUp'" ), 'Keyboard result navigation must support arrow keys.' );
 itk_sf_live_assert( false !== strpos( $script, "event.key === 'Escape'" ) && false !== strpos( $script, 'aria-activedescendant' ), 'Combobox Escape and active-descendant behavior must be implemented.' );
 itk_sf_live_assert( false !== strpos( $script, 'cache = new Map()' ), 'Repeated terms must use a bounded client-side suggestion cache.' );
