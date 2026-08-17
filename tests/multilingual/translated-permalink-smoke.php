@@ -182,9 +182,9 @@ namespace {
             unset( $output );
             $rows = false !== strpos( $sql, 'route_aliases' ) ? $this->aliases : $this->routes;
             $where = array();
-            if ( preg_match_all( "/([a-z_]+) = ('([^']*)'|([0-9]+))/", $sql, $matches, PREG_SET_ORDER ) ) {
+            if ( preg_match_all( "/([a-z_]+) = ('([^']*)'|([0-9]+))/", $sql, $matches, PREG_SET_ORDER | PREG_UNMATCHED_AS_NULL ) ) {
                 foreach ( $matches as $match ) {
-                    $where[ $match[1] ] = '' !== $match[3] ? str_replace( "''", "'", $match[3] ) : (int) $match[4];
+                    $where[ $match[1] ] = null !== $match[3] ? str_replace( "''", "'", $match[3] ) : (int) $match[4];
                 }
             }
             foreach ( $rows as $row ) {
