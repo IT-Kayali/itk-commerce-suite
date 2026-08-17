@@ -44,9 +44,11 @@ function prepare() {
     require_once PATH . '/src/UrlState.php';
     require_once PATH . '/src/WooQueryAdapter.php';
     require_once PATH . '/src/FilterRenderer.php';
+    require_once PATH . '/src/Admin/PostedDefinitionNormalizer.php';
     require_once PATH . '/src/Admin/FilterBuilderPage.php';
     require_once PATH . '/src/SearchFilterModule.php';
 
+    add_action( 'admin_post_itk_commerce_save_search_filters', '\\ITK\\Commerce\\SearchFilter\\Admin\\normalize_posted_definitions', 5 );
     add_action( 'itk_commerce_register_modules', __NAMESPACE__ . '\\register_module' );
 }
 
