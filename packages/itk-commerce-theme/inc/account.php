@@ -83,6 +83,8 @@ function account_page_active() {
 
 /**
  * Add stable classes used by reusable account CSS and optional modules.
+ * Guest login/registration uses a separate class so it is never forced into the
+ * authenticated dashboard grid.
  *
  * @param string[] $classes Existing body classes.
  * @return string[]
@@ -96,6 +98,9 @@ function account_body_classes( $classes ) {
 
     $options   = account_options();
     $classes[] = 'itk-account-enabled';
+    $classes[] = function_exists( 'is_user_logged_in' ) && is_user_logged_in()
+        ? 'itk-account-authenticated'
+        : 'itk-account-guest';
     $classes[] = 'itk-account-model-' . sanitize_html_class( $options['model'] );
     $classes[] = 'itk-account-width-' . sanitize_html_class( $options['content_width'] );
     $classes[] = 'itk-account-nav-' . sanitize_html_class( $options['navigation_style'] );
