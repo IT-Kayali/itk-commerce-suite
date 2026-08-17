@@ -96,6 +96,12 @@ final class LanguageContext {
     }
 
     /** @return string */
+    public function default_code() {
+        $default = isset( $this->config['default'] ) ? (string) $this->config['default'] : '';
+        return isset( $this->languages[ $default ] ) ? $default : $this->current_code;
+    }
+
+    /** @return string */
     public function fallback_code() {
         $fallback = isset( $this->config['fallback'] ) ? (string) $this->config['fallback'] : '';
         return isset( $this->languages[ $fallback ] ) ? $fallback : $this->current_code;
@@ -132,6 +138,7 @@ final class LanguageContext {
             'code'      => $this->code(),
             'locale'    => $this->locale(),
             'direction' => $this->direction(),
+            'default'   => $this->default_code(),
             'fallback'  => $this->fallback_code(),
             'language'  => $this->current(),
             'languages' => $this->enabled_languages(),
