@@ -39,11 +39,12 @@ function enqueue_assets() {
     );
 
     $styles = array(
-        'base'       => array(),
-        'layout'     => array( 'itk-commerce-base' ),
-        'components' => array( 'itk-commerce-layout' ),
-        'commerce'   => array( 'itk-commerce-components' ),
-        'responsive' => array( 'itk-commerce-commerce' ),
+        'base'          => array(),
+        'layout'        => array( 'itk-commerce-base' ),
+        'components'    => array( 'itk-commerce-layout' ),
+        'layout-models' => array( 'itk-commerce-components' ),
+        'commerce'      => array( 'itk-commerce-layout-models' ),
+        'responsive'    => array( 'itk-commerce-commerce' ),
     );
 
     foreach ( $styles as $name => $dependencies ) {
