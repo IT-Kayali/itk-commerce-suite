@@ -35,12 +35,14 @@ function prepare() {
     }
 
     require_once PATH . '/src/LayoutResolver.php';
+    require_once PATH . '/src/CommerceTemplateResolver.php';
     require_once PATH . '/src/MegaMenuConfig.php';
     require_once PATH . '/src/RichMegaMenuRenderer.php';
     require_once PATH . '/src/LivePreview.php';
 
     if ( is_admin() ) {
         require_once PATH . '/src/Admin/LayoutBuilderPage.php';
+        require_once PATH . '/src/Admin/CommerceTemplatePage.php';
         require_once PATH . '/src/Admin/MegaMenuFields.php';
         require_once PATH . '/src/Admin/MegaMenuContentPage.php';
     }

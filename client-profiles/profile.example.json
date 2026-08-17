@@ -81,6 +81,39 @@
           "content_key": "catalog"
         }
       }
+    },
+    "commerce": {
+      "shop": {
+        "model": "grid",
+        "options": {
+          "columns": 4,
+          "sidebar_position": "left",
+          "density": "comfortable"
+        }
+      },
+      "product": {
+        "model": "gallery-left",
+        "options": {
+          "gallery_width": 50,
+          "sticky_summary": true,
+          "tabs_layout": "tabs"
+        }
+      },
+      "cart": {
+        "model": "split",
+        "options": {
+          "sticky_totals": true,
+          "density": "comfortable"
+        }
+      },
+      "checkout": {
+        "model": "split",
+        "options": {
+          "sticky_summary": true,
+          "content_width": "wide",
+          "field_density": "comfortable"
+        }
+      }
     }
   },
   "modules": {

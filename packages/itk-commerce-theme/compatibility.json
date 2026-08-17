@@ -16,13 +16,18 @@
     "elementor": null
   },
   "features": {
-    "woocommerce": "baseline integration implemented",
-    "cart_checkout_blocks": "visual baseline only; full compatibility matrix pending",
-    "rtl": "baseline implemented",
+    "woocommerce": "baseline integration and reusable Shop/Product/Cart/Checkout page-model contracts implemented",
+    "shop_models": ["grid", "sidebar", "editorial", "compact"],
+    "product_models": ["classic", "gallery-left", "gallery-right", "centered", "compact"],
+    "cart_models": ["classic", "split", "compact"],
+    "checkout_models": ["classic", "split", "focused"],
+    "cart_checkout_blocks": "public outer-shell styling implemented; native block internals remain owned by WooCommerce",
+    "rtl": "baseline plus browser regression coverage implemented",
     "elementor": "optional module not yet implemented"
   },
   "notes": [
     "WooCommerce and Elementor version ranges remain unset until the Phase 0 audit and dedicated compatibility testing are completed.",
+    "The Theme uses WooCommerce/WordPress hooks and public block-render boundaries rather than patching WooCommerce templates or targeting Cart/Checkout block internals.",
     "The theme remains usable without Elementor."
   ]
 }

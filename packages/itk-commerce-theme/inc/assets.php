@@ -6,7 +6,6 @@
  */
 
 namespace ITK\Commerce\Theme;
-
 defined( 'ABSPATH' ) || exit;
 
 add_action( 'wp_enqueue_scripts', __NAMESPACE__ . '\\enqueue_assets' );
@@ -39,12 +38,15 @@ function enqueue_assets() {
     );
 
     $styles = array(
-        'base'          => array(),
-        'layout'        => array( 'itk-commerce-base' ),
-        'components'    => array( 'itk-commerce-layout' ),
-        'layout-models' => array( 'itk-commerce-components' ),
-        'commerce'      => array( 'itk-commerce-layout-models' ),
-        'responsive'    => array( 'itk-commerce-commerce' ),
+        'base'                  => array(),
+        'layout'                => array( 'itk-commerce-base' ),
+        'components'            => array( 'itk-commerce-layout' ),
+        'layout-models'         => array( 'itk-commerce-components' ),
+        'commerce'              => array( 'itk-commerce-layout-models' ),
+        'commerce-models'       => array( 'itk-commerce-commerce' ),
+        'responsive'            => array( 'itk-commerce-commerce-models' ),
+        'commerce-grid-contract'=> array( 'itk-commerce-responsive' ),
+        'commerce-block-models' => array( 'itk-commerce-commerce-grid-contract' ),
     );
 
     foreach ( $styles as $name => $dependencies ) {

@@ -1,0 +1,65 @@
+/*
+ * Cart/Checkout block page-model styling.
+ *
+ * WooCommerce treats block internals as private. These rules therefore style
+ * only the IT-Kayali wrapper added through WordPress's public render_block
+ * filter and leave native Cart/Checkout block internals/responsiveness intact.
+ */
+
+.itk-commerce-block-shell {
+  width: 100%;
+  min-width: 0;
+  margin-inline: auto;
+}
+
+.itk-commerce-block-shell--cart.itk-commerce-block-shell--model-classic,
+.itk-commerce-block-shell--checkout.itk-commerce-block-shell--model-classic {
+  max-width: 1180px !important;
+}
+
+.itk-commerce-block-shell--cart.itk-commerce-block-shell--model-split,
+.itk-commerce-block-shell--checkout.itk-commerce-block-shell--model-split {
+  max-width: 1320px !important;
+}
+
+.itk-commerce-block-shell--cart.itk-commerce-block-shell--model-compact {
+  max-width: 980px !important;
+}
+
+.itk-commerce-block-shell--checkout.itk-commerce-block-shell--model-focused,
+.itk-checkout-width-boxed .itk-commerce-block-shell--checkout {
+  max-width: 920px !important;
+}
+
+.itk-checkout-width-wide .itk-commerce-block-shell--checkout {
+  max-width: 1320px !important;
+}
+
+.itk-cart-density-compact .itk-commerce-block-shell--cart,
+.itk-checkout-fields-compact .itk-commerce-block-shell--checkout {
+  --wp--preset--spacing--20: .4rem;
+  --wp--preset--spacing--30: .65rem;
+  --wp--preset--spacing--40: .9rem;
+}
+
+/*
+ * Sticky sidebar behavior is intentionally not forced into Cart/Checkout block
+ * internals. The native blocks own their component tree; this keeps the model
+ * forward-compatible while classic shortcode flows may use the Theme's sticky
+ * options from commerce-models.css.
+ */
+
+@media (max-width: 980px) {
+  .itk-commerce-block-shell--cart,
+  .itk-commerce-block-shell--checkout,
+  .itk-commerce-block-shell--cart.itk-commerce-block-shell--model-classic,
+  .itk-commerce-block-shell--cart.itk-commerce-block-shell--model-split,
+  .itk-commerce-block-shell--cart.itk-commerce-block-shell--model-compact,
+  .itk-commerce-block-shell--checkout.itk-commerce-block-shell--model-classic,
+  .itk-commerce-block-shell--checkout.itk-commerce-block-shell--model-split,
+  .itk-commerce-block-shell--checkout.itk-commerce-block-shell--model-focused,
+  .itk-checkout-width-boxed .itk-commerce-block-shell--checkout,
+  .itk-checkout-width-wide .itk-commerce-block-shell--checkout {
+    max-width: 100% !important;
+  }
+}

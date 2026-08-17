@@ -1,14 +1,14 @@
 # Layout Builders
 
-Phase 2 separates reusable presentation templates from customer-specific layout selection and editing.
+Phase 2 separates reusable presentation models from customer-specific layout selection and editing.
 
 ## Package responsibility
 
 ### Theme
 
-`itk-commerce-theme` owns reusable presentation models and renders them through a public layout registry.
+`itk-commerce-theme` owns reusable presentation/model contracts and responsive rendering.
 
-Current Header models:
+Header models:
 
 - `classic`
 - `centered`
@@ -19,7 +19,7 @@ Current Header models:
 - `sticky`
 - `vertical`
 
-Current Footer models:
+Footer models:
 
 - `classic`
 - `compact`
@@ -29,150 +29,86 @@ Current Footer models:
 - `newsletter`
 - `branches`
 
-The Theme provides these extension points:
+WooCommerce page models:
 
-- `itk_commerce_theme_layout_models` — register additional Theme-compatible model definitions;
-- `itk_commerce_theme_layout_model` — select a model for a layout area;
-- `itk_commerce_before_theme_layout` / `itk_commerce_after_theme_layout` — rendering lifecycle hooks;
-- `itk_commerce_mobile_bottom_enabled` — enable/disable the bottom navigation;
-- `itk_commerce_mobile_bottom_items` — configure its fallback entries.
+- Shop: `grid`, `sidebar`, `editorial`, `compact`
+- Product: `classic`, `gallery-left`, `gallery-right`, `centered`, `compact`
+- Cart: `classic`, `split`, `compact`
+- Checkout: `classic`, `split`, `focused`
 
 ### Layouts module
 
-`itk-commerce-layouts` owns selection, assignment, visual editing and optional rich navigation rules. It reads and writes the active versioned customer profile through Commerce Core public services and selects Theme models through the public Theme hooks.
+`itk-commerce-layouts` owns customer-profile selection, assignment rules, visual editors and authenticated previews. It reads/writes the active versioned customer profile through Commerce Core public services and never patches Theme or WooCommerce source files.
 
-It does not patch Theme files and contains no hard-coded customer branding. WordPress plugin activation synchronizes the module-enabled state with Core and the active profile; deactivation removes the enabled flag while preserving the saved layout configuration.
+WordPress plugin activation synchronizes the module-enabled state with Core and the active profile. Deactivation removes the enabled flag while preserving saved layout configuration for safe reactivation/rollback.
 
-## Visual builder
+## Appearance > Commerce Layouts
 
-The module adds **Appearance > Commerce Layouts** for users with `itk_manage_design`.
-
-The builder currently supports:
+The main visual builder supports:
 
 - visual Header model cards;
 - visual Footer model cards;
-- Shop, Product and Checkout context overrides;
+- Shop/Product/Checkout Header/Footer context overrides;
+- product/category/product-type assignment priority;
 - mobile bottom-navigation visibility;
-- portable Mega-menu definition keys, labels, width and column count;
-- versioned save back into the active customer profile;
-- automatic creation of a neutral `site-default` profile if no active profile exists.
+- portable Mega-menu definition keys, labels, width and columns;
+- versioned save into the active customer profile;
+- neutral `site-default` profile creation when no active profile exists.
 
-Only layout-owned profile sections are changed. Existing branding, contacts, languages, unrelated module configuration and product-specific assignment rules remain intact.
-
-## Authenticated live preview
-
-The builder displays the real storefront in an iframe and can preview unsaved Header, Footer and mobile-bottom choices.
-
-Preview requests require:
-
-1. a logged-in user;
-2. the `itk_manage_design` capability;
-3. the `itk_layout_preview` flag;
-4. a valid nonce for `itk_commerce_layout_preview`.
-
-Preview pages are marked `noindex,nofollow`. The builder offers Desktop, Tablet and Mobile viewport widths without storing those temporary choices.
-
-## Profile configuration
-
-Example:
-
-```json
-{
-  "layouts": {
-    "header": {
-      "default": "classic",
-      "contexts": {
-        "shop": "shop",
-        "checkout": "classic"
-      },
-      "rules": {
-        "single_product": {
-          "123": "centered"
-        },
-        "product_category": {
-          "specials": "shop"
-        },
-        "product_type": {
-          "variable": "centered"
-        }
-      }
-    },
-    "footer": {
-      "default": "columns",
-      "contexts": {
-        "checkout": "compact"
-      }
-    },
-    "mobile_bottom": {
-      "enabled": true,
-      "items": [
-        {"label": "Home", "target": "home", "icon": "home"},
-        {"label": "Shop", "target": "shop", "icon": "shop"},
-        {"label": "Cart", "target": "cart", "icon": "cart", "badge": true},
-        {"label": "Account", "target": "myaccount", "icon": "user"}
-      ]
-    },
-    "mega_menu": {
-      "definitions": {
-        "catalog": {
-          "label": "Catalog",
-          "width": "full",
-          "columns": 4,
-          "content_type": "menu",
-          "content_key": "catalog"
-        }
-      }
-    }
-  },
-  "modules": {
-    "enabled": ["itk-commerce-layouts"],
-    "configuration": {
-      "itk-commerce-layouts": {
-        "mega_content": {
-          "catalog": {
-            "blocks": [
-              {"type": "menu", "title": "Shop", "span": 1},
-              {"type": "categories", "title": "Categories", "span": 1, "slugs": "", "limit": 6, "show_images": true},
-              {"type": "products", "title": "New arrivals", "span": 1, "source": "latest", "value": "", "limit": 4},
-              {"type": "banner", "title": "Collection", "span": 1, "eyebrow": "Featured", "text": "", "image_url": "", "link_url": "", "link_label": "Shop now"}
-            ]
-          }
-        }
-      }
-    }
-  }
-}
-```
-
-## Assignment priority
-
-For commerce-aware Header/Footer assignment, the resolver uses this priority:
+Header/Footer assignment priority:
 
 1. exact single product;
 2. product category;
 3. product type;
 4. current page/commerce context;
 5. area default;
-6. Theme default if the configured model is invalid or missing.
+6. Theme fallback.
 
-Generic contexts currently include:
+## Appearance > Commerce Mega Menu
 
-- `product`
-- `product_category`
-- `shop`
-- `cart`
-- `checkout`
-- `account`
-- `front_page`
-- `page`
-- `archive`
-- `global`
+Mega-menu definitions are portable profile data under `layouts.mega_menu.definitions`. A local WordPress menu item binds to a portable key through menu-item meta `_itk_commerce_mega_menu_key`.
+
+Rich content is stored separately under:
+
+`modules.configuration.itk-commerce-layouts.mega_content.{definition_key}.blocks`
+
+Supported blocks:
+
+- `menu` — existing child/grandchild WordPress menu items;
+- `categories` — WooCommerce product categories;
+- `products` — latest, featured, on-sale, category or explicit product IDs;
+- `image` — customer image/link/alt content;
+- `banner` — promotional content and CTA;
+- `elementor` — optional saved Elementor template ID.
+
+Rich panels use a dedicated toggle separate from the top-level destination link, `aria-expanded`, `aria-controls`, keyboard focus behavior, Escape closing/focus return, click-outside closing and responsive/RTL-aware layout.
+
+Existing basic Mega-menu definitions keep their normal submenu behavior until explicit rich blocks are saved.
+
+## Appearance > Commerce Templates
+
+The final Phase 2 editor manages Shop/Product/Cart/Checkout page-model selection and bounded visual options under `layouts.commerce`.
+
+It includes an authenticated Desktop/Tablet/Mobile live preview and saves only the commerce page-model section, preserving Header/Footer, navigation, Mega-menu and customer branding configuration.
+
+Detailed contracts, model descriptions, block compatibility and profile shape are documented in [`COMMERCE-TEMPLATES.md`](COMMERCE-TEMPLATES.md).
+
+## Authenticated live preview
+
+All layout editors reuse the same preview contract:
+
+1. logged-in user;
+2. `itk_manage_design` capability;
+3. `itk_layout_preview=1`;
+4. valid nonce for `itk_commerce_layout_preview`.
+
+Preview pages are `noindex,nofollow`. Temporary model/options are sent only to the authorized iframe and are not persisted until Save is submitted.
 
 ## Mobile bottom navigation
 
-A dedicated WordPress menu assigned to the Theme's `mobile-bottom` location remains authoritative. If no dedicated menu is assigned, the Layouts module can provide up to six fallback entries from the customer profile.
+A WordPress menu assigned to the Theme's `mobile-bottom` location remains authoritative. Otherwise the profile can provide up to six fallback entries.
 
-Portable targets currently include:
+Portable standard targets:
 
 - `home`
 - `shop`
@@ -180,90 +116,64 @@ Portable targets currently include:
 - `checkout`
 - `myaccount`
 
-This keeps standard commerce destinations portable across domains.
+## Public extension points
 
-## Mega-menu model and menu binding
+Header/Footer Theme hooks:
 
-Mega-menu definitions are stored in the portable customer profile under `layouts.mega_menu.definitions` and referenced by a stable key such as `catalog`.
+- `itk_commerce_theme_layout_models`
+- `itk_commerce_theme_layout_model`
+- `itk_commerce_before_theme_layout`
+- `itk_commerce_after_theme_layout`
+- `itk_commerce_mobile_bottom_enabled`
+- `itk_commerce_mobile_bottom_items`
 
-The visual builder can create and edit up to 12 definition rows. Each definition controls:
-
-- stable key;
-- optional label;
-- width: `aligned` or `full`;
-- column count: 1–6;
-- content type/key compatibility fields.
-
-Under **Appearance > Menus**, a top-level WordPress menu item can be connected to one of these portable definitions using the **Commerce Mega-menu definition key** field. The binding is stored as `_itk_commerce_mega_menu_key` on the local menu item, keeping the local WordPress item ID separate from the portable profile configuration.
-
-Basic definitions keep the previous responsive WordPress submenu behavior until explicit rich content is saved. This preserves backward compatibility for existing customer profiles.
-
-Public Mega-menu filters:
+Mega-menu filters:
 
 - `itk_commerce_mega_menu_definitions`
 - `itk_commerce_mega_menu_definition`
 
-## Rich Mega-menu content
+Commerce page-model filters:
 
-The module adds **Appearance > Commerce Mega Menu** for advanced panel content. Rich content is stored separately from the width/column definition under:
+- `itk_commerce_template_models`
+- `itk_commerce_template_model`
+- `itk_commerce_template_options`
+- `itk_commerce_profile_template_model`
+- `itk_commerce_profile_template_options`
 
-`modules.configuration.itk-commerce-layouts.mega_content.{definition_key}.blocks`
+## Safe fallback and compatibility rules
 
-This separation is intentional: saving the basic Layout Builder can update Mega-menu width or assignment metadata without deleting rich panel content.
+The Theme validates selected model IDs against registered model catalogs. Unknown model IDs never become arbitrary template paths and fall back to a known Theme model.
 
-Supported blocks:
+Optional WooCommerce/Elementor Mega-menu content fails closed rather than breaking navigation.
 
-- `menu` — reuses direct and second-level WordPress child menu items;
-- `categories` — WooCommerce product categories by portable slug, or top-level categories when no slug is supplied;
-- `products` — latest, featured, on-sale, category-based or explicit product IDs;
-- `image` — customer image URL, optional target and alt text;
-- `banner` — eyebrow, title, text, background image, destination and CTA label;
-- `elementor` — optional Elementor saved-template ID.
+Cart/Checkout block internals are intentionally not targeted. The Theme wraps only the public top-level `woocommerce/cart` and `woocommerce/checkout` render boundary and leaves native component markup, validation, payment behavior and responsive internals to WooCommerce.
 
-Each block can span 1–6 configured grid columns and every panel is bounded to six blocks. Product and category query limits are also bounded.
+## Browser regression
 
-Rich blocks never accept executable PHP or JavaScript. Optional Elementor rendering is isolated: if Elementor is inactive, the template is missing or rendering throws an error, that block produces no output and navigation continues normally.
+Phase 2 is protected by customer-neutral Chromium tests covering:
 
-## Rich Mega-menu accessibility and responsive behavior
+- Header/Footer responsive layouts;
+- mobile navigation;
+- Mega-menu accessibility, RTL and responsive behavior;
+- Shop column/sidebar models;
+- Product gallery/sticky models;
+- classic Cart/Checkout split models;
+- public Cart/Checkout block-shell widths;
+- mobile horizontal-overflow guards.
 
-Configured rich top-level items receive a dedicated toggle button separate from the destination link. This means the top-level link remains navigable while the panel can still be opened without relying only on hover.
+See [`BROWSER-REGRESSION.md`](BROWSER-REGRESSION.md).
 
-The frontend behavior includes:
+## Phase 2 status
 
-- `aria-expanded` and `aria-controls` on the toggle;
-- keyboard focus support through `:focus-within`;
-- Escape closes open panels and returns focus to the toggle;
-- click outside closes open panels;
-- one open rich panel at a time;
-- logical CSS properties for RTL-friendly positioning;
-- desktop hover/focus behavior;
-- compact toggle-driven panels inside mobile/tablet navigation.
+The approved Phase 2 layout scope is implemented:
 
-Frontend CSS/JS is enqueued only when at least one definition has explicit rich blocks configured.
+- reusable Header/Footer model registry;
+- visual Header/Footer builder;
+- profile/context assignments;
+- mobile navigation bridge;
+- Mega-menu definitions and rich panels;
+- expanded Header/Footer model families;
+- responsive/RTL/accessibility browser regression gate;
+- visual Shop/Product/Cart/Checkout model editor and live preview.
 
-## Additional model families
-
-Several named models from the product plan intentionally reuse shared structural templates with distinct model classes rather than duplicating near-identical PHP files:
-
-- Transparent, Dark and Sticky use the Classic Header structure with variant styling;
-- Luxury uses the Centered Header structure with variant styling;
-- Vertical has its own responsive structure;
-- Simple uses the Compact Footer structure;
-- Luxury, Newsletter and Branches build on the Columns Footer structure and expose dedicated content hooks.
-
-This keeps future maintenance and WooCommerce/theme compatibility changes centralized.
-
-## Safe fallback
-
-The Theme validates every selected model against its registered model catalog. Unknown model IDs do not become arbitrary template paths; rendering falls back to a known Theme model.
-
-Basic Mega-menu definitions also remain functional without rich content, and optional WooCommerce/Elementor block rendering fails closed rather than breaking the site header.
-
-## Remaining Phase 2 work
-
-The current implementation intentionally does not yet claim completion of:
-
-- browser-based responsive/RTL/accessibility regression tests;
-- full Shop/Product/Cart/Checkout visual template editing beyond the current Header/Footer assignment layer.
-
-These capabilities must extend the existing public contracts rather than replacing or bypassing them.
+New capabilities should extend these public contracts rather than replacing them with customer-specific copies or direct core/template patches.

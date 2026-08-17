@@ -1,0 +1,99 @@
+<!doctype html>
+<html lang="en" dir="ltr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>IT-Kayali Commerce template regression fixture</title>
+  <link rel="stylesheet" href="/packages/itk-commerce-theme/assets/css/base.css">
+  <link rel="stylesheet" href="/packages/itk-commerce-theme/assets/css/commerce.css">
+  <link rel="stylesheet" href="/packages/itk-commerce-theme/assets/css/commerce-models.css">
+  <link rel="stylesheet" href="/packages/itk-commerce-theme/assets/css/responsive.css">
+  <link rel="stylesheet" href="/packages/itk-commerce-theme/assets/css/commerce-grid-contract.css">
+  <link rel="stylesheet" href="/packages/itk-commerce-theme/assets/css/commerce-block-models.css">
+  <style>
+    :root {
+      --itk-container-width: 1240px;
+      --itk-header-height: 72px;
+      --itk-color-text: #111827;
+      --itk-color-muted: #667085;
+      --itk-color-border: #e5e7eb;
+      --itk-color-surface: #fff;
+      --itk-color-surface-alt: #f8fafc;
+      --itk-color-accent: #2563eb;
+      --itk-color-danger: #b42318;
+      --itk-radius-md: 8px;
+      --itk-radius-lg: 14px;
+      --itk-radius-pill: 999px;
+    }
+    * { box-sizing: border-box; }
+    body { margin: 0; font-family: system-ui, sans-serif; color: var(--itk-color-text); background: #fff; }
+    .itk-container { width: min(calc(100% - 32px), var(--itk-container-width)); margin-inline: auto; }
+    .fixture-area { display: none; padding-block: 32px; }
+    .itk-commerce-area-shop [data-fixture-area="shop"],
+    .itk-commerce-area-product [data-fixture-area="product"],
+    .itk-commerce-area-cart [data-fixture-area="cart"],
+    .itk-commerce-area-checkout [data-fixture-area="checkout"] { display: block; }
+    .fixture-card { min-height: 130px; border: 1px solid var(--itk-color-border); background: var(--itk-color-surface-alt); }
+    .fixture-area ul.products { list-style: none; padding: 0; }
+    .fixture-area ul.products li.product { min-width: 0; }
+    .fixture-gallery { min-height: 360px; background: #e9eef5; border-radius: 12px; }
+    .fixture-summary { min-height: 340px; padding: 20px; background: #f8fafc; border: 1px solid var(--itk-color-border); border-radius: 12px; }
+    .fixture-tabs, .fixture-related { min-height: 120px; padding: 16px; border: 1px solid var(--itk-color-border); border-radius: 12px; }
+    .woocommerce-cart-form, .cart-collaterals, #customer_details, #order_review { min-width: 0; min-height: 220px; padding: 16px; border: 1px solid var(--itk-color-border); background: #f8fafc; border-radius: 12px; }
+    #order_review_heading { margin: 0 0 8px; }
+    .itk-commerce-block-shell { min-height: 180px; padding: 16px; border: 1px dashed #98a2b3; background: #fff; }
+    .fixture-native-block { min-height: 140px; display: grid; place-items: center; background: #f8fafc; border-radius: 10px; }
+  </style>
+</head>
+<body class="woocommerce-page itk-commerce-area-shop itk-shop-model-sidebar itk-commerce-columns-5 itk-shop-density-comfortable itk-shop-sidebar-right">
+  <main class="itk-commerce-main">
+    <div class="itk-container">
+      <section class="fixture-area" data-fixture-area="shop">
+        <div class="itk-shop-shell itk-shop-shell--sidebar itk-shop-shell--sidebar-right" data-shop-shell>
+          <aside class="itk-shop-sidebar" data-shop-sidebar><strong>Filters</strong></aside>
+          <div class="itk-shop-shell__content" data-shop-content>
+            <ul class="products" data-shop-grid>
+              <li class="product"><div class="fixture-card">1</div></li>
+              <li class="product"><div class="fixture-card">2</div></li>
+              <li class="product"><div class="fixture-card">3</div></li>
+              <li class="product"><div class="fixture-card">4</div></li>
+              <li class="product"><div class="fixture-card">5</div></li>
+              <li class="product"><div class="fixture-card">6</div></li>
+            </ul>
+          </div>
+        </div>
+      </section>
+
+      <section class="fixture-area" data-fixture-area="product">
+        <div class="product" data-product-layout>
+          <div class="woocommerce-product-gallery fixture-gallery" data-product-gallery></div>
+          <div class="summary fixture-summary" data-product-summary><h1 class="product_title">Fixture Product</h1></div>
+          <div class="woocommerce-tabs fixture-tabs"><ul class="tabs"><li>Description</li></ul><div class="panel">Description</div></div>
+          <div class="related fixture-related">Related products</div>
+        </div>
+      </section>
+
+      <section class="fixture-area" data-fixture-area="cart">
+        <div class="itk-cart-shell itk-cart-shell--split" data-cart-classic>
+          <form class="woocommerce-cart-form">Cart table</form>
+          <div class="cart-collaterals"><div class="cart_totals" data-cart-totals>Totals</div></div>
+        </div>
+        <div class="itk-commerce-block-shell itk-commerce-block-shell--cart itk-commerce-block-shell--model-compact" data-cart-block-shell>
+          <div class="fixture-native-block">Native WooCommerce Cart block owns its internal layout</div>
+        </div>
+      </section>
+
+      <section class="fixture-area" data-fixture-area="checkout">
+        <form class="checkout" data-checkout-classic>
+          <div id="customer_details">Customer fields</div>
+          <h3 id="order_review_heading">Order review</h3>
+          <div id="order_review" data-checkout-review>Order review content</div>
+        </form>
+        <div class="itk-commerce-block-shell itk-commerce-block-shell--checkout itk-commerce-block-shell--model-focused" data-checkout-block-shell>
+          <div class="fixture-native-block">Native WooCommerce Checkout block owns its internal layout</div>
+        </div>
+      </section>
+    </div>
+  </main>
+</body>
+</html>
