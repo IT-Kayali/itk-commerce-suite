@@ -16,4 +16,8 @@ defined( 'ABSPATH' ) || exit;
 <body <?php body_class(); ?>>
 <?php wp_body_open(); ?>
 <a class="itk-skip-link screen-reader-text" href="#primary"><?php esc_html_e( 'Skip to content', 'itk-commerce' ); ?></a>
-<?php ITK\Commerce\Theme\render_layout( 'header', 'classic' ); ?>
+<?php
+if ( ! ITK\Commerce\Theme\maybe_render_elementor_location( 'header' ) ) {
+    ITK\Commerce\Theme\render_layout( 'header', 'classic' );
+}
+?>
