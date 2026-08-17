@@ -1,0 +1,60 @@
+name: Validate Multilingual package
+
+on:
+  push:
+    branches:
+      - main
+      - 'feature/phase5/**'
+      - 'feature/phase5-*'
+  pull_request:
+    paths:
+      - 'packages/itk-commerce-multilingual/**'
+      - 'tests/multilingual/**'
+      - 'docs/MULTILINGUAL.md'
+      - '.github/workflows/multilingual-package.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.1'
+          coverage: none
+
+      - name: PHP syntax check
+        run: find packages/itk-commerce-multilingual tests/multilingual -type f -name '*.php' -print0 | xargs -0 -n1 php -l
+
+      - name: Validate compatibility manifest
+        run: php -r '$data=json_decode(file_get_contents("packages/itk-commerce-multilingual/compatibility.json"),true,512,JSON_THROW_ON_ERROR); foreach(["schema_version","package","type","version","status","minimum","tested_up_to"] as $key){if(!array_key_exists($key,$data)){throw new RuntimeException("Missing {$key}");}} echo "Multilingual compatibility manifest valid\n";'
+
+      - name: Multilingual foundation smoke test
+        run: php tests/multilingual/foundation-smoke.php
+
+      - name: Guard generic Multilingual package from reference-customer coupling
+        run: |
+          if grep -RniE 'Al-Lord|al-lord' packages/itk-commerce-multilingual; then
+            echo 'Reference-customer name detected in generic Multilingual package.'
+            exit 1
+          fi
+
+      - name: Build installable Multilingual ZIP
+        run: |
+          mkdir -p dist
+          cd packages
+          zip -qr ../dist/itk-commerce-multilingual.zip itk-commerce-multilingual
+
+      - name: Upload Multilingual development package
+        uses: actions/upload-artifact@v4
+        with:
+          name: itk-commerce-multilingual-dev-package
+          path: dist/itk-commerce-multilingual.zip
+          if-no-files-found: error
+          retention-days: 14
