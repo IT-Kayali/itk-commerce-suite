@@ -45,6 +45,9 @@ jobs:
       - name: Translation workflow smoke test
         run: php tests/multilingual/translation-workflow-smoke.php
 
+      - name: WooCommerce entity mapping smoke test
+        run: php tests/multilingual/woocommerce-entity-mapping-smoke.php
+
       - name: Guard generic Multilingual package from reference-customer coupling
         run: |
           if grep -RniE 'Al-Lord|al-lord' packages/itk-commerce-multilingual; then
