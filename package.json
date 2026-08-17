@@ -1,0 +1,12 @@
+{
+  "name": "itk-commerce-suite-tooling",
+  "version": "0.1.0-dev",
+  "private": true,
+  "description": "Development and browser-regression tooling for the IT-Kayali Commerce Suite.",
+  "scripts": {
+    "test:browser": "playwright test --config=playwright.config.js"
+  },
+  "devDependencies": {
+    "@playwright/test": "1.55.0"
+  }
+}

@@ -28,7 +28,9 @@ jobs:
         run: find packages tests -type f -name '*.php' -print0 | xargs -0 -n1 php -l
 
       - name: JavaScript syntax check
-        run: find packages -type f -name '*.js' -print0 | xargs -0 -r -n1 node --check
+        run: |
+          node --check playwright.config.js
+          find packages tests -type f -name '*.js' -print0 | xargs -0 -r -n1 node --check
 
       - name: Validate theme JSON
         run: php -r '$json = file_get_contents("packages/itk-commerce-theme/theme.json"); json_decode($json, true, 512, JSON_THROW_ON_ERROR); echo "theme.json valid\n";'
@@ -53,9 +55,43 @@ jobs:
             exit 1
           fi
 
-  build:
+  browser-regression:
     runs-on: ubuntu-latest
     needs: validate
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install browser test tooling
+        run: npm install --ignore-scripts --no-audit --no-fund
+
+      - name: Install Playwright Chromium
+        run: npx playwright install --with-deps chromium
+
+      - name: Responsive RTL accessibility browser regression
+        run: npm run test:browser
+
+      - name: Upload browser regression diagnostics
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: itk-commerce-browser-regression-report
+          path: |
+            playwright-report/
+            test-results/
+          if-no-files-found: ignore
+          retention-days: 7
+
+  build:
+    runs-on: ubuntu-latest
+    needs:
+      - validate
+      - browser-regression
     steps:
       - name: Checkout
         uses: actions/checkout@v4

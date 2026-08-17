@@ -1,0 +1,152 @@
+<!doctype html>
+<html lang="en" dir="ltr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>IT-Kayali layout browser fixture</title>
+  <link rel="stylesheet" href="/packages/itk-commerce-theme/assets/css/base.css">
+  <link rel="stylesheet" href="/packages/itk-commerce-theme/assets/css/layout.css">
+  <link rel="stylesheet" href="/packages/itk-commerce-theme/assets/css/components.css">
+  <link rel="stylesheet" href="/packages/itk-commerce-theme/assets/css/layout-models.css">
+  <link rel="stylesheet" href="/packages/itk-commerce-theme/assets/css/responsive.css">
+  <link rel="stylesheet" href="/packages/itk-commerce-layouts/assets/css/mega-menu.css">
+  <style>
+    :root {
+      --itk-container-width: 1240px;
+      --itk-content-gap: 1rem;
+      --itk-header-height: 76px;
+      --itk-color-text: #111827;
+      --itk-color-muted: #667085;
+      --itk-color-border: #e5e7eb;
+      --itk-color-surface: #fff;
+      --itk-color-surface-alt: #f8fafc;
+    }
+    * { box-sizing: border-box; }
+    body { margin: 0; color: var(--itk-color-text); background: #fff; font-family: system-ui, sans-serif; }
+    .itk-container { width: min(100% - 32px, var(--itk-container-width)); margin-inline: auto; }
+    .fixture-logo { display: inline-flex; align-items: center; min-height: 44px; color: inherit; font-weight: 800; text-decoration: none; }
+    .itk-header-action { display: inline-flex; align-items: center; gap: .35rem; min-height: 44px; color: inherit; text-decoration: none; }
+    .itk-header-actions { display: flex; align-items: center; gap: .75rem; }
+    .itk-header-menu-toggle { min-width: 44px; min-height: 44px; }
+    .itk-primary-navigation-wrap { border-block: 1px solid var(--itk-color-border); background: #fff; }
+    .itk-primary-navigation__menu { display: flex; align-items: center; gap: 1rem; list-style: none; margin: 0; padding: 0; }
+    .itk-primary-navigation__menu > li { position: relative; }
+    .itk-primary-navigation__menu > li > a { display: inline-flex; align-items: center; min-height: 48px; color: inherit; text-decoration: none; }
+    .screen-reader-text { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; border: 0; }
+    .screen-reader-text:focus { position: fixed; z-index: 9999; inset-block-start: 8px; inset-inline-start: 8px; width: auto; height: auto; margin: 0; padding: 10px 12px; clip: auto; background: #fff; color: #111827; }
+    main { min-height: 480px; padding-block: 48px; }
+    .fixture-card { padding: 24px; border: 1px solid var(--itk-color-border); border-radius: 14px; background: var(--itk-color-surface-alt); }
+    .itk-site-footer { padding-block: 32px; background: #111827; color: #fff; }
+    .itk-footer-brand__name, .itk-footer-column a { color: inherit; }
+    .itk-footer-column ul { list-style: none; padding: 0; }
+    .itk-mobile-bottom { display: none; }
+    @media (max-width: 640px) {
+      .itk-mobile-bottom { position: sticky; bottom: 0; z-index: 100; display: block; border-block-start: 1px solid var(--itk-color-border); background: #fff; }
+      .itk-mobile-bottom__menu { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); list-style: none; margin: 0; padding: 0; }
+      .itk-mobile-bottom__menu a { display: grid; place-items: center; min-height: 56px; padding: 4px; color: #111827; font-size: 11px; text-decoration: none; }
+    }
+  </style>
+</head>
+<body>
+  <a class="itk-skip-link screen-reader-text" href="#primary">Skip to content</a>
+
+  <header class="itk-site-header itk-site-header--centered" data-itk-site-header data-itk-layout-model="centered">
+    <div class="itk-header-centered">
+      <div class="itk-container itk-header-centered__inner">
+        <div class="itk-header-centered__start">
+          <button class="itk-header-menu-toggle" type="button" aria-label="Open navigation">☰</button>
+          <a class="itk-header-action" href="#search">Search</a>
+        </div>
+        <div class="itk-header-centered__brand"><a class="fixture-logo" href="#">IT-Kayali Shop</a></div>
+        <div class="itk-header-actions" aria-label="Shop actions">
+          <a class="itk-header-action" href="#account"><span class="itk-header-action__label">Account</span></a>
+          <a class="itk-header-action" href="#cart"><span class="itk-header-action__label">Cart</span></a>
+        </div>
+      </div>
+    </div>
+
+    <div class="itk-primary-navigation-wrap">
+      <div class="itk-container">
+        <nav id="itk-primary-navigation" class="itk-primary-navigation itk-primary-navigation--centered" aria-label="Primary Navigation">
+          <ul class="itk-primary-navigation__menu">
+            <li class="menu-item"><a href="#home">Home</a></li>
+            <li class="menu-item itk-menu-item--mega itk-menu-item--mega-rich itk-mega-menu--aligned itk-mega-menu-columns-4" data-fixture-mega-item>
+              <a href="#catalog" data-itk-mega-menu="catalog" data-itk-mega-menu-width="aligned" data-itk-mega-menu-columns="4" aria-haspopup="true">Catalog</a>
+              <button class="itk-mega-toggle" type="button" aria-expanded="false" aria-controls="itk-mega-panel-fixture" data-itk-mega-toggle>
+                <span class="screen-reader-text">Open Catalog menu</span>
+                <span aria-hidden="true">⌄</span>
+              </button>
+              <div id="itk-mega-panel-fixture" class="itk-mega-panel itk-mega-panel--aligned" data-itk-mega-panel="catalog" style="--itk-mega-columns:4">
+                <div class="itk-mega-panel__inner">
+                  <section class="itk-mega-block itk-mega-block--menu" style="--itk-mega-span:1">
+                    <h3 class="itk-mega-block__title">Shop</h3>
+                    <ul class="itk-mega-links">
+                      <li><a href="#new">New arrivals</a><ul><li><a href="#popular">Popular</a></li></ul></li>
+                      <li><a href="#gifts">Gifts</a></li>
+                    </ul>
+                  </section>
+                  <section class="itk-mega-block itk-mega-block--categories" style="--itk-mega-span:1">
+                    <h3 class="itk-mega-block__title">Categories</h3>
+                    <div class="itk-mega-categories">
+                      <a class="itk-mega-category" href="#men"><span>Men</span></a>
+                      <a class="itk-mega-category" href="#women"><span>Women</span></a>
+                    </div>
+                  </section>
+                  <section class="itk-mega-block itk-mega-block--products" style="--itk-mega-span:1">
+                    <h3 class="itk-mega-block__title">Products</h3>
+                    <div class="itk-mega-products">
+                      <a class="itk-mega-product" href="#product-one"><span class="itk-mega-product__name">Product one</span><span class="itk-mega-product__price">€19.00</span></a>
+                      <a class="itk-mega-product" href="#product-two"><span class="itk-mega-product__name">Product two</span><span class="itk-mega-product__price">€29.00</span></a>
+                    </div>
+                  </section>
+                  <section class="itk-mega-block itk-mega-block--banner" style="--itk-mega-span:1">
+                    <div class="itk-mega-banner">
+                      <span class="itk-mega-banner__eyebrow">Featured</span>
+                      <strong class="itk-mega-banner__title">Summer collection</strong>
+                      <p>Portable promotional content.</p>
+                      <a class="itk-mega-banner__link" href="#summer">Shop now</a>
+                    </div>
+                  </section>
+                </div>
+              </div>
+              <ul class="sub-menu"><li><a href="#fallback">Fallback submenu</a></li></ul>
+            </li>
+            <li class="menu-item"><a href="#contact">Contact</a></li>
+          </ul>
+        </nav>
+      </div>
+    </div>
+
+    <div class="itk-header-search itk-header-search--centered" id="search">
+      <div class="itk-container"><form role="search"><label>Search <input type="search" name="s"></label></form></div>
+    </div>
+  </header>
+
+  <main id="primary" tabindex="-1">
+    <div class="itk-container"><div class="fixture-card"><h1>Storefront fixture</h1><p>This fixture exercises the real Commerce Suite responsive CSS and rich Mega-menu JavaScript without requiring production customer data.</p></div></div>
+  </main>
+
+  <footer class="itk-site-footer itk-site-footer--columns" data-itk-layout-model="columns">
+    <div class="itk-container">
+      <div class="itk-footer-columns__intro"><div><a href="#" class="itk-footer-brand__name">IT-Kayali Shop</a><p>Reusable storefront</p></div></div>
+      <div class="itk-footer-columns__grid" data-footer-grid>
+        <div class="itk-footer-column"><strong>Shop</strong></div>
+        <div class="itk-footer-column"><strong>Service</strong></div>
+        <div class="itk-footer-column"><strong>Company</strong></div>
+        <div class="itk-footer-column"><strong>Legal</strong></div>
+      </div>
+    </div>
+  </footer>
+
+  <nav class="itk-mobile-bottom" aria-label="Mobile Bottom Navigation">
+    <ul class="itk-mobile-bottom__menu">
+      <li><a href="#home">Home</a></li>
+      <li><a href="#shop">Shop</a></li>
+      <li><a href="#cart">Cart</a></li>
+      <li><a href="#account">Account</a></li>
+    </ul>
+  </nav>
+
+  <script src="/packages/itk-commerce-layouts/assets/js/mega-menu.js"></script>
+</body>
+</html>
