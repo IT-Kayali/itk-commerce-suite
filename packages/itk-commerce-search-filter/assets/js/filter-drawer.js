@@ -118,6 +118,7 @@
         }
       } else {
         if (isOpen()) closeDrawer(false);
+        document.documentElement.classList.remove('itk-filter-offcanvas-ready');
         document.body.classList.remove('itk-filter-drawer-open');
         trigger.setAttribute('aria-expanded', details.open ? 'true' : 'false');
         setDialogState(false);
