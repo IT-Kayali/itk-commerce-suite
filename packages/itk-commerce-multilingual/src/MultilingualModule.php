@@ -25,6 +25,15 @@ final class MultilingualModule implements ModuleInterface {
     /** @var LanguageSwitcher|null */
     private $switcher = null;
 
+    /** @var TranslationSchema|null */
+    private $translation_schema = null;
+
+    /** @var TranslationRepository|null */
+    private $translation_repository = null;
+
+    /** @var TranslationWorkflow|null */
+    private $translation_workflow = null;
+
     /** @return string */
     public function id() {
         return MODULE_ID;
@@ -70,6 +79,15 @@ final class MultilingualModule implements ModuleInterface {
         $this->switcher = new LanguageSwitcher( $this->context, $this->router );
         $this->switcher->register();
 
+        $this->translation_schema     = new TranslationSchema();
+        $this->translation_repository = new TranslationRepository( $this->translation_schema );
+        $this->translation_workflow   = new TranslationWorkflow(
+            $this->translation_schema,
+            $this->translation_repository,
+            $this->context
+        );
+        $this->translation_workflow->register();
+
         do_action(
             'itk_commerce_multilingual_loaded',
             $this,
@@ -77,7 +95,8 @@ final class MultilingualModule implements ModuleInterface {
             $this->context,
             $config,
             $this->router,
-            $this->switcher
+            $this->switcher,
+            $this->translation_workflow
         );
     }
 
@@ -99,6 +118,21 @@ final class MultilingualModule implements ModuleInterface {
     /** @return LanguageSwitcher|null */
     public function switcher() {
         return $this->switcher;
+    }
+
+    /** @return TranslationSchema|null */
+    public function translation_schema() {
+        return $this->translation_schema;
+    }
+
+    /** @return TranslationRepository|null */
+    public function translation_repository() {
+        return $this->translation_repository;
+    }
+
+    /** @return TranslationWorkflow|null */
+    public function translation_workflow() {
+        return $this->translation_workflow;
     }
 
     /** @return array<string,mixed> */
