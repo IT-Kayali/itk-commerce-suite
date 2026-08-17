@@ -104,6 +104,59 @@ final class LivePreview {
     }
 
     /**
+     * Preview a product-card model on the real Shop destination without saving.
+     *
+     * @param string $model Current product-card model.
+     * @return string
+     */
+    public function product_card_model( $model ) {
+        if ( ! $this->is_authorized() || ! $this->matches_template_area( 'product-card' ) || empty( $_GET['itk_product_card_model'] ) ) {
+            return $model;
+        }
+
+        return sanitize_key( wp_unslash( $_GET['itk_product_card_model'] ) );
+    }
+
+    /**
+     * Preview bounded product-card visual options without persisting them.
+     * Theme validation remains authoritative.
+     *
+     * @param array<string,mixed> $options Current product-card options.
+     * @return array<string,mixed>
+     */
+    public function product_card_options( $options ) {
+        $options = is_array( $options ) ? $options : array();
+
+        if ( ! $this->is_authorized() || ! $this->matches_template_area( 'product-card' ) ) {
+            return $options;
+        }
+
+        $keys = array(
+            'image_ratio'      => 'itk_card_image_ratio',
+            'content_align'    => 'itk_card_content_align',
+            'price_treatment'  => 'itk_card_price_treatment',
+            'action_treatment' => 'itk_card_action_treatment',
+            'hover_behavior'   => 'itk_card_hover_behavior',
+            'badge_style'      => 'itk_card_badge_style',
+        );
+
+        foreach ( $keys as $option => $parameter ) {
+            if ( isset( $_GET[ $parameter ] ) ) {
+                $options[ $option ] = sanitize_key( wp_unslash( $_GET[ $parameter ] ) );
+            }
+        }
+
+        if ( isset( $_GET['itk_card_show_state_badges'] ) ) {
+            $options['show_state_badges'] = '1' === sanitize_text_field( wp_unslash( $_GET['itk_card_show_state_badges'] ) );
+        }
+        if ( isset( $_GET['itk_card_new_days'] ) ) {
+            $options['new_days'] = absint( wp_unslash( $_GET['itk_card_new_days'] ) );
+        }
+
+        return $options;
+    }
+
+    /**
      * Preview the mobile-bottom visibility without saving the profile.
      *
      * @param bool $enabled Current state.
