@@ -1,4 +1,4 @@
-/* Progressive catalog filter UI. JavaScript/AJAX may enhance this later. */
+/* Progressive catalog filter UI. AJAX may enhance this later. */
 .itk-filter-ui {
     display: flex;
     flex: 1 1 auto;
@@ -28,7 +28,10 @@
     list-style: none;
 }
 
-.itk-filter-trigger::-webkit-details-marker { display: none; }
+.itk-filter-trigger::-webkit-details-marker,
+.itk-filter-group > summary::-webkit-details-marker {
+    display: none;
+}
 
 .itk-filter-trigger__count {
     display: inline-grid;
@@ -67,20 +70,42 @@
 .itk-filter-group {
     min-width: 0;
     margin: 0;
-    padding: 0;
+    padding: 0 0 .75rem;
     border: 0;
+    border-block-end: 1px solid var(--itk-color-border, #e5e7eb);
 }
 
-.itk-filter-group legend {
+.itk-filter-group > summary {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: .65rem;
     width: 100%;
-    margin-block-end: .55rem;
+    min-height: 34px;
     padding: 0;
+    color: var(--itk-color-text, #111827);
     font-size: .9rem;
     font-weight: 800;
+    cursor: pointer;
+    list-style: none;
+}
+
+.itk-filter-group > summary::after {
+    content: '+';
+    flex: 0 0 auto;
+    color: var(--itk-color-muted, #6b7280);
+    font-size: 1rem;
+    font-weight: 700;
+}
+
+.itk-filter-group[open] > summary::after {
+    content: '−';
 }
 
 .itk-filter-group__content {
     min-width: 0;
+    padding-block-start: .55rem;
 }
 
 .itk-filter-options {
@@ -114,6 +139,61 @@
 
 .itk-filter-option--toggle {
     grid-template-columns: auto minmax(0, 1fr);
+}
+
+.itk-filter-group--display-chips .itk-filter-options {
+    display: flex;
+    flex-wrap: wrap;
+    gap: .45rem;
+    max-height: none;
+    overflow: visible;
+}
+
+.itk-filter-option--chip {
+    position: relative;
+    display: inline-flex;
+    grid-template-columns: none;
+    gap: .35rem;
+    width: auto;
+    min-height: 36px;
+    padding: .38rem .62rem;
+    border: 1px solid var(--itk-color-border, #d9dee7);
+    border-radius: 999px;
+    background: var(--itk-color-surface, #fff);
+    cursor: pointer;
+}
+
+.itk-filter-option--chip:has(input:checked) {
+    border-color: var(--itk-color-text, #111827);
+    background: var(--itk-color-surface-alt, #f3f4f6);
+}
+
+.itk-filter-option--chip input {
+    position: absolute;
+    inline-size: 1px;
+    block-size: 1px;
+    overflow: hidden;
+    opacity: 0;
+    pointer-events: none;
+}
+
+.itk-filter-option--chip:focus-within {
+    outline: 2px solid currentColor;
+    outline-offset: 2px;
+}
+
+.itk-filter-select {
+    width: 100%;
+    min-height: 42px;
+    padding: .45rem .65rem;
+    border: 1px solid var(--itk-color-border, #d9dee7);
+    border-radius: var(--itk-radius-md, 10px);
+    background: var(--itk-color-surface, #fff);
+    color: var(--itk-color-text, #111827);
+}
+
+.itk-filter-select[multiple] {
+    min-height: 130px;
 }
 
 .itk-filter-price {
@@ -233,6 +313,14 @@
     .itk-filter-popover,
     .itk-filter-popover__panel {
         width: 100%;
+    }
+
+    .itk-filter-price {
+        grid-template-columns: minmax(0, 1fr);
+    }
+
+    .itk-filter-price > span[aria-hidden='true'] {
+        display: none;
     }
 
     .itk-filter-form__actions {
