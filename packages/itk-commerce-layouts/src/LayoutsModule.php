@@ -89,6 +89,7 @@ final class LayoutsModule implements ModuleInterface {
         if ( is_admin() ) {
             ( new Admin\LayoutBuilderPage() )->register();
             ( new Admin\CommerceTemplatePage() )->register();
+            ( new Admin\ProductCardPage() )->register();
             ( new Admin\MegaMenuFields() )->register();
             ( new Admin\MegaMenuContentPage() )->register();
         }
