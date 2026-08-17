@@ -155,8 +155,9 @@ function mini_cart_content() {
 }
 
 /**
- * Synchronize both the WooCommerce-owned drawer content and every stable Theme
- * cart-count badge through WooCommerce's public fragment contract.
+ * Synchronize the WooCommerce-owned drawer content through the public fragment
+ * contract. The Theme-wide cart_count_fragment() callback in woocommerce.php
+ * owns the stable `span[data-itk-cart-count]` fragment separately.
  */
 function mini_cart_fragment( $fragments ) {
     if ( ! mini_cart_enabled() ) {
@@ -165,8 +166,5 @@ function mini_cart_fragment( $fragments ) {
     ob_start();
     mini_cart_content();
     $fragments['div[data-itk-mini-cart-content]'] = ob_get_clean();
-    ob_start();
-    cart_badge();
-    $fragments['span[data-itk-cart-count]'] = trim( (string) ob_get_clean() );
     return $fragments;
 }
