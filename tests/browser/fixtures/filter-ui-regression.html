@@ -1,0 +1,53 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Search Filter UI regression fixture</title>
+  <link rel="stylesheet" href="/packages/itk-commerce-theme/assets/css/base.css">
+  <link rel="stylesheet" href="/packages/itk-commerce-theme/assets/css/component-contracts.css">
+  <link rel="stylesheet" href="/packages/itk-commerce-search-filter/assets/css/filter-ui.css">
+  <style>body{margin:0}.fixture{max-width:1180px;margin:0 auto;padding:32px 20px}.woocommerce-result-count{margin:0}.woocommerce-ordering select{min-height:42px}</style>
+</head>
+<body>
+  <main class="fixture">
+    <div class="itk-catalog-toolbar" data-toolbar>
+      <p class="woocommerce-result-count">Showing 1–12 of 42 results</p>
+      <div class="itk-filter-ui" data-itk-filter-ui>
+        <details class="itk-filter-popover" open data-filter-popover>
+          <summary class="itk-filter-trigger"><span>Filters</span><span class="itk-filter-trigger__count">3</span></summary>
+          <div class="itk-filter-popover__panel" data-filter-panel>
+            <form class="itk-filter-form" method="get">
+              <div class="itk-filter-groups" data-filter-groups>
+                <details class="itk-filter-group itk-filter-group--taxonomy itk-filter-group--display-chips" open>
+                  <summary>Category</summary>
+                  <div class="itk-filter-group__content"><div class="itk-filter-options"><label class="itk-filter-option itk-filter-option--chip"><input type="checkbox" checked><span>Fragrance</span><small>12</small></label><label class="itk-filter-option itk-filter-option--chip"><input type="checkbox"><span>Gifts</span><small>8</small></label></div></div>
+                </details>
+                <details class="itk-filter-group itk-filter-group--price itk-filter-group--display-range" open>
+                  <summary>Price</summary>
+                  <div class="itk-filter-group__content"><div class="itk-filter-price"><label><span>Min</span><input type="number" value="20"></label><span>–</span><label><span>Max</span><input type="number" value="150"></label></div></div>
+                </details>
+                <details class="itk-filter-group itk-filter-group--stock itk-filter-group--display-select">
+                  <summary>Availability</summary>
+                  <div class="itk-filter-group__content"><select class="itk-filter-select"><option>Any availability</option><option>In stock</option><option>Out of stock</option></select></div>
+                </details>
+                <details class="itk-filter-group itk-filter-group--rating itk-filter-group--display-radio" open>
+                  <summary>Rating</summary><div class="itk-filter-group__content"><div class="itk-filter-options"><label class="itk-filter-option"><input type="radio" checked><span>4 stars & up</span></label></div></div>
+                </details>
+              </div>
+              <div class="itk-filter-form__actions"><button class="button itk-filter-apply" type="submit">Apply filters</button><a class="itk-filter-clear" href="#clear">Clear all</a></div>
+            </form>
+          </div>
+        </details>
+        <div class="itk-active-filters" data-active-filters>
+          <a class="itk-active-filter" href="#category"><span>Category: Fragrance</span><span>×</span></a>
+          <a class="itk-active-filter" href="#price"><span>Price: €20–€150</span><span>×</span></a>
+          <a class="itk-active-filter" href="#rating"><span>Rating: 4+ stars</span><span>×</span></a>
+          <a class="itk-active-filter itk-active-filter--clear" href="#clear">Clear all</a>
+        </div>
+      </div>
+      <form class="woocommerce-ordering"><select><option>Default sorting</option></select></form>
+    </div>
+  </main>
+</body>
+</html>
