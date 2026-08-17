@@ -6,6 +6,7 @@ on:
       - main
       - 'feature/phase5/**'
       - 'feature/phase5-*'
+      - 'agent/phase5-*'
   pull_request:
     paths:
       - 'packages/itk-commerce-multilingual/**'
@@ -37,6 +38,9 @@ jobs:
 
       - name: Multilingual foundation smoke test
         run: php tests/multilingual/foundation-smoke.php
+
+      - name: Multilingual routing smoke test
+        run: php tests/multilingual/routing-smoke.php
 
       - name: Guard generic Multilingual package from reference-customer coupling
         run: |
