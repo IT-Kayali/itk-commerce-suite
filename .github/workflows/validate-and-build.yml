@@ -43,6 +43,9 @@ jobs:
       - name: Layouts module contract smoke test
         run: php tests/layouts/module-contract-smoke.php
 
+      - name: Rich mega-menu normalization smoke test
+        run: php tests/layouts/rich-mega-menu-smoke.php
+
       - name: Guard generic packages from reference-customer coupling
         run: |
           if grep -RniE 'Al-Lord|al-lord' packages; then

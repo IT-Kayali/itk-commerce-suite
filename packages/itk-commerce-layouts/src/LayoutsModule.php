@@ -8,7 +8,6 @@
 namespace ITK\Commerce\Layouts;
 
 use ITK\Commerce\Core\Contracts\ModuleInterface;
-
 defined( 'ABSPATH' ) || exit;
 
 final class LayoutsModule implements ModuleInterface {
@@ -17,6 +16,9 @@ final class LayoutsModule implements ModuleInterface {
 
     /** @var MegaMenuConfig|null */
     private $mega_menu = null;
+
+    /** @var RichMegaMenuRenderer|null */
+    private $mega_renderer = null;
 
     /** @var LivePreview|null */
     private $preview = null;
@@ -57,9 +59,10 @@ final class LayoutsModule implements ModuleInterface {
             return;
         }
 
-        $this->resolver  = new LayoutResolver();
-        $this->mega_menu = new MegaMenuConfig();
-        $this->preview   = new LivePreview();
+        $this->resolver      = new LayoutResolver();
+        $this->mega_menu     = new MegaMenuConfig();
+        $this->mega_renderer = new RichMegaMenuRenderer( $this->mega_menu );
+        $this->preview       = new LivePreview();
 
         add_filter( 'itk_commerce_theme_layout_model', array( $this->resolver, 'resolve_theme_model' ), 10, 2 );
         add_filter( 'itk_commerce_mobile_bottom_enabled', array( $this->resolver, 'mobile_bottom_enabled' ) );
@@ -68,6 +71,9 @@ final class LayoutsModule implements ModuleInterface {
 
         add_filter( 'nav_menu_css_class', array( $this->mega_menu, 'menu_item_classes' ), 10, 4 );
         add_filter( 'nav_menu_link_attributes', array( $this->mega_menu, 'menu_link_attributes' ), 10, 4 );
+        add_filter( 'wp_nav_menu_objects', array( $this->mega_renderer, 'capture_menu_objects' ), 10, 2 );
+        add_filter( 'walker_nav_menu_start_el', array( $this->mega_renderer, 'render_panel' ), 20, 4 );
+        add_action( 'wp_enqueue_scripts', array( $this, 'enqueue_frontend_assets' ) );
 
         add_filter( 'itk_commerce_theme_layout_model', array( $this->preview, 'layout_model' ), 999, 2 );
         add_filter( 'itk_commerce_mobile_bottom_enabled', array( $this->preview, 'mobile_bottom_enabled' ), 999 );
@@ -76,15 +82,61 @@ final class LayoutsModule implements ModuleInterface {
         if ( is_admin() ) {
             ( new Admin\LayoutBuilderPage() )->register();
             ( new Admin\MegaMenuFields() )->register();
+            ( new Admin\MegaMenuContentPage() )->register();
         }
 
         /**
          * Fires after the Layouts module has attached its public extension points.
          *
-         * @param LayoutResolver $resolver  Active resolver.
-         * @param MegaMenuConfig $mega_menu Mega-menu configuration service.
-         * @param LivePreview    $preview   Authenticated preview service.
+         * @param LayoutResolver       $resolver      Active resolver.
+         * @param MegaMenuConfig       $mega_menu     Mega-menu configuration service.
+         * @param LivePreview          $preview       Authenticated preview service.
+         * @param RichMegaMenuRenderer $mega_renderer Rich panel renderer.
          */
-        do_action( 'itk_commerce_layouts_loaded', $this->resolver, $this->mega_menu, $this->preview );
+        do_action( 'itk_commerce_layouts_loaded', $this->resolver, $this->mega_menu, $this->preview, $this->mega_renderer );
+    }
+
+    /**
+     * Load rich panel assets only when at least one mega-menu definition has
+     * explicit rich blocks configured.
+     *
+     * @return void
+     */
+    public function enqueue_frontend_assets() {
+        if ( ! $this->has_rich_mega_menu() ) {
+            return;
+        }
+
+        wp_enqueue_style(
+            'itk-commerce-rich-mega-menu',
+            plugins_url( 'assets/css/mega-menu.css', FILE ),
+            array(),
+            VERSION
+        );
+
+        wp_enqueue_script(
+            'itk-commerce-rich-mega-menu',
+            plugins_url( 'assets/js/mega-menu.js', FILE ),
+            array(),
+            VERSION,
+            true
+        );
+    }
+
+    /**
+     * @return bool
+     */
+    private function has_rich_mega_menu() {
+        if ( null === $this->mega_menu ) {
+            return false;
+        }
+
+        foreach ( $this->mega_menu->definitions() as $definition ) {
+            if ( is_array( $definition ) && ! empty( $definition['blocks'] ) ) {
+                return true;
+            }
+        }
+
+        return false;
     }
 }

@@ -22,11 +22,13 @@
     "live_preview": "authenticated desktop/tablet/mobile storefront preview implemented",
     "profile_assignments": "implemented",
     "mobile_bottom_navigation": "profile bridge implemented",
-    "mega_menu": "portable definitions, menu-item binding and responsive submenu foundation implemented"
+    "mega_menu": "portable definitions, menu-item binding, rich panel editor and accessible responsive renderer implemented",
+    "mega_menu_blocks": ["menu", "categories", "products", "image", "banner", "elementor"]
   },
   "notes": [
     "WooCommerce version ranges remain unset until the Phase 0 environment audit and compatibility matrix are completed.",
     "The module extends public Theme hooks and does not patch Theme source at runtime.",
-    "Rich Mega-menu product/banner panels and browser-based visual regression testing remain Phase 2 follow-up work."
+    "Rich mega-menu content is stored in the versioned customer profile under the Layouts module configuration and contains no executable PHP or JavaScript.",
+    "Browser-based responsive/RTL/accessibility regression testing and full Shop/Product/Cart/Checkout visual template editing remain Phase 2 follow-up work."
   ]
 }

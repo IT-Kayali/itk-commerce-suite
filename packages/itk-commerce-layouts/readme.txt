@@ -19,6 +19,11 @@ Profile-driven reusable layout selection and visual builder for the IT-Kayali Co
 * bridges customer-profile configuration into the mobile bottom navigation
 * provides portable Mega-menu definitions with responsive column metadata
 * adds a WordPress menu-item field to bind local menu items to portable Mega-menu definition keys
+* provides Appearance > Commerce Mega Menu for rich panel content
+* rich Mega-menu blocks support WordPress child links, WooCommerce categories, WooCommerce product queries, images, promo banners and optional Elementor saved templates
+* rich panels include a separate accessible toggle, Escape handling, click-outside close behavior and responsive mobile rendering
+* rich content is stored under the Layouts module namespace inside the versioned active customer profile so width/assignment edits do not delete panel content
+* no executable PHP or JavaScript can be stored as a rich Mega-menu block
 * keeps executable templates inside the Theme and selection logic inside this module
 
 == Header models ==
@@ -42,8 +47,19 @@ Profile-driven reusable layout selection and visual builder for the IT-Kayali Co
 * newsletter
 * branches
 
+== Rich Mega-menu blocks ==
+
+* menu links: reuses existing WordPress child and grandchild items
+* categories: optional WooCommerce product-category slugs, limits and images
+* products: latest, featured, on-sale, category-based or explicit product IDs
+* image: customer image URL with optional destination and alt text
+* promo banner: eyebrow, title, text, image, destination and CTA label
+* Elementor: optional saved-template ID; failure/inactive Elementor never breaks navigation
+
 == Architecture ==
 
-The module contains no customer-specific branding, content or production data. It reads and writes the active versioned customer profile through Commerce Core public services and only selects Theme-owned reusable models.
+The module contains no hard-coded customer branding, content or production data. It reads and writes the active versioned customer profile through Commerce Core public services and only selects Theme-owned reusable models or renders profile-configured navigation content.
 
-Authenticated preview URLs are nonce-protected and noindex/nofollow. Rich Mega-menu product/banner panels and browser-based regression testing remain later Phase 2 work.
+Existing basic Mega-menu definitions keep their previous submenu behavior until rich blocks are explicitly saved. Authenticated preview URLs are nonce-protected and noindex/nofollow.
+
+Browser-based responsive/RTL/accessibility regression testing and full Shop/Product/Cart/Checkout visual template editing remain later Phase 2 work.
