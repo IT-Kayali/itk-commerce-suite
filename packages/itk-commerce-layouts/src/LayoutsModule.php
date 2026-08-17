@@ -69,6 +69,8 @@ final class LayoutsModule implements ModuleInterface {
 
         add_filter( 'itk_commerce_template_model', array( $this->commerce_resolver, 'resolve_model' ), 10, 2 );
         add_filter( 'itk_commerce_template_options', array( $this->commerce_resolver, 'resolve_options' ), 10, 2 );
+        add_filter( 'itk_commerce_product_card_model', array( $this->commerce_resolver, 'resolve_product_card_model' ), 10 );
+        add_filter( 'itk_commerce_product_card_options', array( $this->commerce_resolver, 'resolve_product_card_options' ), 10 );
 
         add_filter( 'nav_menu_css_class', array( $this->mega_menu, 'menu_item_classes' ), 10, 4 );
         add_filter( 'nav_menu_link_attributes', array( $this->mega_menu, 'menu_link_attributes' ), 10, 4 );
@@ -79,6 +81,8 @@ final class LayoutsModule implements ModuleInterface {
         add_filter( 'itk_commerce_theme_layout_model', array( $this->preview, 'layout_model' ), 999, 2 );
         add_filter( 'itk_commerce_template_model', array( $this->preview, 'commerce_template_model' ), 999, 2 );
         add_filter( 'itk_commerce_template_options', array( $this->preview, 'commerce_template_options' ), 999, 2 );
+        add_filter( 'itk_commerce_product_card_model', array( $this->preview, 'product_card_model' ), 999 );
+        add_filter( 'itk_commerce_product_card_options', array( $this->preview, 'product_card_options' ), 999 );
         add_filter( 'itk_commerce_mobile_bottom_enabled', array( $this->preview, 'mobile_bottom_enabled' ), 999 );
         add_filter( 'wp_robots', array( $this->preview, 'robots' ) );
 
@@ -92,11 +96,11 @@ final class LayoutsModule implements ModuleInterface {
         /**
          * Fires after the Layouts module has attached its public extension points.
          *
-         * @param LayoutResolver          $resolver          Header/Footer resolver.
-         * @param MegaMenuConfig          $mega_menu         Mega-menu configuration service.
-         * @param LivePreview             $preview           Authenticated preview service.
-         * @param RichMegaMenuRenderer    $mega_renderer     Rich panel renderer.
-         * @param CommerceTemplateResolver $commerce_resolver Shop/Product/Cart/Checkout resolver.
+         * @param LayoutResolver           $resolver          Header/Footer resolver.
+         * @param MegaMenuConfig           $mega_menu         Mega-menu configuration service.
+         * @param LivePreview              $preview           Authenticated preview service.
+         * @param RichMegaMenuRenderer     $mega_renderer     Rich panel renderer.
+         * @param CommerceTemplateResolver $commerce_resolver Commerce page/component resolver.
          */
         do_action( 'itk_commerce_layouts_loaded', $this->resolver, $this->mega_menu, $this->preview, $this->mega_renderer, $this->commerce_resolver );
     }
