@@ -32,10 +32,13 @@ jobs:
 
       - name: Validate package compatibility manifests
         run: |
-          php -r '$files=["packages/itk-commerce-theme/compatibility.json","packages/itk-commerce-core/compatibility.json"]; foreach($files as $file){$data=json_decode(file_get_contents($file),true,512,JSON_THROW_ON_ERROR); foreach(["schema_version","package","type","version","status","minimum","tested_up_to"] as $key){if(!array_key_exists($key,$data)){throw new RuntimeException("Missing {$key} in {$file}");}} echo "{$file} valid\n";}'
+          php -r '$files=glob("packages/*/compatibility.json"); if(!$files){throw new RuntimeException("No compatibility manifests found");} foreach($files as $file){$data=json_decode(file_get_contents($file),true,512,JSON_THROW_ON_ERROR); foreach(["schema_version","package","type","version","status","minimum","tested_up_to"] as $key){if(!array_key_exists($key,$data)){throw new RuntimeException("Missing {$key} in {$file}");}} echo "{$file} valid\n";}'
 
       - name: Core activation smoke test
         run: php tests/core/activation-smoke.php
+
+      - name: Layouts module contract smoke test
+        run: php tests/layouts/module-contract-smoke.php
 
       - name: Guard generic packages from reference-customer coupling
         run: |
@@ -57,6 +60,7 @@ jobs:
           cd packages
           zip -qr ../dist/itk-commerce-theme.zip itk-commerce-theme
           zip -qr ../dist/itk-commerce-core.zip itk-commerce-core
+          zip -qr ../dist/itk-commerce-layouts.zip itk-commerce-layouts
 
       - name: Upload development packages
         uses: actions/upload-artifact@v4
