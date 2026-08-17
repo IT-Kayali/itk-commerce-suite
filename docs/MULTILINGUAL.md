@@ -83,6 +83,8 @@ $text = apply_filters(
 
 Lookup order is requested/current language, configured fallback language, then caller source text.
 
+The effective lookup language can be isolated through `itk_commerce_translation_language_code`. Normal callers should not set that globally; the order-language renderer uses it only inside a bounded rendering scope so historical orders can still read translations in their frozen language.
+
 ## WooCommerce entity translation mapping
 
 The module maps **display text onto existing WooCommerce identities** instead of creating a separate product per language.
@@ -163,7 +165,68 @@ $order_context = apply_filters(
 
 Returned values include `code`, `locale`, `direction` and whether the language is still configured. Historical stored locale/direction remain available even if the language is no longer enabled.
 
-The module emits `itk_commerce_order_language_captured` when the snapshot is written.
+## WooCommerce email language scope
+
+WooCommerce transactional order emails are rendered inside the frozen order language **before the actual email trigger executes**. This is necessary because WooCommerce customer email classes can call `setup_locale()` before assigning the current order object to the email instance.
+
+The Multilingual module wraps WooCommerce's `..._notification` actions for order-related transactional events. WooCommerce uses those notification actions both for immediate transactional email delivery and when its deferred email queue later processes an event, so the same language contract applies in both modes.
+
+While the explicit order scope is active:
+
+- the Commerce language context is selected when the stored code is still enabled;
+- WordPress is switched to the order's frozen locale with `switch_to_locale()`;
+- `woocommerce_allow_switching_email_locale` is forced to false so `WC_Email::setup_locale()` cannot replace the order locale with the shop locale;
+- `woocommerce_allow_restoring_email_locale` is forced to false so WooCommerce does not restore a locale stack it does not own;
+- Commerce translation lookup is scoped to the stored order language code;
+- after the notification, the previous WordPress locale and Commerce language are restored.
+
+Non-order notifications do not enter an active scope and therefore retain normal WooCommerce locale behavior.
+
+### Manual order-email resend
+
+WooCommerce's admin resend flow is wrapped with its public `woocommerce_before_resend_order_emails` and `woocommerce_after_resend_order_email` hooks. Customer invoice and new-order resends therefore use the same frozen order-language contract and restore the previous locale afterwards.
+
+Programmatic integrations that trigger email classes directly outside WooCommerce's transactional/resend flows should explicitly use the public order-language scope below.
+
+## Document / programmatic order-language scope
+
+The documents package is intentionally separate and may not be installed. The Multilingual module therefore exposes a reusable rendering service instead of hard-coding a dependency on `itk-commerce-documents`:
+
+```php
+$scope = apply_filters( 'itk_commerce_order_language_scope', null );
+
+if ( $scope ) {
+    $pdf = $scope->run(
+        $order,
+        function ( $order_context ) use ( $order ) {
+            // Render invoice / delivery note / return slip / pack list here.
+            return render_document( $order, $order_context );
+        }
+    );
+}
+```
+
+`run()` returns the callback result. Restoration is implemented with `finally`, so exceptions during PDF/email rendering cannot leak the order locale into subsequent operations in the same PHP process.
+
+Scope lifecycle actions:
+
+```text
+itk_commerce_order_language_scope_entered
+itk_commerce_order_language_scope_left
+```
+
+These allow later document/font/RTL integrations to react without duplicating locale handling.
+
+## Historical disabled languages
+
+An old order may reference a language that is no longer enabled in the current customer profile. The order snapshot remains authoritative for historical rendering:
+
+- its stored locale is still used for WordPress/WooCommerce strings when that locale is installed;
+- its stored language code temporarily scopes Commerce translation lookup;
+- its stored direction remains available to PDF/document renderers;
+- the language is **not** globally re-enabled and normal storefront routing remains unchanged.
+
+This keeps old invoices/emails reproducible without changing current storefront language configuration.
 
 ## Commercial-data boundary
 
@@ -183,13 +246,12 @@ WooCommerce remains authoritative for all of those values. Multilingual stores o
 
 ## Output safety
 
-Translation persistence does not apply one global HTML sanitizer because output contexts differ. The consuming WooCommerce/Theme component remains responsible for escaping/sanitizing translated content correctly for plain text, controlled HTML, attributes, JSON, email text and documents.
+Translation persistence does not apply one global HTML sanitizer because output contexts differ. The consuming WooCommerce/Theme/document component remains responsible for escaping/sanitizing translated content correctly for plain text, controlled HTML, attributes, JSON, email text and documents.
 
 ## Remaining Phase 5 boundaries
 
 The current implementation does **not** yet:
 
-- switch WooCommerce email/document generation into the frozen order locale;
 - emit translated slugs/canonical/hreflang policy;
 - import/export CSV/JSON/XLIFF translations;
 - create the translator role/capability/admin UI boundary;
@@ -197,4 +259,4 @@ The current implementation does **not** yet:
 
 ## Next slice
 
-The next workstream consumes the frozen order-language contract to render WooCommerce emails and Commerce documents in the language captured at checkout, while restoring the previous locale after each isolated rendering scope.
+The next workstream implements language-aware SEO/hreflang and translation import/export foundations while keeping localized route/canonical policy separate from WooCommerce commercial identities.
