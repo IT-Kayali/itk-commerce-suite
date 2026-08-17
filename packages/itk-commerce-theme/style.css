@@ -1,0 +1,36 @@
+/*
+Theme Name: IT-Kayali Commerce
+Description: Reusable WooCommerce theme foundation for the IT-Kayali Commerce Suite.
+Author: IT-Kayali
+Version: 0.1.0-dev
+Text Domain: itk-commerce
+*/
+
+:root {
+  --itk-container-width: 1440px;
+  --itk-content-gap: clamp(1rem, 2vw, 2rem);
+  --itk-radius-sm: 0.375rem;
+  --itk-radius-md: 0.75rem;
+  --itk-radius-lg: 1.25rem;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  text-size-adjust: 100%;
+}
+
+body {
+  margin: 0;
+}
+
+img,
+svg,
+video {
+  max-width: 100%;
+  height: auto;
+}
