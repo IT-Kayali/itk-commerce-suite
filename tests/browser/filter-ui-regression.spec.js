@@ -1,6 +1,12 @@
+const fs = require('fs');
+const path = require('path');
 const { test, expect } = require('@playwright/test');
 
 const fixture = '/tests/browser/fixtures/filter-ui-regression.html';
+const filteredHtml = fs.readFileSync(
+  path.join(process.cwd(), 'tests/browser/fixtures/filter-ui-regression-filtered.html'),
+  'utf8'
+);
 
 async function gridColumnCount(locator) {
   return locator.evaluate((element) => {
@@ -57,5 +63,66 @@ test.describe('Search Filter progressive UI', () => {
     await expect(page.locator('[data-filter-panel]')).toBeVisible();
     const overflow = await page.evaluate(() => document.documentElement.scrollWidth - window.innerWidth);
     expect(overflow).toBeLessThanOrEqual(1);
+  });
+
+  test('filter submit replaces catalog without reload and browser Back restores previous results', async ({ page }) => {
+    await page.setViewportSize({ width: 1280, height: 900 });
+
+    await page.route('**/tests/browser/fixtures/filter-ui-regression.html?**', async (route) => {
+      const url = new URL(route.request().url());
+      if (url.searchParams.get('filter_category') === 'fragrance,gifts') {
+        await route.fulfill({ status: 200, contentType: 'text/html; charset=utf-8', body: filteredHtml });
+        return;
+      }
+      await route.continue();
+    });
+
+    await page.goto(fixture);
+    await page.evaluate(() => {
+      window.__itkFixtureMarker = 'preserved';
+      window.__itkCatalogUpdates = 0;
+      document.addEventListener('itk:catalog-updated', () => {
+        window.__itkCatalogUpdates += 1;
+      });
+    });
+
+    await page.locator('input[name="filter_category[]"][value="gifts"]').check();
+    await page.locator('.itk-filter-form').evaluate((form) => form.requestSubmit());
+
+    await expect(page.locator('[data-product-state="filtered"]')).toBeVisible();
+    await expect(page.locator('.woocommerce-result-count')).toContainText('2 results');
+
+    const state = await page.evaluate(() => ({
+      marker: window.__itkFixtureMarker,
+      updates: window.__itkCatalogUpdates,
+      busy: document.querySelector('[data-itk-catalog-results]').getAttribute('aria-busy'),
+      status: document.querySelector('[data-itk-catalog-live-status]').textContent,
+      href: window.location.href,
+    }));
+
+    expect(state.marker).toBe('preserved');
+    expect(state.updates).toBe(1);
+    expect(state.busy).toBe('false');
+    expect(state.status).toBe('Products updated.');
+
+    const filteredUrl = new URL(state.href);
+    expect(filteredUrl.searchParams.get('filter_category')).toBe('fragrance,gifts');
+    expect(filteredUrl.searchParams.get('filter_price')).toBe('20-150');
+    expect(filteredUrl.searchParams.get('filter_rating')).toBe('4');
+    expect(filteredUrl.search).not.toContain('%5B%5D');
+    expect(filteredUrl.search).not.toContain('%5Bmin%5D');
+
+    await page.evaluate(() => window.history.back());
+    await expect(page.locator('[data-product-state="original"]')).toBeVisible();
+
+    const restored = await page.evaluate(() => ({
+      marker: window.__itkFixtureMarker,
+      updates: window.__itkCatalogUpdates,
+      search: window.location.search,
+    }));
+
+    expect(restored.marker).toBe('preserved');
+    expect(restored.updates).toBe(2);
+    expect(restored.search).toBe('');
   });
 });
