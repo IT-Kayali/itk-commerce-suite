@@ -20,15 +20,17 @@
     return map[type] || map.taxonomy;
   }
 
+  function filterRows(container) {
+    return Array.from(container.querySelectorAll(':scope > [data-itk-filter-row]'));
+  }
+
   function renumber(container) {
-    Array.from(container.querySelectorAll('[data-itk-filter-row]')).forEach(function (row, index) {
+    filterRows(container).forEach(function (row, index) {
       row.querySelectorAll('[name]').forEach(function (field) {
         field.name = field.name.replace(/definitions\[[^\]]+\]/, 'definitions[' + index + ']');
       });
       var order = row.querySelector('[data-itk-filter-order]');
-      if (order && (!order.value || Number(order.value) === 100)) {
-        order.value = String((index + 1) * 10);
-      }
+      if (order) order.value = String((index + 1) * 10);
     });
   }
 
@@ -62,6 +64,14 @@
     updateType(row);
   }
 
+  function adjacentRow(row, direction) {
+    var sibling = direction === 'up' ? row.previousElementSibling : row.nextElementSibling;
+    while (sibling && !sibling.matches('[data-itk-filter-row]')) {
+      sibling = direction === 'up' ? sibling.previousElementSibling : sibling.nextElementSibling;
+    }
+    return sibling;
+  }
+
   function init() {
     var builder = document.querySelector('[data-itk-filter-builder]');
     if (!builder) return;
@@ -74,12 +84,13 @@
       var add = event.target.closest('[data-itk-add-filter]');
       if (add) {
         event.preventDefault();
+        var index = filterRows(rows).length;
         var wrapper = document.createElement('div');
-        wrapper.innerHTML = template.innerHTML.replace(/__INDEX__/g, String(rows.children.length));
+        wrapper.innerHTML = template.innerHTML.replace(/__INDEX__/g, String(index));
         var row = wrapper.querySelector('[data-itk-filter-row]');
         if (!row) return;
         rows.appendChild(row);
-        setRowDefaults(row, add.dataset.itkAddFilter || 'taxonomy', rows.children.length - 1);
+        setRowDefaults(row, add.dataset.itkAddFilter || 'taxonomy', index);
         renumber(rows);
         var label = row.querySelector('[data-itk-filter-label]');
         if (label) label.focus();
@@ -100,10 +111,12 @@
         event.preventDefault();
         var moveRow = move.closest('[data-itk-filter-row]');
         if (!moveRow) return;
-        if (move.dataset.itkMoveFilter === 'up' && moveRow.previousElementSibling) {
-          rows.insertBefore(moveRow, moveRow.previousElementSibling);
-        } else if (move.dataset.itkMoveFilter === 'down' && moveRow.nextElementSibling) {
-          rows.insertBefore(moveRow.nextElementSibling, moveRow);
+        var direction = move.dataset.itkMoveFilter === 'up' ? 'up' : 'down';
+        var sibling = adjacentRow(moveRow, direction);
+        if (sibling && direction === 'up') {
+          rows.insertBefore(moveRow, sibling);
+        } else if (sibling) {
+          rows.insertBefore(sibling, moveRow);
         }
         renumber(rows);
       }
@@ -133,7 +146,7 @@
       }
     });
 
-    Array.from(rows.querySelectorAll('[data-itk-filter-row]')).forEach(updateType);
+    filterRows(rows).forEach(updateType);
     renumber(rows);
   }
 
