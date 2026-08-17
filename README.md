@@ -4,7 +4,7 @@ Modular, scalable WooCommerce commerce platform by IT-Kayali with a reusable the
 
 ## Status
 
-Foundation / Phase 1. The reusable base theme template is implemented on `foundation/initial-structure`; advanced builders and optional commerce capabilities remain separate packages.
+Foundation / Phase 1. The reusable base theme and Core infrastructure are implemented; advanced builders and optional commerce capabilities remain separate packages.
 
 ## Product ownership
 
@@ -38,6 +38,21 @@ The reusable theme now provides:
 - a local-font-only policy by default;
 - layered CSS/JS assets and public extension hooks for future modules.
 
+## Core baseline (`0.1.0-dev`)
+
+The Core now provides:
+
+- versioned suite settings;
+- versioned customer-profile schema and persistence;
+- portable-profile secret rejection;
+- module registry with dependency and environment validation;
+- deterministic dependency-ordered module boot;
+- role/capability foundation;
+- activation/deactivation lifecycle handling;
+- CI lifecycle smoke testing;
+- compatibility manifests for Theme and Core;
+- documented update/migration/rollback rules.
+
 ## Planned packages
 
 - `itk-commerce-theme`
@@ -70,7 +85,7 @@ tools/
 
 ## Validation and development ZIPs
 
-GitHub Actions validates PHP syntax and `theme.json`, then builds development artifacts:
+GitHub Actions validates PHP syntax, `theme.json`, package compatibility manifests, the Core lifecycle smoke test and the generic/customer separation rule. It then builds development artifacts:
 
 - `itk-commerce-theme.zip`
 - `itk-commerce-core.zip`
@@ -91,10 +106,12 @@ GitHub Actions validates PHP syntax and `theme.json`, then builds development ar
 - [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md)
 - [`docs/DEVELOPMENT.md`](docs/DEVELOPMENT.md)
 - [`docs/ROADMAP.md`](docs/ROADMAP.md)
+- [`docs/CORE-FOUNDATION.md`](docs/CORE-FOUNDATION.md)
+- [`docs/UPDATE-ROLLBACK.md`](docs/UPDATE-ROLLBACK.md)
 
 ## Versioning
 
-Development starts at `0.1.0-dev`. Stable releases will use semantic versioning. Theme, core and modules may be released independently while remaining subject to a documented compatibility matrix.
+Development starts at `0.1.0-dev`. Stable releases will use semantic versioning. Theme, Core and modules may be released independently while remaining subject to a documented compatibility matrix.
 
 ---
 
