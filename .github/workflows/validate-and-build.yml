@@ -57,6 +57,9 @@ jobs:
       - name: My Account contract smoke test
         run: php tests/layouts/account-contract-smoke.php
 
+      - name: Public integration contract smoke test
+        run: php tests/layouts/integration-contract-smoke.php
+
       - name: Guard generic packages from reference-customer coupling
         run: |
           if grep -RniE 'Al-Lord|al-lord' packages; then
