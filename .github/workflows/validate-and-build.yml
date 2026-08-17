@@ -60,6 +60,9 @@ jobs:
       - name: Public component extension contract smoke test
         run: php tests/layouts/component-extension-contract-smoke.php
 
+      - name: Search Filter foundation smoke test
+        run: php tests/search-filter/foundation-smoke.php
+
       - name: Guard generic packages from reference-customer coupling
         run: |
           if grep -RniE 'Al-Lord|al-lord' packages; then
@@ -115,6 +118,7 @@ jobs:
           zip -qr ../dist/itk-commerce-theme.zip itk-commerce-theme
           zip -qr ../dist/itk-commerce-core.zip itk-commerce-core
           zip -qr ../dist/itk-commerce-layouts.zip itk-commerce-layouts
+          zip -qr ../dist/itk-commerce-search-filter.zip itk-commerce-search-filter
 
       - name: Upload development packages
         uses: actions/upload-artifact@v4
