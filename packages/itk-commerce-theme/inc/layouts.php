@@ -32,6 +32,26 @@ function layout_models() {
                 'label'    => __( 'Shop Search', 'itk-commerce' ),
                 'template' => 'template-parts/header/shop',
             ),
+            'transparent' => array(
+                'label'    => __( 'Transparent', 'itk-commerce' ),
+                'template' => 'template-parts/header/site-header',
+            ),
+            'dark' => array(
+                'label'    => __( 'Dark', 'itk-commerce' ),
+                'template' => 'template-parts/header/site-header',
+            ),
+            'luxury' => array(
+                'label'    => __( 'Luxury', 'itk-commerce' ),
+                'template' => 'template-parts/header/centered',
+            ),
+            'sticky' => array(
+                'label'    => __( 'Sticky', 'itk-commerce' ),
+                'template' => 'template-parts/header/site-header',
+            ),
+            'vertical' => array(
+                'label'    => __( 'Vertical', 'itk-commerce' ),
+                'template' => 'template-parts/header/vertical',
+            ),
         ),
         'footer' => array(
             'classic' => array(
@@ -44,6 +64,22 @@ function layout_models() {
             ),
             'columns' => array(
                 'label'    => __( 'Columns', 'itk-commerce' ),
+                'template' => 'template-parts/footer/columns',
+            ),
+            'simple' => array(
+                'label'    => __( 'Simple', 'itk-commerce' ),
+                'template' => 'template-parts/footer/compact',
+            ),
+            'luxury' => array(
+                'label'    => __( 'Luxury', 'itk-commerce' ),
+                'template' => 'template-parts/footer/columns',
+            ),
+            'newsletter' => array(
+                'label'    => __( 'Newsletter', 'itk-commerce' ),
+                'template' => 'template-parts/footer/columns',
+            ),
+            'branches' => array(
+                'label'    => __( 'Branches', 'itk-commerce' ),
                 'template' => 'template-parts/footer/columns',
             ),
         ),
@@ -124,7 +160,14 @@ function render_layout( $area, $default_model = 'classic' ) {
      */
     do_action( 'itk_commerce_before_theme_layout', $area, $model );
 
-    get_template_part( $template );
+    get_template_part(
+        $template,
+        null,
+        array(
+            'itk_layout_area'  => $area,
+            'itk_layout_model' => $model,
+        )
+    );
 
     /**
      * Fires immediately after a Theme layout model is rendered.
