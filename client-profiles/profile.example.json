@@ -118,7 +118,8 @@
   },
   "modules": {
     "enabled": [
-      "itk-commerce-layouts"
+      "itk-commerce-layouts",
+      "itk-commerce-search-filter"
     ],
     "configuration": {
       "itk-commerce-layouts": {
@@ -199,6 +200,59 @@
               }
             ]
           }
+        }
+      },
+      "itk-commerce-search-filter": {
+        "filters": {
+          "definitions": [
+            {
+              "id": "category",
+              "type": "taxonomy",
+              "label": "Category",
+              "taxonomy": "product_cat",
+              "query_key": "filter_category",
+              "display": "checkbox",
+              "multiple": true,
+              "match": "any",
+              "show_count": true,
+              "collapsed": false,
+              "order": 10,
+              "enabled": true
+            },
+            {
+              "id": "price",
+              "type": "price",
+              "label": "Price",
+              "query_key": "filter_price",
+              "display": "range",
+              "show_count": false,
+              "collapsed": false,
+              "order": 20,
+              "enabled": true
+            },
+            {
+              "id": "stock",
+              "type": "stock",
+              "label": "Availability",
+              "query_key": "filter_stock",
+              "display": "radio",
+              "show_count": true,
+              "collapsed": false,
+              "order": 30,
+              "enabled": true
+            },
+            {
+              "id": "rating",
+              "type": "rating",
+              "label": "Rating",
+              "query_key": "filter_rating",
+              "display": "radio",
+              "show_count": false,
+              "collapsed": true,
+              "order": 40,
+              "enabled": true
+            }
+          ]
         }
       }
     }
