@@ -1,13 +1,15 @@
 <?php
 /**
- * Compact footer model.
+ * Compact/simple footer model.
  *
  * @package ITK_Commerce_Theme
  */
 
 defined( 'ABSPATH' ) || exit;
+
+$layout_model = isset( $args['itk_layout_model'] ) ? sanitize_key( $args['itk_layout_model'] ) : 'compact';
 ?>
-<footer class="itk-site-footer itk-site-footer--compact" data-itk-layout-model="compact">
+<footer class="itk-site-footer itk-site-footer--compact itk-site-footer--<?php echo esc_attr( $layout_model ); ?>" data-itk-layout-model="<?php echo esc_attr( $layout_model ); ?>">
     <?php do_action( 'itk_commerce_before_footer' ); ?>
     <div class="itk-container itk-footer-compact__inner">
         <div class="itk-footer-compact__brand">
