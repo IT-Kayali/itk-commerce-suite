@@ -127,6 +127,36 @@ final class CommerceTemplateResolver {
     }
 
     /**
+     * Merge profile mini-cart presentation options into Theme defaults. The Theme
+     * validates all bounded values after this resolver runs.
+     *
+     * @param array<string,mixed> $defaults Theme defaults/current options.
+     * @return array<string,mixed>
+     */
+    public function resolve_mini_cart_options( $defaults ) {
+        $defaults = is_array( $defaults ) ? $defaults : array();
+        $profile  = $this->active_profile();
+        $config   = $this->mini_cart_config( $profile );
+
+        if ( empty( $config['options'] ) || ! is_array( $config['options'] ) ) {
+            return $defaults;
+        }
+
+        $options = array_merge( $defaults, $config['options'] );
+
+        /**
+         * Filter profile-resolved mini-cart options before Theme validation.
+         *
+         * @param array<string,mixed>      $options Profile options merged with defaults.
+         * @param array<string,mixed>      $config  Mini-cart configuration.
+         * @param array<string,mixed>|null $profile Active profile.
+         */
+        $filtered = apply_filters( 'itk_commerce_profile_mini_cart_options', $options, $config, $profile );
+
+        return is_array( $filtered ) ? $filtered : $defaults;
+    }
+
+    /**
      * Product-card presentation belongs to the Layouts module configuration
      * namespace so the Phase 2 Commerce page editor can continue saving its
      * `layouts.commerce` page areas without erasing component configuration.
@@ -144,6 +174,25 @@ final class CommerceTemplateResolver {
         }
 
         return $profile['modules']['configuration'][ MODULE_ID ]['product_card'];
+    }
+
+    /**
+     * Mini-cart presentation is stored independently from page templates and
+     * product-card settings inside the Layouts module namespace.
+     *
+     * @param array<string,mixed>|null $profile Active profile.
+     * @return array<string,mixed>
+     */
+    private function mini_cart_config( $profile ) {
+        if (
+            ! is_array( $profile ) ||
+            empty( $profile['modules']['configuration'][ MODULE_ID ]['mini_cart'] ) ||
+            ! is_array( $profile['modules']['configuration'][ MODULE_ID ]['mini_cart'] )
+        ) {
+            return array();
+        }
+
+        return $profile['modules']['configuration'][ MODULE_ID ]['mini_cart'];
     }
 
     /**
