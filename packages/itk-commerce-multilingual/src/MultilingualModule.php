@@ -37,6 +37,12 @@ final class MultilingualModule implements ModuleInterface {
     /** @var TranslationWorkflow|null */
     private $translation_workflow = null;
 
+    /** @var TranslatedRouteRepository|null */
+    private $translated_route_repository = null;
+
+    /** @var TranslatedPermalinkService|null */
+    private $translated_permalink_service = null;
+
     /** @var WooCommerceLanguageContext|null */
     private $woocommerce_language_context = null;
 
@@ -106,6 +112,15 @@ final class MultilingualModule implements ModuleInterface {
         );
         $this->translation_workflow->register();
 
+        $this->translated_route_repository = new TranslatedRouteRepository();
+        $this->translated_permalink_service = new TranslatedPermalinkService(
+            $this->context,
+            $this->router,
+            $this->translation_repository,
+            $this->translated_route_repository
+        );
+        $this->translated_permalink_service->register();
+
         $this->woocommerce_language_context = new WooCommerceLanguageContext( $this->context, $this->router );
         $this->woocommerce_language_context->register();
 
@@ -130,6 +145,7 @@ final class MultilingualModule implements ModuleInterface {
             $this->router,
             $this->switcher,
             $this->translation_workflow,
+            $this->translated_permalink_service,
             $this->woocommerce_language_context,
             $this->order_language_scope,
             $this->woocommerce_mapper
@@ -174,6 +190,16 @@ final class MultilingualModule implements ModuleInterface {
     /** @return TranslationWorkflow|null */
     public function translation_workflow() {
         return $this->translation_workflow;
+    }
+
+    /** @return TranslatedRouteRepository|null */
+    public function translated_route_repository() {
+        return $this->translated_route_repository;
+    }
+
+    /** @return TranslatedPermalinkService|null */
+    public function translated_permalink_service() {
+        return $this->translated_permalink_service;
     }
 
     /** @return WooCommerceLanguageContext|null */

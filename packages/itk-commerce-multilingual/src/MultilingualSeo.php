@@ -52,8 +52,8 @@ final class MultilingualSeo {
 
     /**
      * Return the canonical URL for the current route with all query and fragment
-     * state removed. Unprefixed default-language requests canonicalize into the
-     * configured language directory.
+     * state removed. Entity-aware permalink services may replace the generic
+     * same-path URL with the current language's translated entity slug.
      *
      * @param string $language_code Optional explicit target language.
      * @return string
@@ -73,9 +73,7 @@ final class MultilingualSeo {
             $source = '/';
         }
 
-        $url = $this->router->url_for( $code, $source );
-        $url = is_string( $url ) ? $url : '';
-
+        $url = $this->language_url( $code, $source );
         return (string) apply_filters( 'itk_commerce_multilingual_canonical_target', $url, $code, $source );
     }
 
@@ -83,6 +81,8 @@ final class MultilingualSeo {
      * Build hreflang alternatives for every enabled language plus x-default.
      * URLs intentionally use only the current path, never the current query
      * string, so tracking/filter/action parameters cannot create SEO variants.
+     * Entity-aware URL filters replace the current slug with the target
+     * language's own product/taxonomy slug where available.
      *
      * @return array<int,array{hreflang:string,code:string,url:string,current:bool,x_default:bool}>
      */
@@ -107,7 +107,7 @@ final class MultilingualSeo {
                 continue;
             }
 
-            $url = $this->router->url_for( $code, $source );
+            $url = $this->language_url( $code, $source );
             if ( '' === $url ) {
                 continue;
             }
@@ -122,7 +122,7 @@ final class MultilingualSeo {
         }
 
         $default_code = $this->context->default_code();
-        $default_url  = $this->router->url_for( $default_code, $source );
+        $default_url  = $this->language_url( $default_code, $source );
         if ( '' !== $default_url ) {
             $items[] = array(
                 'hreflang'  => 'x-default',
@@ -200,9 +200,7 @@ final class MultilingualSeo {
         return $this->alternate_urls();
     }
 
-    /**
-     * @return bool
-     */
+    /** @return bool */
     public function is_indexable_request() {
         if ( function_exists( 'is_admin' ) && is_admin() ) {
             return false;
@@ -241,6 +239,18 @@ final class MultilingualSeo {
         }
 
         return '/' . ltrim( $path, '/' );
+    }
+
+    /** @param string $code Target language. @param string $source Source path/URL. @return string */
+    private function language_url( $code, $source ) {
+        $url = function_exists( 'apply_filters' )
+            ? apply_filters( 'itk_commerce_language_url', '', $code, $source )
+            : $this->router->url_for( $code, $source );
+
+        if ( ! is_string( $url ) || '' === $url ) {
+            $url = $this->router->url_for( $code, $source );
+        }
+        return is_string( $url ) ? $url : '';
     }
 
     /** @param mixed $code Candidate language code. @return string */
