@@ -133,7 +133,7 @@ final class LanguageSwitcher {
 
         ob_start();
         ?>
-        <nav class="<?php echo esc_attr( implode( ' ', array_values( array_unique( $classes ) ) ); ?>" aria-label="<?php echo esc_attr__( 'Language', 'itk-commerce-multilingual' ); ?>" data-itk-language-switcher>
+        <nav class="<?php echo esc_attr( implode( ' ', array_values( array_unique( $classes ) ) ) ); ?>" aria-label="<?php echo esc_attr__( 'Language', 'itk-commerce-multilingual' ); ?>" data-itk-language-switcher>
             <ul class="itk-language-switcher__list" role="list">
                 <?php foreach ( $items as $item ) : ?>
                     <?php
