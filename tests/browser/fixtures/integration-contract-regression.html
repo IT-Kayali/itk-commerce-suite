@@ -1,0 +1,29 @@
+<!doctype html>
+<html lang="en" dir="ltr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Integration contract regression fixture</title>
+  <link rel="stylesheet" href="/packages/itk-commerce-theme/assets/css/base.css">
+  <link rel="stylesheet" href="/packages/itk-commerce-theme/assets/css/integrations.css">
+  <style>
+    :root{--itk-color-border:#e5e7eb;--itk-color-surface:#fff;--itk-radius-lg:14px;--itk-radius-md:8px}
+    *{box-sizing:border-box}body{margin:0;font-family:system-ui,sans-serif}.fixture{width:min(calc(100% - 32px),1100px);margin:40px auto}.fixture-search{display:flex;gap:.5rem;width:min(100%,34rem)}.fixture-search input{flex:1 1 auto;min-width:0}.fixture-search input,.fixture-search button,.fixture-filter button,.itk-product-card-actions button{min-height:42px;padding:8px 12px}.itk-product-card-actions{display:flex;gap:.5rem;flex-wrap:wrap;margin-block-start:2rem}
+  </style>
+</head>
+<body>
+  <main class="fixture">
+    <div class="itk-catalog-extensions" data-itk-catalog-extensions>
+      <div class="itk-catalog-extension-slot itk-catalog-extension-slot--search" data-itk-catalog-slot="search" aria-label="Catalog search">
+        <form class="fixture-search"><label class="screen-reader-text" for="catalog-search">Search products</label><input id="catalog-search" type="search" placeholder="Search products"><button type="submit">Search</button></form>
+      </div>
+      <div class="itk-catalog-extension-slot itk-catalog-extension-slot--filters fixture-filter" data-itk-catalog-slot="filters" aria-label="Catalog filters"><button type="button">Filters</button></div>
+    </div>
+    <div class="itk-product-card-actions" aria-label="Product actions">
+      <button type="button" data-itk-component-action="quick-view">Quick view</button>
+      <button type="button" data-itk-component-action="wishlist">Wishlist</button>
+      <button type="button" data-itk-component-action="compare">Compare</button>
+    </div>
+  </main>
+</body>
+</html>
