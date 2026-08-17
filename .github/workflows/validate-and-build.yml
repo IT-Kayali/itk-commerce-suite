@@ -30,6 +30,10 @@ jobs:
       - name: Validate theme JSON
         run: php -r '$json = file_get_contents("packages/itk-commerce-theme/theme.json"); json_decode($json, true, 512, JSON_THROW_ON_ERROR); echo "theme.json valid\n";'
 
+      - name: Validate package compatibility manifests
+        run: |
+          php -r '$files=["packages/itk-commerce-theme/compatibility.json","packages/itk-commerce-core/compatibility.json"]; foreach($files as $file){$data=json_decode(file_get_contents($file),true,512,JSON_THROW_ON_ERROR); foreach(["schema_version","package","type","version","status","minimum","tested_up_to"] as $key){if(!array_key_exists($key,$data)){throw new RuntimeException("Missing {$key} in {$file}");}} echo "{$file} valid\n";}'
+
       - name: Core activation smoke test
         run: php tests/core/activation-smoke.php
 
