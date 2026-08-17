@@ -34,8 +34,9 @@ final class TranslationSchema {
      */
     public function normalize_key( $key ) {
         $key = strtolower( trim( (string) $key ) );
-        $key = str_replace( array( ' ', '/' ), array( '-', '.' ), $key );
-        $key = preg_replace( '/[^a-z0-9._:-]+/', '-', $key );
+        $key = preg_replace( '/[\s\/]+/', '.', $key );
+        $key = preg_replace( '/[^a-z0-9._:-]+/', '-', (string) $key );
+        $key = preg_replace( '/\.{2,}/', '.', (string) $key );
         $key = trim( (string) $key, '.:-_' );
 
         if ( '' === $key || strlen( $key ) > 191 || ! preg_match( '/^[a-z0-9][a-z0-9._:-]*$/', $key ) ) {
