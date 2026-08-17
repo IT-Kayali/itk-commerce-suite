@@ -4,6 +4,13 @@
   var controller = null;
   var resultsSelector = '[data-itk-catalog-results]';
   var toolbarSelector = '[data-itk-catalog-toolbar]';
+  var config = window.ITKCommerceCatalogAsync || {};
+
+  function message(key, fallback) {
+    return config.messages && typeof config.messages[key] === 'string' && config.messages[key]
+      ? config.messages[key]
+      : fallback;
+  }
 
   function supported() {
     return Boolean(window.fetch && window.DOMParser && window.history && window.URL && window.FormData && window.AbortController);
@@ -62,12 +69,12 @@
     return url.toString();
   }
 
-  function announce(message) {
+  function announce(text) {
     var status = document.querySelector('[data-itk-catalog-live-status]');
     if (!status) return;
     status.textContent = '';
     window.setTimeout(function () {
-      status.textContent = message || 'Products updated.';
+      status.textContent = text;
     }, 20);
   }
 
@@ -82,6 +89,8 @@
     if (toolbar) {
       toolbar.classList.toggle('is-loading', busy);
     }
+
+    if (busy) announce(message('loading', 'Updating products…'));
   }
 
   function importedClone(source) {
@@ -144,7 +153,7 @@
       }
 
       setBusy(false);
-      announce('Products updated.');
+      announce(message('updated', 'Products updated.'));
       document.dispatchEvent(new CustomEvent('itk:catalog-updated', { detail: { url: requested } }));
     } catch (error) {
       if (error && error.name === 'AbortError') return;
@@ -181,7 +190,7 @@
     });
 
     document.addEventListener('click', function (event) {
-      var link = event.target.closest('.itk-active-filter, .itk-filter-clear');
+      var link = event.target.closest('.itk-active-filter, .itk-filter-clear, .woocommerce-pagination a');
       if (!eligibleLink(link, event)) return;
 
       event.preventDefault();
