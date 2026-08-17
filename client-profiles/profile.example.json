@@ -87,6 +87,46 @@
     "enabled": [
       "itk-commerce-layouts"
     ],
-    "configuration": {}
+    "configuration": {
+      "itk-commerce-layouts": {
+        "mega_content": {
+          "catalog": {
+            "blocks": [
+              {
+                "type": "menu",
+                "title": "Shop",
+                "span": 1
+              },
+              {
+                "type": "categories",
+                "title": "Categories",
+                "span": 1,
+                "slugs": "",
+                "limit": 6,
+                "show_images": true
+              },
+              {
+                "type": "products",
+                "title": "New arrivals",
+                "span": 1,
+                "source": "latest",
+                "value": "",
+                "limit": 4
+              },
+              {
+                "type": "banner",
+                "title": "Seasonal collection",
+                "span": 1,
+                "eyebrow": "Featured",
+                "text": "",
+                "image_url": "",
+                "link_url": "",
+                "link_label": "Shop now"
+              }
+            ]
+          }
+        }
+      }
+    }
   }
 }
