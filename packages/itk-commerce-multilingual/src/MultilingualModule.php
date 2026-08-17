@@ -34,6 +34,9 @@ final class MultilingualModule implements ModuleInterface {
     /** @var TranslationWorkflow|null */
     private $translation_workflow = null;
 
+    /** @var WooCommerceTranslationMapper|null */
+    private $woocommerce_mapper = null;
+
     /** @return string */
     public function id() {
         return MODULE_ID;
@@ -88,6 +91,12 @@ final class MultilingualModule implements ModuleInterface {
         );
         $this->translation_workflow->register();
 
+        $this->woocommerce_mapper = new WooCommerceTranslationMapper(
+            array( $this->translation_workflow, 'translate' ),
+            $this->context
+        );
+        $this->woocommerce_mapper->register();
+
         do_action(
             'itk_commerce_multilingual_loaded',
             $this,
@@ -96,7 +105,8 @@ final class MultilingualModule implements ModuleInterface {
             $config,
             $this->router,
             $this->switcher,
-            $this->translation_workflow
+            $this->translation_workflow,
+            $this->woocommerce_mapper
         );
     }
 
@@ -133,6 +143,11 @@ final class MultilingualModule implements ModuleInterface {
     /** @return TranslationWorkflow|null */
     public function translation_workflow() {
         return $this->translation_workflow;
+    }
+
+    /** @return WooCommerceTranslationMapper|null */
+    public function woocommerce_mapper() {
+        return $this->woocommerce_mapper;
     }
 
     /** @return array<string,mixed> */
