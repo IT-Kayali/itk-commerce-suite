@@ -46,8 +46,8 @@ final class FilterRenderer {
     }
 
     /**
-     * Render the filter control inside the Theme Phase 3 catalog toolbar.
-     * A normal GET form provides full filtering without JavaScript.
+     * Render the filter control inside the public Theme catalog-toolbar slot.
+     * A normal GET form provides complete filtering without JavaScript.
      *
      * @param array<string,mixed> $context Theme commerce context.
      * @return void
@@ -96,18 +96,27 @@ final class FilterRenderer {
     }
 
     /**
+     * Use native details/summary for independently collapsible groups so the
+     * configured collapsed state works without JavaScript.
+     *
      * @param array<string,mixed> $definition Definition.
      * @param array<string,mixed> $state Current state.
      * @return void
      */
     private function render_group( array $definition, array $state ) {
-        $id        = $definition['id'];
-        $active    = array_key_exists( $id, $state ) ? $state[ $id ] : null;
-        $collapsed = ! empty( $definition['collapsed'] ) && null === $active;
+        $id       = $definition['id'];
+        $active   = array_key_exists( $id, $state ) ? $state[ $id ] : null;
+        $display  = isset( $definition['display'] ) ? sanitize_key( $definition['display'] ) : '';
+        $is_open  = empty( $definition['collapsed'] ) || null !== $active;
+        $classes  = array(
+            'itk-filter-group',
+            'itk-filter-group--' . sanitize_html_class( $definition['type'] ),
+            'itk-filter-group--display-' . sanitize_html_class( $display ),
+        );
         ?>
-        <fieldset class="itk-filter-group itk-filter-group--<?php echo esc_attr( sanitize_html_class( $definition['type'] ) ); ?>">
-            <legend><?php echo esc_html( $definition['label'] ); ?></legend>
-            <div class="itk-filter-group__content<?php echo $collapsed ? ' is-collapsed-default' : ''; ?>">
+        <details class="<?php echo esc_attr( implode( ' ', $classes ) ); ?>" <?php echo $is_open ? 'open' : ''; ?>>
+            <summary><?php echo esc_html( $definition['label'] ); ?></summary>
+            <div class="itk-filter-group__content">
                 <?php
                 switch ( $definition['type'] ) {
                     case 'taxonomy':
@@ -128,11 +137,14 @@ final class FilterRenderer {
                 }
                 ?>
             </div>
-        </fieldset>
+        </details>
         <?php
     }
 
     /**
+     * Render a taxonomy/attribute control according to its normalized display
+     * contract. Multiple selection remains governed by the schema definition.
+     *
      * @param array<string,mixed> $definition Definition.
      * @param mixed               $active Current value.
      * @return void
@@ -157,9 +169,35 @@ final class FilterRenderer {
             return;
         }
 
-        $active = is_array( $active ) ? $active : array();
-        $name   = $definition['query_key'] . ( ! empty( $definition['multiple'] ) ? '[]' : '' );
-        $type   = ! empty( $definition['multiple'] ) ? 'checkbox' : 'radio';
+        $active   = is_array( $active ) ? $active : array();
+        $display  = isset( $definition['display'] ) ? $definition['display'] : 'checkbox';
+        $multiple = ! empty( $definition['multiple'] );
+        $key      = $definition['query_key'];
+
+        if ( 'select' === $display ) {
+            $name = $key . ( $multiple ? '[]' : '' );
+            echo '<select class="itk-filter-select" name="' . esc_attr( $name ) . '"' . ( $multiple ? ' multiple' : '' ) . '>';
+            if ( ! $multiple ) {
+                echo '<option value="">' . esc_html__( 'Any', 'itk-commerce-search-filter' ) . '</option>';
+            }
+            foreach ( $terms as $term ) {
+                $slug = isset( $term->slug ) ? sanitize_title( $term->slug ) : '';
+                if ( '' === $slug ) {
+                    continue;
+                }
+                $label = isset( $term->name ) ? $term->name : $slug;
+                if ( ! empty( $definition['show_count'] ) && isset( $term->count ) ) {
+                    $label .= ' (' . absint( $term->count ) . ')';
+                }
+                echo '<option value="' . esc_attr( $slug ) . '" ' . selected( in_array( $slug, $active, true ), true, false ) . '>' . esc_html( $label ) . '</option>';
+            }
+            echo '</select>';
+            return;
+        }
+
+        $input_type = 'radio' === $display ? 'radio' : ( $multiple ? 'checkbox' : 'radio' );
+        $name       = $key . ( 'checkbox' === $input_type ? '[]' : '' );
+        $chip       = 'chips' === $display;
 
         echo '<div class="itk-filter-options">';
         foreach ( $terms as $term ) {
@@ -167,9 +205,10 @@ final class FilterRenderer {
             if ( '' === $slug ) {
                 continue;
             }
+            $classes = 'itk-filter-option' . ( $chip ? ' itk-filter-option--chip' : '' );
             ?>
-            <label class="itk-filter-option">
-                <input type="<?php echo esc_attr( $type ); ?>" name="<?php echo esc_attr( $name ); ?>" value="<?php echo esc_attr( $slug ); ?>" <?php checked( in_array( $slug, $active, true ) ); ?>>
+            <label class="<?php echo esc_attr( $classes ); ?>">
+                <input type="<?php echo esc_attr( $input_type ); ?>" name="<?php echo esc_attr( $name ); ?>" value="<?php echo esc_attr( $slug ); ?>" <?php checked( in_array( $slug, $active, true ) ); ?>>
                 <span><?php echo esc_html( isset( $term->name ) ? $term->name : $slug ); ?></span>
                 <?php if ( ! empty( $definition['show_count'] ) && isset( $term->count ) ) : ?>
                     <small><?php echo esc_html( (string) absint( $term->count ) ); ?></small>
@@ -197,17 +236,29 @@ final class FilterRenderer {
 
     /** @param array<string,mixed> $definition Definition. @param mixed $active Value. @return void */
     private function render_stock( array $definition, $active ) {
-        $key = $definition['query_key'];
-        $items = array(
+        $key     = $definition['query_key'];
+        $display = isset( $definition['display'] ) ? $definition['display'] : 'radio';
+        $items   = array(
             ''             => __( 'Any availability', 'itk-commerce-search-filter' ),
             'in-stock'     => __( 'In stock', 'itk-commerce-search-filter' ),
             'out-of-stock' => __( 'Out of stock', 'itk-commerce-search-filter' ),
         );
 
+        if ( 'select' === $display ) {
+            echo '<select class="itk-filter-select" name="' . esc_attr( $key ) . '">';
+            foreach ( $items as $value => $label ) {
+                echo '<option value="' . esc_attr( $value ) . '" ' . selected( (string) $active, $value, false ) . '>' . esc_html( $label ) . '</option>';
+            }
+            echo '</select>';
+            return;
+        }
+
+        $chip = 'chips' === $display;
         echo '<div class="itk-filter-options">';
         foreach ( $items as $value => $label ) {
+            $classes = 'itk-filter-option' . ( $chip ? ' itk-filter-option--chip' : '' );
             ?>
-            <label class="itk-filter-option"><input type="radio" name="<?php echo esc_attr( $key ); ?>" value="<?php echo esc_attr( $value ); ?>" <?php checked( (string) $active, $value ); ?>><span><?php echo esc_html( $label ); ?></span></label>
+            <label class="<?php echo esc_attr( $classes ); ?>"><input type="radio" name="<?php echo esc_attr( $key ); ?>" value="<?php echo esc_attr( $value ); ?>" <?php checked( (string) $active, $value ); ?>><span><?php echo esc_html( $label ); ?></span></label>
             <?php
         }
         echo '</div>';
@@ -215,21 +266,38 @@ final class FilterRenderer {
 
     /** @param array<string,mixed> $definition Definition. @param mixed $active Value. @return void */
     private function render_sale( array $definition, $active ) {
+        $display = isset( $definition['display'] ) ? $definition['display'] : 'toggle';
+        $classes = 'itk-filter-option' . ( 'toggle' === $display ? ' itk-filter-option--toggle' : '' );
         ?>
-        <label class="itk-filter-option itk-filter-option--toggle"><input type="checkbox" name="<?php echo esc_attr( $definition['query_key'] ); ?>" value="1" <?php checked( true === $active ); ?>><span><?php esc_html_e( 'Only products on sale', 'itk-commerce-search-filter' ); ?></span></label>
+        <label class="<?php echo esc_attr( $classes ); ?>"><input type="checkbox" name="<?php echo esc_attr( $definition['query_key'] ); ?>" value="1" <?php checked( true === $active ); ?>><span><?php esc_html_e( 'Only products on sale', 'itk-commerce-search-filter' ); ?></span></label>
         <?php
     }
 
     /** @param array<string,mixed> $definition Definition. @param mixed $active Value. @return void */
     private function render_rating( array $definition, $active ) {
-        $key = $definition['query_key'];
-        echo '<div class="itk-filter-options">';
-        ?>
-        <label class="itk-filter-option"><input type="radio" name="<?php echo esc_attr( $key ); ?>" value="" <?php checked( empty( $active ) ); ?>><span><?php esc_html_e( 'Any rating', 'itk-commerce-search-filter' ); ?></span></label>
-        <?php
+        $key     = $definition['query_key'];
+        $display = isset( $definition['display'] ) ? $definition['display'] : 'radio';
+        $items   = array( '' => __( 'Any rating', 'itk-commerce-search-filter' ) );
+
         for ( $rating = 5; $rating >= 1; $rating-- ) {
+            $items[ (string) $rating ] = sprintf( __( '%d stars & up', 'itk-commerce-search-filter' ), $rating );
+        }
+
+        if ( 'select' === $display ) {
+            echo '<select class="itk-filter-select" name="' . esc_attr( $key ) . '">';
+            foreach ( $items as $value => $label ) {
+                echo '<option value="' . esc_attr( $value ) . '" ' . selected( (string) $active, $value, false ) . '>' . esc_html( $label ) . '</option>';
+            }
+            echo '</select>';
+            return;
+        }
+
+        $chip = 'chips' === $display;
+        echo '<div class="itk-filter-options">';
+        foreach ( $items as $value => $label ) {
+            $classes = 'itk-filter-option' . ( $chip ? ' itk-filter-option--chip' : '' );
             ?>
-            <label class="itk-filter-option"><input type="radio" name="<?php echo esc_attr( $key ); ?>" value="<?php echo esc_attr( (string) $rating ); ?>" <?php checked( (int) $active, $rating ); ?>><span><?php echo esc_html( sprintf( __( '%d stars & up', 'itk-commerce-search-filter' ), $rating ) ); ?></span></label>
+            <label class="<?php echo esc_attr( $classes ); ?>"><input type="radio" name="<?php echo esc_attr( $key ); ?>" value="<?php echo esc_attr( $value ); ?>" <?php checked( (string) $active, $value ); ?>><span><?php echo esc_html( $label ); ?></span></label>
             <?php
         }
         echo '</div>';
@@ -333,8 +401,7 @@ final class FilterRenderer {
 
     /** @return void */
     private function render_preserved_query_inputs() {
-        $safe = array( 'orderby' );
-        foreach ( $safe as $key ) {
+        foreach ( array( 'orderby' ) as $key ) {
             if ( isset( $_GET[ $key ] ) && is_scalar( $_GET[ $key ] ) ) { // phpcs:ignore WordPress.Security.NonceVerification.Recommended
                 echo '<input type="hidden" name="' . esc_attr( $key ) . '" value="' . esc_attr( sanitize_text_field( wp_unslash( $_GET[ $key ] ) ) ) . '">'; // phpcs:ignore WordPress.Security.NonceVerification.Recommended
             }
@@ -343,8 +410,7 @@ final class FilterRenderer {
 
     /** @param array<string,mixed> $state State. @return string */
     private function state_url( array $state ) {
-        $args = $this->preserved_query_args();
-        $args = array_merge( $args, $this->url_state->serialize( $state ) );
+        $args = array_merge( $this->preserved_query_args(), $this->url_state->serialize( $state ) );
         return $args ? add_query_arg( $args, $this->catalog_url() ) : $this->catalog_url();
     }
 
