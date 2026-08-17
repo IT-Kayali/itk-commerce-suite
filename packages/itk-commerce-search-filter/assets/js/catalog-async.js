@@ -4,7 +4,6 @@
   var controller = null;
   var resultsSelector = '[data-itk-catalog-results]';
   var toolbarSelector = '[data-itk-catalog-toolbar]';
-  var filterSelector = '[data-itk-filter-ui]';
 
   function supported() {
     return Boolean(window.fetch && window.DOMParser && window.history && window.URL && window.FormData && window.AbortController);
@@ -21,21 +20,46 @@
   function formUrl(form) {
     var url = new URL(form.action || window.location.href, window.location.href);
     var data = new FormData(form);
+    var multi = {};
+    var ranges = {};
+
     url.search = '';
 
-    data.forEach(function (value, key) {
+    data.forEach(function (value, rawKey) {
       if (typeof value !== 'string' || value === '') return;
-      url.searchParams.append(key, value);
+
+      var multiMatch = rawKey.match(/^(.*)\[\]$/);
+      if (multiMatch) {
+        var multiKey = multiMatch[1];
+        if (!multi[multiKey]) multi[multiKey] = [];
+        if (multi[multiKey].indexOf(value) === -1) multi[multiKey].push(value);
+        return;
+      }
+
+      var rangeMatch = rawKey.match(/^(.*)\[(min|max)\]$/);
+      if (rangeMatch) {
+        var rangeKey = rangeMatch[1];
+        if (!ranges[rangeKey]) ranges[rangeKey] = { min: '', max: '' };
+        ranges[rangeKey][rangeMatch[2]] = value;
+        return;
+      }
+
+      url.searchParams.set(rawKey, value);
     });
 
-    return url.toString();
-  }
+    Object.keys(multi).sort().forEach(function (key) {
+      if (multi[key].length) url.searchParams.set(key, multi[key].join(','));
+    });
 
-  function canonicalUrl(sourceDocument, requestedUrl) {
-    var filter = sourceDocument.querySelector(filterSelector);
-    var candidate = filter && filter.getAttribute('data-itk-filter-state-url');
-    if (!candidate || !sameOrigin(candidate)) return requestedUrl;
-    return new URL(candidate, window.location.href).toString();
+    Object.keys(ranges).sort().forEach(function (key) {
+      var range = ranges[key];
+      if (range.min !== '' || range.max !== '') {
+        url.searchParams.set(key, range.min + '-' + range.max);
+      }
+    });
+
+    url.searchParams.sort();
+    return url.toString();
   }
 
   function announce(message) {
@@ -113,16 +137,15 @@
       var sourceDocument = new DOMParser().parseFromString(html, 'text/html');
       if (!replaceCatalog(sourceDocument)) throw new Error('Catalog response is missing the result boundary.');
 
-      var finalUrl = canonicalUrl(sourceDocument, requested);
       if (mode === 'push') {
-        window.history.pushState({ itkCommerceCatalog: true }, '', finalUrl);
+        window.history.pushState({ itkCommerceCatalog: true }, '', requested);
       } else if (mode === 'replace') {
-        window.history.replaceState({ itkCommerceCatalog: true }, '', finalUrl);
+        window.history.replaceState({ itkCommerceCatalog: true }, '', requested);
       }
 
       setBusy(false);
       announce('Products updated.');
-      document.dispatchEvent(new CustomEvent('itk:catalog-updated', { detail: { url: finalUrl } }));
+      document.dispatchEvent(new CustomEvent('itk:catalog-updated', { detail: { url: requested } }));
     } catch (error) {
       if (error && error.name === 'AbortError') return;
       setBusy(false);
@@ -147,7 +170,7 @@
     window.history.replaceState({ itkCommerceCatalog: true }, '', window.location.href);
 
     document.addEventListener('submit', function (event) {
-      var form = event.target.closest('[data-itk-filter-form]');
+      var form = event.target.closest('.itk-filter-form');
       if (!form || String(form.method || 'get').toLowerCase() !== 'get') return;
 
       var url = formUrl(form);
@@ -158,7 +181,7 @@
     });
 
     document.addEventListener('click', function (event) {
-      var link = event.target.closest('[data-itk-filter-link]');
+      var link = event.target.closest('.itk-active-filter, .itk-filter-clear');
       if (!eligibleLink(link, event)) return;
 
       event.preventDefault();
