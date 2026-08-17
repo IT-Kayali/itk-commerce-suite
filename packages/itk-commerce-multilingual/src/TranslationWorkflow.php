@@ -72,7 +72,9 @@ final class TranslationWorkflow {
          * @param string $key Translation key.
          * @param string $source Source/default text.
          */
-        $scoped_code = apply_filters( 'itk_commerce_translation_language_code', $code, $key, $source );
+        $scoped_code = function_exists( 'apply_filters' )
+            ? apply_filters( 'itk_commerce_translation_language_code', $code, $key, $source )
+            : $code;
         $scoped_code = $this->schema->normalize_language_code( $scoped_code );
         if ( '' !== $scoped_code ) {
             $code = $scoped_code;
