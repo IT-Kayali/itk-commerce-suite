@@ -82,9 +82,7 @@ final class RichMegaMenuRenderer {
         ob_start();
         ?>
         <button class="itk-mega-toggle" type="button" aria-expanded="false" aria-controls="<?php echo esc_attr( $panel_id ); ?>" data-itk-mega-toggle>
-            <span class="screen-reader-text">
-                <?php echo esc_html( sprintf( __( 'Open %s menu', 'itk-commerce-layouts' ), $label ) ); ?>
-            </span>
+            <span class="screen-reader-text"><?php echo esc_html( sprintf( __( 'Open %s menu', 'itk-commerce-layouts' ), $label ) ); ?></span>
             <span aria-hidden="true">⌄</span>
         </button>
         <div
@@ -95,26 +93,28 @@ final class RichMegaMenuRenderer {
         >
             <div class="itk-mega-panel__inner">
                 <?php foreach ( $definition['blocks'] as $block ) : ?>
-                    <?php $this->render_block( $block, $item ); ?>
+                    <?php if ( is_array( $block ) ) : ?>
+                        <?php $this->render_block( $block, $item, $columns ); ?>
+                    <?php endif; ?>
                 <?php endforeach; ?>
             </div>
         </div>
         <?php
+
         return $item_output . ob_get_clean();
     }
 
     /**
-     * Render one normalized rich-content block.
-     *
-     * @param array<string,mixed> $block Normalized block.
-     * @param object              $item  Parent menu item.
+     * @param array<string,mixed> $block   Normalized block.
+     * @param object              $item    Parent menu item.
+     * @param int                 $columns Definition column count.
      * @return void
      */
-    private function render_block( array $block, $item ) {
+    private function render_block( array $block, $item, $columns ) {
         $type = isset( $block['type'] ) ? sanitize_key( $block['type'] ) : '';
-        $span = max( 1, min( 6, isset( $block['span'] ) ? absint( $block['span'] ) : 1 ) );
+        $span = max( 1, min( $columns, isset( $block['span'] ) ? absint( $block['span'] ) : 1 ) );
 
-        if ( ! $type ) {
+        if ( ! in_array( $type, array( 'menu', 'categories', 'products', 'image', 'banner', 'elementor' ), true ) ) {
             return;
         }
 
@@ -124,33 +124,24 @@ final class RichMegaMenuRenderer {
             echo '<h3 class="itk-mega-block__title">' . esc_html( $block['title'] ) . '</h3>';
         }
 
-        switch ( $type ) {
-            case 'menu':
-                $this->render_menu_block( ! empty( $item->ID ) ? absint( $item->ID ) : 0 );
-                break;
-            case 'categories':
-                $this->render_categories_block( $block );
-                break;
-            case 'products':
-                $this->render_products_block( $block );
-                break;
-            case 'image':
-                $this->render_image_block( $block );
-                break;
-            case 'banner':
-                $this->render_banner_block( $block );
-                break;
-            case 'elementor':
-                $this->render_elementor_block( $block );
-                break;
+        if ( 'menu' === $type ) {
+            $this->render_menu_block( ! empty( $item->ID ) ? absint( $item->ID ) : 0 );
+        } elseif ( 'categories' === $type ) {
+            $this->render_categories_block( $block );
+        } elseif ( 'products' === $type ) {
+            $this->render_products_block( $block );
+        } elseif ( 'image' === $type ) {
+            $this->render_image_block( $block );
+        } elseif ( 'banner' === $type ) {
+            $this->render_banner_block( $block );
+        } elseif ( 'elementor' === $type ) {
+            $this->render_elementor_block( $block );
         }
 
         echo '</section>';
     }
 
     /**
-     * Reuse direct/second-level WordPress menu children in a rich panel.
-     *
      * @param int $parent_id Parent menu item ID.
      * @return void
      */
@@ -166,8 +157,7 @@ final class RichMegaMenuRenderer {
             $title = isset( $child->title ) ? $child->title : '';
             $id    = ! empty( $child->ID ) ? absint( $child->ID ) : 0;
 
-            echo '<li>';
-            echo '<a href="' . esc_url( $url ) . '">' . esc_html( $title ) . '</a>';
+            echo '<li><a href="' . esc_url( $url ) . '">' . esc_html( $title ) . '</a>';
 
             $grandchildren = isset( $this->items_by_parent[ $id ] ) ? $this->items_by_parent[ $id ] : array();
             if ( $grandchildren ) {
@@ -184,13 +174,11 @@ final class RichMegaMenuRenderer {
     }
 
     /**
-     * Render WooCommerce product categories by portable slug or top-level query.
-     *
      * @param array<string,mixed> $block Block.
      * @return void
      */
     private function render_categories_block( array $block ) {
-        if ( ! taxonomy_exists( 'product_cat' ) ) {
+        if ( ! function_exists( 'taxonomy_exists' ) || ! taxonomy_exists( 'product_cat' ) ) {
             return;
         }
 
@@ -229,15 +217,12 @@ final class RichMegaMenuRenderer {
                     echo wp_kses_post( wp_get_attachment_image( $thumbnail_id, 'woocommerce_thumbnail', false, array( 'class' => 'itk-mega-category__image' ) ) );
                 }
             }
-            echo '<span>' . esc_html( $term->name ) . '</span>';
-            echo '</a>';
+            echo '<span>' . esc_html( $term->name ) . '</span></a>';
         }
         echo '</div>';
     }
 
     /**
-     * Render a bounded WooCommerce product query.
-     *
      * @param array<string,mixed> $block Block.
      * @return void
      */
@@ -259,16 +244,28 @@ final class RichMegaMenuRenderer {
 
         if ( 'featured' === $source ) {
             $args['featured'] = true;
-        } elseif ( 'on_sale' === $source && function_exists( 'wc_get_product_ids_on_sale' ) ) {
-            $args['include'] = array_slice( array_map( 'absint', wc_get_product_ids_on_sale() ), 0, 50 );
-        } elseif ( 'category' === $source && $value ) {
-            $args['category'] = array( sanitize_title( $value ) );
-        } elseif ( 'ids' === $source && $value ) {
-            $ids = array_values( array_filter( array_map( 'absint', preg_split( '/\s*,\s*/', $value ) ) ) );
-            if ( $ids ) {
-                $args['include'] = array_slice( $ids, 0, $limit );
-                unset( $args['orderby'], $args['order'] );
+        } elseif ( 'on_sale' === $source ) {
+            if ( ! function_exists( 'wc_get_product_ids_on_sale' ) ) {
+                return;
             }
+            $sale_ids = array_values( array_filter( array_map( 'absint', wc_get_product_ids_on_sale() ) ) );
+            if ( ! $sale_ids ) {
+                return;
+            }
+            $args['include'] = array_slice( $sale_ids, 0, 50 );
+        } elseif ( 'category' === $source ) {
+            if ( ! $value ) {
+                return;
+            }
+            $args['category'] = array( sanitize_title( $value ) );
+        } elseif ( 'ids' === $source ) {
+            $ids = array_values( array_filter( array_map( 'absint', preg_split( '/\s*,\s*/', $value ) ) ) );
+            if ( ! $ids ) {
+                return;
+            }
+            $args['include'] = array_slice( $ids, 0, $limit );
+            $args['orderby'] = 'include';
+            unset( $args['order'] );
         }
 
         $products = wc_get_products( $args );
@@ -282,7 +279,11 @@ final class RichMegaMenuRenderer {
                 continue;
             }
 
-            $product_id = $product->get_id();
+            $product_id = absint( $product->get_id() );
+            if ( ! $product_id ) {
+                continue;
+            }
+
             echo '<a class="itk-mega-product" href="' . esc_url( get_permalink( $product_id ) ) . '">';
             if ( method_exists( $product, 'get_image' ) ) {
                 echo wp_kses_post( $product->get_image( 'woocommerce_thumbnail', array( 'class' => 'itk-mega-product__image' ) ) );
@@ -306,6 +307,7 @@ final class RichMegaMenuRenderer {
         }
 
         $image = '<img src="' . esc_url( $block['image_url'] ) . '" alt="' . esc_attr( isset( $block['alt'] ) ? $block['alt'] : '' ) . '" loading="lazy">';
+
         if ( ! empty( $block['link_url'] ) ) {
             echo '<a class="itk-mega-image" href="' . esc_url( $block['link_url'] ) . '">' . $image . '</a>'; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
             return;
@@ -319,11 +321,12 @@ final class RichMegaMenuRenderer {
      * @return void
      */
     private function render_banner_block( array $block ) {
-        $style = ! empty( $block['image_url'] )
-            ? ' style="background-image:linear-gradient(90deg,rgba(17,24,39,.82),rgba(17,24,39,.28)),url(' . esc_url( $block['image_url'] ) . ')"'
-            : '';
+        $style = '';
+        if ( ! empty( $block['image_url'] ) ) {
+            $style = 'background-image:linear-gradient(90deg,rgba(17,24,39,.82),rgba(17,24,39,.28)),url(' . esc_url( $block['image_url'] ) . ')';
+        }
 
-        echo '<div class="itk-mega-banner"' . $style . '>'; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+        echo '<div class="itk-mega-banner"' . ( $style ? ' style="' . esc_attr( $style ) . '"' : '' ) . '>';
         if ( ! empty( $block['eyebrow'] ) ) {
             echo '<span class="itk-mega-banner__eyebrow">' . esc_html( $block['eyebrow'] ) . '</span>';
         }
@@ -341,8 +344,6 @@ final class RichMegaMenuRenderer {
     }
 
     /**
-     * Render an optional Elementor saved template by local template ID.
-     *
      * @param array<string,mixed> $block Block.
      * @return void
      */
@@ -354,11 +355,15 @@ final class RichMegaMenuRenderer {
 
         try {
             $plugin = \Elementor\Plugin::instance();
-            if ( isset( $plugin->frontend ) && method_exists( $plugin->frontend, 'get_builder_content_for_display' ) ) {
-                echo wp_kses_post( $plugin->frontend->get_builder_content_for_display( $template_id, true ) );
+            if ( ! isset( $plugin->frontend ) || ! method_exists( $plugin->frontend, 'get_builder_content_for_display' ) ) {
+                return;
+            }
+
+            $content = $plugin->frontend->get_builder_content_for_display( $template_id, true );
+            if ( is_string( $content ) && '' !== $content ) {
+                echo wp_kses_post( $content );
             }
         } catch ( \Throwable $error ) {
-            // Optional integration failures must never break navigation rendering.
             return;
         }
     }
