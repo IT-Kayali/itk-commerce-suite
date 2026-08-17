@@ -7,7 +7,9 @@
 
 defined( 'ABSPATH' ) || exit;
 
-ITK\Commerce\Theme\render_layout( 'footer', 'classic' );
+if ( ! ITK\Commerce\Theme\maybe_render_elementor_location( 'footer' ) ) {
+    ITK\Commerce\Theme\render_layout( 'footer', 'classic' );
+}
 ITK\Commerce\Theme\mobile_bottom_navigation();
 wp_footer();
 ?>
