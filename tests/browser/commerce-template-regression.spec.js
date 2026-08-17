@@ -23,7 +23,20 @@ async function setBlockModel(locator, area, model) {
 async function gridColumnCount(locator) {
   return locator.evaluate((element) => {
     const value = getComputedStyle(element).gridTemplateColumns.trim();
-    return value && value !== 'none' ? value.split(/\s+/).length : 0;
+    if (!value || value === 'none') {
+      return 0;
+    }
+
+    // Chromium may preserve repeat(N, ...) in computed styles instead of
+    // expanding it into N used track sizes. Count that form explicitly so the
+    // regression test verifies the actual configured column contract rather
+    // than the number of whitespace-separated CSS tokens.
+    const repeatMatch = value.match(/^repeat\(\s*(\d+)\s*,/i);
+    if (repeatMatch) {
+      return Number(repeatMatch[1]);
+    }
+
+    return value.split(/\s+/).length;
   });
 }
 
