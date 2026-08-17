@@ -4,7 +4,7 @@ Modular, scalable WooCommerce commerce platform by IT-Kayali with a reusable the
 
 ## Status
 
-Foundation / Phase 1. The reusable base theme and Core infrastructure are implemented; advanced builders and optional commerce capabilities remain separate packages.
+Phase 1 foundation is complete. Phase 2 layout builders are in progress with the first installable `itk-commerce-layouts` foundation implemented.
 
 ## Product ownership
 
@@ -28,7 +28,9 @@ The reusable theme now provides:
 
 - standard page, front-page, single, archive, search and 404 templates;
 - WooCommerce integration and product-gallery support;
-- customer-neutral header and multi-column footer;
+- customer-neutral header and footer rendering;
+- reusable Header models: Classic, Centered and Shop/Search-first;
+- reusable Footer models: Classic, Compact and Columns;
 - desktop primary navigation and mobile drawer navigation;
 - configurable mobile bottom navigation with a neutral commerce fallback;
 - responsive WooCommerce product-grid baseline;
@@ -36,7 +38,7 @@ The reusable theme now provides:
 - versioned `theme.json` design tokens;
 - RTL-aware logical layout rules;
 - a local-font-only policy by default;
-- layered CSS/JS assets and public extension hooks for future modules.
+- layered CSS/JS assets and public extension hooks for modules.
 
 ## Core baseline (`0.1.0-dev`)
 
@@ -50,16 +52,32 @@ The Core now provides:
 - role/capability foundation;
 - activation/deactivation lifecycle handling;
 - CI lifecycle smoke testing;
-- compatibility manifests for Theme and Core;
+- compatibility manifests;
 - documented update/migration/rollback rules.
 
-## Planned packages
+## Layouts module (`0.1.0-dev`)
+
+The first optional module now provides:
+
+- profile-driven Header/Footer model selection;
+- single-product, category, product-type and contextual assignment priority;
+- WordPress activation/deactivation bridge to Core module enablement;
+- configurable mobile bottom-navigation visibility and fallback items;
+- portable mega-menu definition keys and responsive submenu column metadata;
+- safe Theme fallback when an unknown model is configured.
+
+## Packages
+
+Implemented:
 
 - `itk-commerce-theme`
 - `itk-commerce-core`
+- `itk-commerce-layouts`
+
+Planned:
+
 - `itk-commerce-multilingual`
 - `itk-commerce-elementor`
-- `itk-commerce-layouts`
 - `itk-commerce-search-filter`
 - `itk-commerce-documents`
 - `itk-commerce-badges`
@@ -75,6 +93,7 @@ Packages are created when implementation starts; empty placeholder packages are 
 packages/
   itk-commerce-theme/
   itk-commerce-core/
+  itk-commerce-layouts/
 client-profiles/
   al-lord/
 docs/
@@ -85,10 +104,11 @@ tools/
 
 ## Validation and development ZIPs
 
-GitHub Actions validates PHP syntax, `theme.json`, package compatibility manifests, the Core lifecycle smoke test and the generic/customer separation rule. It then builds development artifacts:
+GitHub Actions validates PHP syntax, `theme.json`, all package compatibility manifests, Core lifecycle smoke tests, the Layouts module contract and the generic/customer separation rule. It then builds development artifacts:
 
 - `itk-commerce-theme.zip`
 - `itk-commerce-core.zip`
+- `itk-commerce-layouts.zip`
 
 ## Engineering rules
 
@@ -108,6 +128,7 @@ GitHub Actions validates PHP syntax, `theme.json`, package compatibility manifes
 - [`docs/ROADMAP.md`](docs/ROADMAP.md)
 - [`docs/CORE-FOUNDATION.md`](docs/CORE-FOUNDATION.md)
 - [`docs/UPDATE-ROLLBACK.md`](docs/UPDATE-ROLLBACK.md)
+- [`docs/LAYOUT-BUILDERS.md`](docs/LAYOUT-BUILDERS.md)
 
 ## Versioning
 
