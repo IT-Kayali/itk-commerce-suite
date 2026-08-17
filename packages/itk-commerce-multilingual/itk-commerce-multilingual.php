@@ -20,16 +20,21 @@ const PATH           = __DIR__;
 const MODULE_ID      = 'itk-commerce-multilingual';
 const SCHEMA_VERSION = 1;
 
+require_once PATH . '/src/TranslationInstaller.php';
+
 \register_activation_hook( FILE, __NAMESPACE__ . '\activate' );
 \register_deactivation_hook( FILE, __NAMESPACE__ . '\deactivate' );
 add_action( 'plugins_loaded', __NAMESPACE__ . '\prepare', 7 );
 
 /**
- * Load the module only when Commerce Core is available.
+ * Load the module only when Commerce Core is available. Translation table
+ * upgrades remain module-owned and versioned independently from Commerce Core.
  *
  * @return void
  */
 function prepare() {
+    TranslationInstaller::maybe_install();
+
     if ( ! interface_exists( '\ITK\Commerce\Core\Contracts\ModuleInterface' ) ) {
         add_action( 'admin_notices', __NAMESPACE__ . '\render_core_notice' );
         return;
@@ -39,6 +44,9 @@ function prepare() {
     require_once PATH . '/src/LanguageContext.php';
     require_once PATH . '/src/LanguageRouter.php';
     require_once PATH . '/src/LanguageSwitcher.php';
+    require_once PATH . '/src/TranslationSchema.php';
+    require_once PATH . '/src/TranslationRepository.php';
+    require_once PATH . '/src/TranslationWorkflow.php';
     require_once PATH . '/src/MultilingualModule.php';
 
     add_action( 'itk_commerce_register_modules', __NAMESPACE__ . '\register_module' );
@@ -46,6 +54,7 @@ function prepare() {
 
 /** @return void */
 function activate() {
+    TranslationInstaller::install();
     set_enabled_state( true );
 }
 
@@ -56,7 +65,7 @@ function deactivate() {
 
 /**
  * Synchronize explicit plugin state with Commerce Core and the active profile.
- * Existing language configuration is preserved for rollback/reactivation.
+ * Existing language/translation data is preserved for rollback/reactivation.
  *
  * @param bool $enable Desired state.
  * @return void
