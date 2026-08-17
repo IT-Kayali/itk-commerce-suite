@@ -133,6 +133,7 @@ final class LivePreview {
 
         $keys = array(
             'image_ratio'      => 'itk_card_image_ratio',
+            'content_order'    => 'itk_card_content_order',
             'content_align'    => 'itk_card_content_align',
             'price_treatment'  => 'itk_card_price_treatment',
             'action_treatment' => 'itk_card_action_treatment',
