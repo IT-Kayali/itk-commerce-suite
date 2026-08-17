@@ -72,6 +72,9 @@ jobs:
       - name: Search Filter async catalog contract smoke test
         run: php tests/search-filter/ajax-contract-smoke.php
 
+      - name: Search Filter mobile drawer contract smoke test
+        run: php tests/search-filter/mobile-drawer-contract-smoke.php
+
       - name: Guard generic packages from reference-customer coupling
         run: |
           if grep -RniE 'Al-Lord|al-lord' packages; then
