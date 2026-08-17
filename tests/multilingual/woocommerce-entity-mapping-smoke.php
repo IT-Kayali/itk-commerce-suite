@@ -23,6 +23,7 @@ namespace {
     function add_filter( $hook, $callback, $priority = 10, $args = 1 ) {
         $GLOBALS['itk_mapper_filters'][ $hook ] = array( $callback, $priority, $args );
     }
+    function apply_filters( $hook, $value ) { return $value; }
     function is_admin() { return (bool) $GLOBALS['itk_mapper_admin']; }
     function wp_doing_ajax() { return (bool) $GLOBALS['itk_mapper_ajax']; }
     function wp_doing_cron() { return false; }
@@ -127,7 +128,7 @@ namespace {
     $GLOBALS['itk_mapper_admin'] = false;
 
     $GLOBALS['itk_mapper_ajax'] = true;
-    itk_mapper_assert( 'Original Product' === $mapper->product_name( 'Original Product', $product ), 'AJAX must wait for explicit session-language persistence instead of guessing a language.' );
+    itk_mapper_assert( 'Original Product' === $mapper->product_name( 'Original Product', $product ), 'Async translation must remain disabled unless the session language service explicitly allows it.' );
     $GLOBALS['itk_mapper_ajax'] = false;
 
     $before = count( $GLOBALS['itk_mapper_calls'] );

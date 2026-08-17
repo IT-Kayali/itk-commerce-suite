@@ -38,7 +38,7 @@ Configured languages can be addressed as directories such as `/de/`, `/ar/` and 
 
 Unprefixed routes remain valid in the configured default language. Canonical redirect policy is intentionally deferred to the SEO slice.
 
-For storefront requests the module also attempts `switch_to_locale()` and aligns the public WordPress locale filters with the selected Commerce language. Admin, AJAX, cron, installation and already-declared REST requests are not forced into storefront locale state.
+For normal storefront requests the module attempts `switch_to_locale()` and aligns public WordPress locale filters with the selected Commerce language. WooCommerce async requests use the separately persisted customer-session language described below instead of guessing from an unprefixed AJAX/REST URL.
 
 ## Safe language URLs and switcher
 
@@ -58,20 +58,11 @@ A style-neutral accessible switcher is available through:
 
 Theme, Elementor or other presentation packages may style the stable `itk-language-switcher*` classes or replace the output through the public switcher filters.
 
-## Translation repository
+## Translation repository and workflow
 
-Translations are not stored in the Theme and are not packed into one growing serialized customer-profile option. The Multilingual module owns two versioned WordPress-prefixed tables:
+Translations are not stored in the Theme and are not packed into one growing serialized customer-profile option. The module owns versioned WordPress-prefixed entry/revision tables. Entries use one stable translation key + public language code; revisions are append-only and retain workflow status, author/reviewer IDs, timestamps and source hashes.
 
-```text
-{prefix}itk_commerce_translation_entries
-{prefix}itk_commerce_translation_revisions
-```
-
-An entry represents one stable machine translation key + public language code. Each entry stores a deterministic source hash plus current/published revision pointers. Revisions are append-only and contain translated value, revision number, workflow status, author/reviewer IDs and timestamps.
-
-## Draft / review / published workflow
-
-Customer-facing lookup reads **published revisions only**. Editing a live translation creates a new draft without replacing the current published value.
+Customer-facing lookup reads **published revisions only**:
 
 ```text
 draft -> review -> published
@@ -80,8 +71,6 @@ draft -> review -> published
 ```
 
 Published revisions are immutable. Publishing a newer reviewed revision archives the previous published revision and switches the live pointer only after the replacement is ready.
-
-## Public translation lookup
 
 ```php
 $text = apply_filters(
@@ -92,23 +81,13 @@ $text = apply_filters(
 );
 ```
 
-Lookup order is requested/current language, configured fallback language, then the caller-provided source text. Programmatic integrations can obtain the repository/workflow through `itk_commerce_translation_repository` and `itk_commerce_translation_workflow`.
+Lookup order is requested/current language, configured fallback language, then caller source text.
 
 ## WooCommerce entity translation mapping
 
 The module maps **display text onto existing WooCommerce identities** instead of creating a separate product per language.
 
-### Product text
-
-WooCommerce product/variation view getters are mapped for:
-
-```text
-name
-short description
-description
-```
-
-Stable keys use the existing WooCommerce object ID:
+Product/variation keys use the existing WooCommerce object ID:
 
 ```text
 woocommerce.product.42.name
@@ -116,62 +95,91 @@ woocommerce.product.42.short-description
 woocommerce.product.42.description
 ```
 
-The same convention works for a variation because a variation already has its own WooCommerce ID. No translated copy of the product object is created.
-
-### Categories, tags and attribute terms
-
-Product category/tag and global attribute-option terms use the original taxonomy + term ID:
+Product category/tag and global attribute-option terms use original taxonomy + term ID:
 
 ```text
 woocommerce.term.product_cat.7.name
-woocommerce.term.product_cat.7.description
 woocommerce.term.product_tag.11.name
 woocommerce.term.pa_color.13.name
 ```
 
-Term objects are cloned before the translated `name` / `description` is applied. That avoids mutating the shared WordPress term object/cache instance when a process later changes language context. Term IDs and slugs stay unchanged in this slice.
+Global attribute labels use keys such as `woocommerce.attribute.pa_color.label`; product-local labels include the original product ID. Term objects are cloned before localized `name` / `description` mutation so shared cached objects are not polluted.
 
-### Attribute labels
-
-Global attribute labels use the original taxonomy name:
-
-```text
-woocommerce.attribute.pa_color.label
-```
-
-Product-local attribute labels include the existing product ID:
-
-```text
-woocommerce.product.42.attribute.bottle-size.label
-```
-
-Attribute taxonomy names, option IDs/term IDs and variation identity are not replaced.
-
-### Public WooCommerce mapper
-
-The active mapper is available through:
+The mapper is available through:
 
 ```php
 $mapper = apply_filters( 'itk_commerce_woocommerce_translation_mapper', null );
 ```
 
-This allows later admin/import integrations to generate exactly the same entity translation keys without coupling to Theme templates.
+## WooCommerce session language
+
+The localized storefront URL is the source of truth for ordinary page navigation. Once WooCommerce has initialized its customer session, the selected public language is stored under:
+
+```text
+itk_commerce_language
+```
+
+Rules:
+
+1. an explicit localized route such as `/ar/...` stores `ar` in WooCommerce session state;
+2. an unprefixed normal storefront route stores its configured/default request language;
+3. AJAX/REST/Store API requests restore a valid persisted session language into the Commerce request context;
+4. invalid, disabled or malformed session language values are ignored;
+5. async WooCommerce entity translation is allowed only after that valid session language has been restored.
+
+The current session language is exposed through:
+
+```php
+$code = apply_filters( 'itk_commerce_woocommerce_session_language', '' );
+```
+
+This keeps mini-cart/cart/checkout async traffic aligned with the language the shopper explicitly selected, without encoding commercial state into translation storage.
+
+## Order language capture
+
+Both classic checkout and Checkout Block/Store API capture the selected WooCommerce session language onto the existing `WC_Order` object through WooCommerce CRUD metadata.
+
+Stored keys:
+
+```text
+_itk_commerce_language
+_itk_commerce_locale
+_itk_commerce_direction
+```
+
+The language code identifies the public Commerce language. Locale and direction are frozen as a historical snapshot so future removal/renaming of a configured language does not erase the language context of old orders.
+
+Classic checkout captures the snapshot while WooCommerce is constructing the order. Store API checkout uses its public order-meta hook. No direct `wp_posts`, postmeta or HPOS table access is used.
+
+Read the frozen order context through:
+
+```php
+$order_context = apply_filters(
+    'itk_commerce_order_language_context',
+    array(),
+    $order
+);
+```
+
+Returned values include `code`, `locale`, `direction` and whether the language is still configured. Historical stored locale/direction remain available even if the language is no longer enabled.
+
+The module emits `itk_commerce_order_language_captured` when the snapshot is written.
 
 ## Commercial-data boundary
 
-The mapping layer deliberately does **not** translate or copy:
+The multilingual layer deliberately does **not** translate or copy:
 
 - product/variation IDs;
 - SKU;
 - regular/sale/active price;
 - stock quantity/status;
 - tax classes/rates;
-- product/category/attribute slugs;
-- cart/order/payment state.
+- product/category/attribute slugs in the current slice;
+- cart contents/totals;
+- payment state;
+- WooCommerce order ownership/state.
 
-WooCommerce remains authoritative for all of those values. The mapper runs only on customer-facing textual view surfaces.
-
-Admin, AJAX and REST entity mapping is intentionally skipped for now. The next WooCommerce language-context slice will persist the selected language into the customer session/order so AJAX, Store API, cart and emails can use an explicit language instead of guessing from the default request context.
+WooCommerce remains authoritative for all of those values. Multilingual stores only translation content and language-context metadata.
 
 ## Output safety
 
@@ -181,9 +189,7 @@ Translation persistence does not apply one global HTML sanitizer because output 
 
 The current implementation does **not** yet:
 
-- persist cart/session language or capture order language;
-- translate AJAX/Store API responses using explicit persisted customer language;
-- switch WooCommerce email/document generation into stored order language;
+- switch WooCommerce email/document generation into the frozen order locale;
 - emit translated slugs/canonical/hreflang policy;
 - import/export CSV/JSON/XLIFF translations;
 - create the translator role/capability/admin UI boundary;
@@ -191,4 +197,4 @@ The current implementation does **not** yet:
 
 ## Next slice
 
-The next workstream adds WooCommerce cart/session/order language persistence and an explicit email/document language context while preserving HPOS/WooCommerce CRUD ownership.
+The next workstream consumes the frozen order-language contract to render WooCommerce emails and Commerce documents in the language captured at checkout, while restoring the previous locale after each isolated rendering scope.

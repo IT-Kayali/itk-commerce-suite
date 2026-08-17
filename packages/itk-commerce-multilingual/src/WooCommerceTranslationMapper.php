@@ -177,26 +177,29 @@ final class WooCommerceTranslationMapper {
     }
 
     /**
-     * AJAX/REST language persistence is intentionally handled by the later
-     * WooCommerce session/order context slice. Until then we do not guess a
-     * storefront language for those request types.
+     * AJAX/REST translation is opt-in and requires the WooCommerce language
+     * context service to confirm a valid persisted customer-session language.
+     * This prevents async requests from silently falling back to the wrong
+     * default storefront language.
      *
      * @return bool
      */
     private function is_customer_view_request() {
-        if ( function_exists( 'is_admin' ) && is_admin() ) {
-            return false;
-        }
-        if ( function_exists( 'wp_doing_ajax' ) && wp_doing_ajax() ) {
-            return false;
-        }
         if ( function_exists( 'wp_doing_cron' ) && wp_doing_cron() ) {
             return false;
         }
         if ( function_exists( 'wp_installing' ) && wp_installing() ) {
             return false;
         }
-        if ( defined( 'REST_REQUEST' ) && REST_REQUEST ) {
+
+        $is_ajax = function_exists( 'wp_doing_ajax' ) && wp_doing_ajax();
+        $is_rest = defined( 'REST_REQUEST' ) && REST_REQUEST;
+
+        if ( $is_ajax || $is_rest ) {
+            return (bool) apply_filters( 'itk_commerce_allow_async_translation_mapping', false, $this->context );
+        }
+
+        if ( function_exists( 'is_admin' ) && is_admin() ) {
             return false;
         }
 

@@ -34,6 +34,9 @@ final class MultilingualModule implements ModuleInterface {
     /** @var TranslationWorkflow|null */
     private $translation_workflow = null;
 
+    /** @var WooCommerceLanguageContext|null */
+    private $woocommerce_language_context = null;
+
     /** @var WooCommerceTranslationMapper|null */
     private $woocommerce_mapper = null;
 
@@ -91,6 +94,9 @@ final class MultilingualModule implements ModuleInterface {
         );
         $this->translation_workflow->register();
 
+        $this->woocommerce_language_context = new WooCommerceLanguageContext( $this->context, $this->router );
+        $this->woocommerce_language_context->register();
+
         $this->woocommerce_mapper = new WooCommerceTranslationMapper(
             array( $this->translation_workflow, 'translate' ),
             $this->context
@@ -106,6 +112,7 @@ final class MultilingualModule implements ModuleInterface {
             $this->router,
             $this->switcher,
             $this->translation_workflow,
+            $this->woocommerce_language_context,
             $this->woocommerce_mapper
         );
     }
@@ -143,6 +150,11 @@ final class MultilingualModule implements ModuleInterface {
     /** @return TranslationWorkflow|null */
     public function translation_workflow() {
         return $this->translation_workflow;
+    }
+
+    /** @return WooCommerceLanguageContext|null */
+    public function woocommerce_language_context() {
+        return $this->woocommerce_language_context;
     }
 
     /** @return WooCommerceTranslationMapper|null */

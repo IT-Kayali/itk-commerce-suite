@@ -27,19 +27,20 @@
     "translation_repository": "versioned entry/revision tables with published lookup and source hashes implemented",
     "translation_workflow": "append-only draft/review/published workflow with published-revision isolation implemented",
     "woocommerce_entity_mapping": "product text, product category/tag/attribute term text and attribute labels mapped to translation keys without commercial-data duplication",
-    "woocommerce_language_context": "planned follow-up slice",
+    "woocommerce_language_context": "localized storefront language persisted in WooCommerce session and captured through WC_Order CRUD meta for classic and Store API checkout",
+    "async_translation_context": "AJAX/REST entity translation allowed only when a valid WooCommerce session language is restored",
+    "order_language_snapshot": "language code, WordPress locale and text direction frozen on the order for later email/document rendering",
     "seo_hreflang": "planned follow-up slice",
     "import_export": "planned follow-up slice"
   },
   "notes": [
     "WordPress minimum/tested ranges will be finalized with the Phase 0 environment audit and compatibility matrix.",
     "Language directories are resolved before normal WordPress route parsing so WordPress and WooCommerce remain authoritative for the internal storefront route.",
-    "Translation storage is module-owned and versioned independently from the Theme and customer profile configuration.",
-    "Published revisions remain customer-facing while newer draft/review revisions are edited.",
-    "WooCommerce product IDs, variation IDs, category/attribute term IDs and attribute taxonomy names remain the shared entity identity.",
-    "Only customer-facing text fields are mapped in this slice; product/category/attribute slugs remain unchanged until the SEO/routing design is implemented.",
-    "Price, SKU, stock, tax, cart and order state are never copied into translation storage.",
-    "Admin, AJAX and REST entity mapping is intentionally deferred until an explicit session/order language context is available.",
+    "WooCommerce session state carries the explicit storefront language into AJAX and Store API requests; invalid/unknown session codes are ignored.",
+    "Classic checkout uses the WC_Order object before save and Store API checkout uses its public order-meta hook; no direct post/order-table writes are used.",
+    "Order language metadata stores a historical locale/direction snapshot so later configuration changes do not erase the order's original language context.",
+    "WooCommerce product IDs, variation IDs, taxonomy/term IDs, SKU, prices, stock, tax, slugs, cart and order state remain WooCommerce-owned.",
+    "Email/document locale switching is a separate follow-up slice and will consume the frozen order-language contract.",
     "Customer-specific language lists live in the versioned customer profile rather than generic package code."
   ]
 }
