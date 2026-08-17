@@ -48,6 +48,18 @@ test.describe('WooCommerce My Account presentation', () => {
     expect(await navList.evaluate((element) => getComputedStyle(element).display)).toBe('flex');
   });
 
+  test('guest login state is not forced into the authenticated dashboard grid', async ({ page }) => {
+    await page.setViewportSize({ width: 1280, height: 900 });
+    await page.goto(fixture);
+    await page.evaluate(() => {
+      document.body.classList.remove('itk-account-authenticated');
+      document.body.classList.add('itk-account-guest');
+    });
+
+    const shell = page.locator('[data-account-shell]');
+    expect(await shell.evaluate((element) => getComputedStyle(element).display)).toBe('block');
+  });
+
   test('mobile layout collapses cards and addresses without horizontal overflow', async ({ page }) => {
     await page.setViewportSize({ width: 390, height: 844 });
     await page.goto(fixture);
