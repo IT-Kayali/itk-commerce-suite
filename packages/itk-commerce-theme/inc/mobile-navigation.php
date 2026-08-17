@@ -92,10 +92,17 @@ function mobile_bottom_navigation() {
     <nav class="itk-mobile-bottom" aria-label="<?php esc_attr_e( 'Mobile Bottom Navigation', 'itk-commerce' ); ?>">
         <ul class="itk-mobile-bottom__menu">
             <?php foreach ( $items as $item ) : ?>
+                <?php
+                $icon_name       = sanitize_key( $item['icon'] );
+                $is_cart_trigger = 'cart' === $icon_name && ! empty( $item['badge'] ) && function_exists( __NAMESPACE__ . '\\mini_cart_enabled' ) && mini_cart_enabled();
+                ?>
                 <li class="menu-item">
-                    <a href="<?php echo esc_url( $item['url'] ); ?>">
+                    <a
+                        href="<?php echo esc_url( $item['url'] ); ?>"
+                        <?php if ( $is_cart_trigger ) : ?>data-itk-mini-cart-trigger="1" aria-controls="itk-mini-cart" aria-haspopup="dialog" aria-expanded="false"<?php endif; ?>
+                    >
                         <span class="itk-mobile-bottom__icon-wrap">
-                            <?php icon( sanitize_key( $item['icon'] ) ); ?>
+                            <?php icon( $icon_name ); ?>
                             <?php if ( ! empty( $item['badge'] ) ) : ?>
                                 <?php cart_badge(); ?>
                             <?php endif; ?>
