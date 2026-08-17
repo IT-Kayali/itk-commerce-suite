@@ -15,108 +15,72 @@ The current development foundation provides:
 
 * versioned and bounded active-profile language configuration;
 * default and fallback language contracts;
-* enabled-language request context and RTL/LTR document state;
 * directory-style storefront routes such as /de/, /ar/ and /en/;
-* normal WordPress/WooCommerce route parsing after the language prefix is resolved;
 * storefront locale selection through public WordPress locale APIs;
-* safe same-origin language URLs and an accessible [itk_language_switcher];
-* localized canonical targets for indexable storefront routes;
-* hreflang alternates for every enabled language plus x-default;
-* query-free SEO URLs so tracking/filter/action state does not create alternate canonical variants;
+* accessible language switching and RTL/LTR document state;
+* localized canonical targets, hreflang alternates and x-default;
 * module-owned versioned translation entry/revision tables;
-* append-only draft/review/published translation workflow;
-* immutable published revisions while replacement drafts are edited;
-* published translation lookup with fallback-language/source fallback;
-* deterministic source hashes for later stale-translation detection;
-* read-only WooCommerce product/variation name and description mapping;
-* product category/tag and global attribute-term text mapping by existing taxonomy + term ID;
-* global and product-local attribute label translation mapping without changing WooCommerce identity;
-* WooCommerce customer-session language persistence for localized storefront requests;
-* explicit session-language restore for AJAX and Store API requests;
-* classic Checkout and Checkout Block/Store API order-language capture through WC_Order CRUD meta;
-* historical order snapshots for public language code, WordPress locale and text direction;
-* isolated order-language rendering scopes for WooCommerce transactional order emails;
-* manual order-email resend language scoping;
-* programmatic order-language run(order, callback) scope for future invoice/delivery/return document generators;
-* guaranteed previous-locale/context restoration, including renderer exceptions;
-* historical disabled-language translation lookup during order rendering.
+* append-only draft/review/published translation workflow with pre-publish validation;
+* product/variation/category/tag/attribute display-text translation on existing WooCommerce identities;
+* language-specific product, product-category, product-tag and global-attribute term slugs;
+* indexed translated-route uniqueness plus historical translated-slug aliases;
+* same-entity language URLs for the switcher, canonical and hreflang output;
+* WooCommerce customer-session language persistence;
+* classic and Store API order-language capture through WC_Order CRUD meta;
+* isolated stored-language rendering for transactional order emails and future Commerce documents.
 
-Translated entity slugs/permalinks, translator admin/capabilities and translation import/export remain separate follow-up slices.
+Translator admin/capabilities and translation CSV/JSON/XLIFF import/export remain follow-up slices.
 
 == Architecture ==
 
-The module depends on IT-Kayali Commerce Core and registers itself through the Commerce Suite module registry.
+The module depends on IT-Kayali Commerce Core and registers itself through the Commerce Suite module registry. Customer language lists/settings belong to the active versioned customer profile. Translation content and translated-route indexes are module-owned rather than Theme-owned.
 
-Customer language lists and language settings belong to the active versioned customer profile. Translation content is stored in module-owned WordPress-prefixed tables rather than Theme files or one growing serialized profile option.
-
-The Theme remains a presentation consumer. WooCommerce continues to own product and variation IDs, prices, SKU, stock, tax, slugs, cart contents/totals, payment state and order state. The multilingual module stores only translation content and bounded language/SEO context metadata.
+WooCommerce remains authoritative for product/variation IDs, term IDs, technical source slugs, prices, SKU, stock, tax, cart contents, payment state and orders. A translated permalink is a language-specific URL projection of the same existing entity, not a duplicated product or taxonomy term.
 
 == Language switcher ==
 
-Use the shortcode:
-
-[itk_language_switcher]
-
-Optional display modes are label, code and both. Themes/builders can consume the public switcher filters and style the stable itk-language-switcher classes.
+Use [itk_language_switcher]. Optional display modes are label, code and both. When the current page is a supported WooCommerce product/taxonomy entity, each switcher target uses that target language's published entity slug. If a target language has no slug translation, it uses the technical source slug rather than another language's slug.
 
 == SEO / hreflang ==
 
-The current localized route is canonicalized into its language directory. An unprefixed default-language duplicate canonicalizes to the configured default language directory instead of becoming a second canonical URL.
+The current localized route is canonicalized into its language directory. Every enabled language receives a same-entity hreflang alternate and x-default points to the configured default language. Entity-aware alternates use each target language's own published product/category/tag/attribute slug.
 
-WordPress Core's singular canonical URL is localized through its canonical filter. Other indexable frontend routes receive a filterable Multilingual canonical through wp_head. Every enabled language receives a same-route hreflang alternate and x-default points to the configured default language, not the fallback language.
+SEO targets do not copy current tracking, catalog-filter, nonce or action query parameters. Search, 404, feed, trackback, preview, admin, AJAX and REST requests do not receive default Multilingual SEO head output.
 
-SEO targets are built from the request path only. Current tracking, catalog filter, nonce and action query parameters are not copied into canonical or hreflang URLs.
+== Translation workflow ==
 
-Search, 404, feed, trackback, preview, admin, AJAX and REST requests do not receive Multilingual SEO head output. Integrations can disable/replace the default head output through the public itk_commerce_multilingual_manage_head_links, itk_commerce_multilingual_render_canonical and itk_commerce_multilingual_render_hreflang filters.
+Customer-facing lookup reads published revisions only. Editing a published translation creates a new draft and keeps the previous live revision visible until the replacement passes review and is explicitly published.
 
-Translated slugs/permalink resolution remains a separate routing slice so the current SEO foundation does not silently change WordPress/WooCommerce entity identity.
+Specialized translation consumers can validate reviewed revisions through itk_commerce_translation_validate_publish before the live pointer changes. The translated-permalink service uses this boundary to reject empty, oversized or conflicting slugs before publication.
 
-== Translation lookup ==
+== Translated WooCommerce permalinks ==
 
-Reusable components can use the itk_commerce_translate_text filter with a source/default string, stable machine key and optional explicit language code. Only published revisions are returned to customer-facing output. Missing target translations fall back to the configured fallback language and finally the caller-provided source string.
+Supported slug translation keys use the existing entity identity:
 
-Published text stays live while a newer draft or review revision exists. A replacement becomes visible only after review and explicit publish; the previous published revision is then archived as history.
+woocommerce.product.42.slug
+woocommerce.term.product_cat.7.slug
+woocommerce.term.product_tag.11.slug
+woocommerce.term.pa_color.13.slug
 
-== WooCommerce mapping ==
+Translation DB schema version 2 adds current translated-route and historical-alias indexes. The technical WordPress/WooCommerce post_name/term slug is not overwritten.
 
-Product and variation text uses the original WooCommerce object ID, for example:
+Outgoing product and supported taxonomy links use the current language's published route. Incoming translated route query vars are mapped back to the existing technical source slug before WordPress/WooCommerce executes the normal query.
 
-woocommerce.product.42.name
-woocommerce.product.42.short-description
-woocommerce.product.42.description
+Changing a translated slug preserves the previous translated slug as a same-language alias. Requests for the old translated slug redirect to the current translated permalink instead of redirecting to the technical source URL.
 
-Product category, product tag and global attribute-option terms use the existing taxonomy and term ID, for example:
-
-woocommerce.term.product_cat.7.name
-woocommerce.term.pa_color.13.name
-
-Global attribute labels use keys such as woocommerce.attribute.pa_color.label. Product-local attribute labels include the original product ID. Product/category/attribute slugs and all commercial values remain unchanged in this slice.
-
-Normal storefront pages use the language selected by the localized URL. AJAX/REST entity mapping is allowed only when the WooCommerce language-context service restores a valid persisted customer-session language; the mapper never guesses an async language from the default route context.
+Route publication rejects collisions with another translated current/alias route and with another entity's existing technical source slug in the same route scope.
 
 == WooCommerce language context ==
 
-The selected storefront language is persisted in the WooCommerce customer session under itk_commerce_language.
+The selected storefront language is persisted in the WooCommerce customer session under itk_commerce_language. Classic checkout and Checkout Block/Store API capture language, WordPress locale and text direction on the existing WC_Order object through CRUD metadata.
 
-Classic checkout and Checkout Block/Store API capture the same language snapshot on the existing WC_Order object through WooCommerce CRUD metadata:
-
-_itk_commerce_language
-_itk_commerce_locale
-_itk_commerce_direction
-
-These values are language context only. They do not duplicate or replace WooCommerce order ownership, items, totals, stock, taxes, payment state or HPOS data.
-
-The current persisted session language is exposed through itk_commerce_woocommerce_session_language. Historical order context is exposed through itk_commerce_order_language_context and remains readable even if a language is later disabled, because locale and direction are frozen with the order.
+These values are language context only; they do not duplicate WooCommerce order ownership, items, totals, stock, taxes, payment state or HPOS data.
 
 == Order email and document rendering ==
 
-WooCommerce transactional order notification events are wrapped in the frozen order language before the email trigger runs. While that explicit scope is active, WooCommerce's own customer-email store-locale switch/restore is disabled so it cannot overwrite the order locale. The previous WordPress locale and Commerce request language are restored after the notification.
+WooCommerce transactional order notifications and manual order-email resends run inside the frozen order-language scope. The previous WordPress locale and Commerce language are restored afterwards, including exception paths.
 
-The WooCommerce admin resend path is wrapped through its public before/after resend hooks. Non-order emails keep normal WooCommerce locale behavior.
-
-Future invoice, delivery-note, return-slip and pack-list renderers can obtain the service through itk_commerce_order_language_scope and call run($order, $callback). The callback receives normalized frozen order context and always restores locale/language in a finally block, even when rendering throws an exception.
-
-Historical orders whose language was later disabled can still use their stored locale and stored translation language only inside this order scope. The language is not globally re-enabled.
+Future invoice, delivery-note, return-slip and pack-list renderers can obtain itk_commerce_order_language_scope and call run($order, $callback) instead of implementing a separate locale stack.
 
 == Development status ==
 
