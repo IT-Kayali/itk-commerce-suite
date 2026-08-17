@@ -4,7 +4,7 @@ Modular, scalable WooCommerce commerce platform by IT-Kayali with a reusable the
 
 ## Status
 
-Phase 1 foundation is complete. Phase 2 now includes the first visual Layout Builder, profile-driven Header/Footer assignments, responsive navigation controls and the installable `itk-commerce-layouts` module.
+Phase 1 foundation is complete. Phase 2 now includes the visual Layout Builder, profile-driven Header/Footer assignments, responsive navigation controls, rich Mega-menu panels and the installable `itk-commerce-layouts` module.
 
 ## Product ownership
 
@@ -71,7 +71,13 @@ The optional Layouts module provides:
 - configurable mobile bottom-navigation visibility and fallback items;
 - portable Mega-menu definition keys, width and 1–6 column settings;
 - a WordPress menu-item field that binds local menu items to portable Mega-menu definitions;
+- **Appearance > Commerce Mega Menu** rich-content editor;
+- rich Mega-menu blocks for WordPress child links, WooCommerce categories, WooCommerce products, images, promo banners and optional Elementor saved templates;
+- responsive rich-panel rendering with a dedicated toggle, `aria-expanded`, keyboard focus support, Escape handling and click-outside closing;
+- customer-profile storage that keeps rich content separate from width/assignment metadata so normal Layout Builder saves do not delete rich panels;
 - safe Theme fallback when an unknown model is configured.
+
+Existing basic Mega-menu definitions keep their previous submenu behavior until rich blocks are explicitly saved. Rich blocks do not accept executable PHP or JavaScript. Optional WooCommerce/Elementor content fails closed instead of breaking the site header.
 
 Preview URLs require a logged-in user with the Commerce design capability and a valid nonce, and are marked `noindex,nofollow`.
 
@@ -113,7 +119,7 @@ tools/
 
 ## Validation and development ZIPs
 
-GitHub Actions validates PHP syntax, `theme.json`, all package compatibility manifests, Core lifecycle smoke tests, the Layouts module contract and the generic/customer separation rule. It then builds development artifacts:
+GitHub Actions validates PHP and JavaScript syntax, `theme.json`, all package compatibility manifests, Core lifecycle smoke tests, the Layouts module contract, rich Mega-menu normalization and the generic/customer separation rule. It then builds development artifacts:
 
 - `itk-commerce-theme.zip`
 - `itk-commerce-core.zip`
