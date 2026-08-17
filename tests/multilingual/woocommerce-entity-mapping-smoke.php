@@ -17,6 +17,7 @@ namespace {
 
     function get_locale() { return 'ar'; }
     function sanitize_text_field( $value ) { return trim( strip_tags( (string) $value ) ); }
+    function sanitize_key( $value ) { return preg_replace( '/[^a-z0-9_\-]/', '', strtolower( (string) $value ) ); }
     function sanitize_html_class( $value ) { return preg_replace( '/[^A-Za-z0-9_-]/', '', (string) $value ); }
     function esc_attr( $value ) { return (string) $value; }
     function add_filter( $hook, $callback, $priority = 10, $args = 1 ) {
