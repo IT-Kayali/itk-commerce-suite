@@ -25,6 +25,7 @@ Use `itk_commerce_product_card_models` to add reusable models. The selected mode
 `itk_commerce_product_card_options` receives the current options before final Theme validation. Supported values are intentionally bounded:
 
 - `image_ratio`: `portrait`, `square`, `landscape`
+- `content_order`: `title-price`, `price-title`
 - `content_align`: `left`, `center`
 - `price_treatment`: `standard`, `emphasis`, `muted`
 - `action_treatment`: `button`, `outline`, `text`
@@ -38,6 +39,8 @@ The Layouts module stores these values in:
 `modules.configuration.itk-commerce-layouts.product_card`
 
 This namespace keeps the component configuration isolated from the Shop/Product/Cart/Checkout page-template editor.
+
+The Theme applies the resolved card classes globally, while the CSS targets WooCommerce product-loop markup. This lets Shop, category, related/upsell and shortcode product loops share one presentation contract without changing WooCommerce data flows.
 
 ## Badges
 
@@ -77,6 +80,8 @@ No empty action wrapper is rendered when the hook has no listeners.
 ## WooCommerce compatibility
 
 The implementation relies on supported WooCommerce loop hooks and native product methods. It does not patch WooCommerce core, replace product loop templates, or reach into private Cart/Checkout block internals. The native Sale flash and standard product link, thumbnail, title, price, rating and add-to-cart callbacks remain WooCommerce-owned.
+
+The optional `price-title` presentation only changes visual order inside WooCommerce's standard product-loop link; it does not move or duplicate WooCommerce callbacks or product data.
 
 ## Live preview
 
