@@ -1,0 +1,50 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Mini cart regression fixture</title>
+  <link rel="stylesheet" href="/packages/itk-commerce-theme/assets/css/base.css">
+  <link rel="stylesheet" href="/packages/itk-commerce-theme/assets/css/components.css">
+  <link rel="stylesheet" href="/packages/itk-commerce-theme/assets/css/mini-cart.css">
+  <style>
+    body { margin: 0; min-height: 120vh; }
+    .fixture-header { display: flex; justify-content: flex-end; padding: 24px; }
+    .fixture-cart-trigger { display: inline-flex; align-items: center; min-height: 42px; padding: 0 14px; border: 1px solid #d9dee7; border-radius: 10px; color: #111827; text-decoration: none; }
+    .fixture-content { padding: 32px; }
+  </style>
+</head>
+<body class="itk-mini-cart-enabled itk-mini-cart-position-end itk-mini-cart-width-standard">
+  <header class="fixture-header">
+    <a class="itk-header-action--cart fixture-cart-trigger" href="/cart/">Cart <span data-itk-cart-count>2</span></a>
+  </header>
+
+  <main class="fixture-content">
+    <a href="#content-link" id="content-link">Focusable page content</a>
+  </main>
+
+  <div id="itk-mini-cart" class="itk-mini-cart itk-mini-cart--position-end itk-mini-cart--width-standard" data-itk-mini-cart aria-hidden="true">
+    <div class="itk-mini-cart__backdrop" data-itk-mini-cart-backdrop aria-hidden="true"></div>
+    <section class="itk-mini-cart__panel" role="dialog" aria-modal="true" aria-labelledby="itk-mini-cart-title" tabindex="-1" data-itk-mini-cart-panel>
+      <header class="itk-mini-cart__header">
+        <div><span class="itk-mini-cart__eyebrow">Shopping cart</span><h2 id="itk-mini-cart-title">Your cart</h2></div>
+        <button class="itk-mini-cart__close" type="button" data-itk-mini-cart-close aria-label="Close cart">×</button>
+      </header>
+      <div class="itk-mini-cart__content" data-itk-mini-cart-content aria-live="polite">
+        <ul class="woocommerce-mini-cart cart_list product_list_widget">
+          <li class="woocommerce-mini-cart-item mini_cart_item">
+            <a href="#product"><img alt="" src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///ywAAAAAAQABAAACAUwAOw==">Test Product</a>
+            <span class="quantity">1 × €29.00</span>
+            <a href="#remove" class="remove remove_from_cart_button" aria-label="Remove item">×</a>
+          </li>
+        </ul>
+        <p class="woocommerce-mini-cart__total total"><strong>Subtotal:</strong> <span>€29.00</span></p>
+        <p class="woocommerce-mini-cart__buttons buttons"><a href="/cart/" class="button wc-forward">View cart</a><a href="/checkout/" class="button checkout wc-forward">Checkout</a></p>
+      </div>
+    </section>
+  </div>
+
+  <script>window.ITKCommerceMiniCart = { openAfterAdd: true, closeOnBackdrop: true };</script>
+  <script src="/packages/itk-commerce-theme/assets/js/mini-cart.js"></script>
+</body>
+</html>

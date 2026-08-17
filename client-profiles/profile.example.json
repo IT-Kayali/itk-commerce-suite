@@ -136,6 +136,17 @@
             "new_days": 30
           }
         },
+        "mini_cart": {
+          "options": {
+            "enabled": true,
+            "position": "end",
+            "width": "standard",
+            "open_after_add": true,
+            "close_on_backdrop": true,
+            "show_thumbnails": true,
+            "show_subtotal": true
+          }
+        },
         "mega_content": {
           "catalog": {
             "blocks": [
