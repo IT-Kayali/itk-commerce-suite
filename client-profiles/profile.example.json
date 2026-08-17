@@ -70,6 +70,17 @@
           "icon": "user"
         }
       ]
+    },
+    "mega_menu": {
+      "definitions": {
+        "catalog": {
+          "label": "Catalog",
+          "width": "full",
+          "columns": 4,
+          "content_type": "menu",
+          "content_key": "catalog"
+        }
+      }
     }
   },
   "modules": {
