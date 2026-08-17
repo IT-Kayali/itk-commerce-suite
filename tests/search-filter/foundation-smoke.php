@@ -87,10 +87,16 @@ $custom = $schema->normalize(
             'query_key' => 'filter_rating',
             'order'     => 10,
         ),
+        array(
+            'id'        => 'stars-copy',
+            'type'      => 'rating',
+            'query_key' => 'filter_stars_copy',
+            'order'     => 50,
+        ),
     )
 );
 
-itk_sf_assert( 2 === count( $custom ), 'Unsafe and duplicate definitions should be discarded.' );
+itk_sf_assert( 2 === count( $custom ), 'Unsafe, duplicate and duplicate singleton-type definitions should be discarded.' );
 itk_sf_assert( 'rating' === $custom[0]['id'], 'Definitions should be sorted by bounded order.' );
 itk_sf_assert( 'brand' === $custom[1]['id'] && 'pa_brand' === $custom[1]['taxonomy'], 'Product attribute taxonomy should be accepted.' );
 
@@ -150,6 +156,34 @@ itk_sf_assert( 'BETWEEN' === $meta_query[0]['compare'] && array( 20.0, 150.0 ) =
 $query = new ITKSFFakeQuery( array( 'post__in' => array( 1, 2, 3 ) ) );
 $adapter->filter_product_query( $query );
 itk_sf_assert( array( 2, 3 ) === $query->value( 'post__in' ), 'Sale filter should intersect an existing post__in constraint.' );
+
+$custom_scalar_definitions = $schema->normalize(
+    array(
+        array( 'id' => 'cost', 'type' => 'price', 'query_key' => 'catalog_cost', 'label' => 'Cost', 'order' => 10 ),
+        array( 'id' => 'availability', 'type' => 'stock', 'query_key' => 'availability', 'label' => 'Availability', 'order' => 20 ),
+        array( 'id' => 'promotion', 'type' => 'sale', 'query_key' => 'promotion', 'label' => 'Promotion', 'order' => 30 ),
+        array( 'id' => 'stars', 'type' => 'rating', 'query_key' => 'stars', 'label' => 'Stars', 'order' => 40 ),
+    )
+);
+$custom_scalar_state = new \ITK\Commerce\SearchFilter\UrlState( $custom_scalar_definitions );
+$_GET = array(
+    'catalog_cost' => '10-30',
+    'availability' => 'out-of-stock',
+    'promotion'    => '1',
+    'stars'        => '5',
+);
+$custom_adapter = new \ITK\Commerce\SearchFilter\WooQueryAdapter( $custom_scalar_state );
+
+$custom_tax_query = $custom_adapter->filter_tax_query( array(), null );
+itk_sf_assert( 'IN' === $custom_tax_query[0]['operator'], 'Custom-ID stock filter should still resolve by schema type.' );
+itk_sf_assert( array( 105 ) === $custom_tax_query[1]['terms'], 'Custom-ID rating filter should still resolve by schema type.' );
+
+$custom_meta_query = $custom_adapter->filter_meta_query( array(), null );
+itk_sf_assert( array( 10.0, 30.0 ) === $custom_meta_query[0]['value'], 'Custom-ID price filter should still resolve by schema type.' );
+
+$custom_query = new ITKSFFakeQuery();
+$custom_adapter->filter_product_query( $custom_query );
+itk_sf_assert( array( 2, 3, 4 ) === $custom_query->value( 'post__in' ), 'Custom-ID sale filter should still resolve by schema type.' );
 
 $_GET = array( 'filter_stock' => 'invalid', 'filter_rating' => '99', 'filter_price' => 'not-a-range' );
 $invalid_adapter = new \ITK\Commerce\SearchFilter\WooQueryAdapter( $url_state );
