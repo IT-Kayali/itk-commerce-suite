@@ -14,25 +14,25 @@
 
 .itk-commerce-block-shell--cart.itk-commerce-block-shell--model-classic,
 .itk-commerce-block-shell--checkout.itk-commerce-block-shell--model-classic {
-  max-width: 1180px;
+  max-width: 1180px !important;
 }
 
 .itk-commerce-block-shell--cart.itk-commerce-block-shell--model-split,
 .itk-commerce-block-shell--checkout.itk-commerce-block-shell--model-split {
-  max-width: 1320px;
+  max-width: 1320px !important;
 }
 
 .itk-commerce-block-shell--cart.itk-commerce-block-shell--model-compact {
-  max-width: 980px;
+  max-width: 980px !important;
 }
 
 .itk-commerce-block-shell--checkout.itk-commerce-block-shell--model-focused,
 .itk-checkout-width-boxed .itk-commerce-block-shell--checkout {
-  max-width: 920px;
+  max-width: 920px !important;
 }
 
 .itk-checkout-width-wide .itk-commerce-block-shell--checkout {
-  max-width: 1320px;
+  max-width: 1320px !important;
 }
 
 .itk-cart-density-compact .itk-commerce-block-shell--cart,
@@ -57,7 +57,9 @@
   .itk-commerce-block-shell--cart.itk-commerce-block-shell--model-compact,
   .itk-commerce-block-shell--checkout.itk-commerce-block-shell--model-classic,
   .itk-commerce-block-shell--checkout.itk-commerce-block-shell--model-split,
-  .itk-commerce-block-shell--checkout.itk-commerce-block-shell--model-focused {
-    max-width: 100%;
+  .itk-commerce-block-shell--checkout.itk-commerce-block-shell--model-focused,
+  .itk-checkout-width-boxed .itk-commerce-block-shell--checkout,
+  .itk-checkout-width-wide .itk-commerce-block-shell--checkout {
+    max-width: 100% !important;
   }
 }
