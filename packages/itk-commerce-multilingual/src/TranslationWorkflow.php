@@ -149,10 +149,36 @@ final class TranslationWorkflow {
         return $revision;
     }
 
-    /** @param int $revision_id Revision ID. @param int $reviewer_id Optional reviewer ID. @return array<string,mixed>|\WP_Error|false */
+    /**
+     * Publish a reviewed revision only after specialized consumers have had a
+     * chance to validate it. Generic translations keep the default `true`
+     * decision; route/slug consumers can reject collisions before the live
+     * translation pointer changes.
+     *
+     * @param int $revision_id Revision ID.
+     * @param int $reviewer_id Optional reviewer ID.
+     * @return array<string,mixed>|\WP_Error|false
+     */
     public function publish( $revision_id, $reviewer_id = 0 ) {
         $reviewer_id = $this->resolve_user_id( $reviewer_id );
-        $revision    = $this->repository->transition(
+        $candidate   = $this->repository->revision( $revision_id );
+
+        if ( is_array( $candidate ) && TranslationSchema::STATUS_REVIEW === $candidate['workflow_status'] && function_exists( 'apply_filters' ) ) {
+            $validation = apply_filters( 'itk_commerce_translation_validate_publish', true, $candidate, $this );
+
+            if ( function_exists( 'is_wp_error' ) && is_wp_error( $validation ) ) {
+                return $validation;
+            }
+
+            if ( false === $validation ) {
+                if ( class_exists( '\WP_Error' ) ) {
+                    return new \WP_Error( 'translation_publish_rejected', 'Translation publication was rejected by a validation contract.' );
+                }
+                return false;
+            }
+        }
+
+        $revision = $this->repository->transition(
             $revision_id,
             TranslationSchema::STATUS_REVIEW,
             TranslationSchema::STATUS_PUBLISHED,
