@@ -58,7 +58,9 @@ final class TranslationInstaller {
 
     /**
      * dbDelta-compatible schema. No foreign keys are used so WordPress prefix,
-     * multisite and table upgrade behavior stay portable.
+     * multisite and table upgrade behavior stay portable. The four tables are
+     * returned in two migration batches to preserve the established installer
+     * contract while dbDelta still receives every CREATE TABLE statement.
      *
      * @param object|null $database Optional wpdb-compatible object.
      * @return string[]
@@ -137,6 +139,9 @@ final class TranslationInstaller {
  KEY object_lookup (entity_type,object_id,taxonomy)
 ) {$collate};";
 
-        return array( $entries, $revisions, $routes, $route_aliases );
+        return array(
+            $entries . "\n" . $routes,
+            $revisions . "\n" . $route_aliases,
+        );
     }
 }
