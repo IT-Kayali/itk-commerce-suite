@@ -25,6 +25,16 @@ interface ModuleInterface {
     public function version();
 
     /**
+     * Declare minimum environment and module dependencies.
+     *
+     * Supported keys: core, php, wordpress, woocommerce and modules.
+     * The modules value must be an array of module identifiers.
+     *
+     * @return array<string,mixed>
+     */
+    public function requirements();
+
+    /**
      * Register hooks, services and extension points for this module.
      *
      * @return void

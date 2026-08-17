@@ -1,0 +1,34 @@
+{
+  "schema_version": 1,
+  "profile_id": "example-customer",
+  "profile_version": "1.0.0",
+  "name": "Example Customer",
+  "branding": {
+    "company_name": "Example Customer",
+    "slogan": "",
+    "logos": {
+      "primary": "",
+      "dark": "",
+      "mobile": "",
+      "favicon": ""
+    }
+  },
+  "design": {
+    "colors": {},
+    "typography": {},
+    "layout": {}
+  },
+  "contacts": {},
+  "languages": [
+    {
+      "code": "de",
+      "label": "Deutsch",
+      "direction": "ltr"
+    }
+  ],
+  "layouts": {},
+  "modules": {
+    "enabled": [],
+    "configuration": {}
+  }
+}
