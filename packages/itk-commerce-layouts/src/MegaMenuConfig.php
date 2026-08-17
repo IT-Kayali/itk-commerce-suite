@@ -137,7 +137,8 @@ final class MegaMenuConfig {
      *
      * Rich content is stored under the Layouts module configuration so the
      * basic layout builder can safely update definition width/column metadata
-     * without discarding rich block content.
+     * without discarding rich block content. Existing basic mega menus remain
+     * unchanged until explicit rich blocks are saved.
      *
      * @return array<string,array<string,mixed>>
      */
@@ -167,16 +168,6 @@ final class MegaMenuConfig {
                         isset( $rich_content[ $key ]['blocks'] ) && is_array( $rich_content[ $key ]['blocks'] )
                             ? $rich_content[ $key ]['blocks']
                             : array()
-                    );
-                }
-
-                if ( empty( $normalized['blocks'] ) ) {
-                    $normalized['blocks'] = array(
-                        array(
-                            'type' => 'menu',
-                            'title' => '',
-                            'span' => max( 1, min( 6, (int) $normalized['columns'] ) ),
-                        ),
                     );
                 }
 
