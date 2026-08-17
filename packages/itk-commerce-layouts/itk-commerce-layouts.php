@@ -49,48 +49,83 @@ function prepare() {
 }
 
 /**
- * Enable the module in Core settings on WordPress activation when Core is available.
- * Customer-profile module selections are not rewritten here.
+ * Enable the module in global Core settings and the active customer profile.
+ * Existing profile configuration is preserved.
  *
  * @return void
  */
 function activate() {
-    if ( ! class_exists( '\\ITK\\Commerce\\Core\\Core' ) ) {
-        return;
-    }
-
-    $settings_repository = \ITK\Commerce\Core\Core::instance()->settings();
-    $settings            = $settings_repository->all();
-    $enabled             = isset( $settings['modules']['enabled'] ) && is_array( $settings['modules']['enabled'] )
-        ? $settings['modules']['enabled']
-        : array();
-
-    if ( ! in_array( MODULE_ID, $enabled, true ) ) {
-        $enabled[] = MODULE_ID;
-    }
-
-    $settings['modules']['enabled'] = array_values( array_unique( $enabled ) );
-    $settings_repository->save( $settings );
+    set_enabled_state( true );
 }
 
 /**
- * Disable the global Core setting on WordPress deactivation while preserving
- * customer-profile configuration for safe reactivation/rollback.
+ * Disable the module in global Core settings and the active customer profile.
+ * Layout configuration remains stored for safe reactivation/rollback.
  *
  * @return void
  */
 function deactivate() {
+    set_enabled_state( false );
+}
+
+/**
+ * Synchronize the explicit WordPress plugin state with Core/profile module flags.
+ *
+ * @param bool $enable Desired module state.
+ * @return void
+ */
+function set_enabled_state( $enable ) {
     if ( ! class_exists( '\\ITK\\Commerce\\Core\\Core' ) ) {
         return;
     }
 
-    $settings_repository = \ITK\Commerce\Core\Core::instance()->settings();
+    $core                = \ITK\Commerce\Core\Core::instance();
+    $settings_repository = $core->settings();
     $settings            = $settings_repository->all();
     $enabled             = isset( $settings['modules']['enabled'] ) && is_array( $settings['modules']['enabled'] )
         ? $settings['modules']['enabled']
         : array();
 
-    $settings['modules']['enabled'] = array_values(
+    $enabled = update_enabled_list( $enabled, (bool) $enable );
+    $settings['modules']['enabled'] = $enabled;
+    $settings_repository->save( $settings );
+
+    $profile_id = isset( $settings['active_profile_id'] ) ? sanitize_key( $settings['active_profile_id'] ) : '';
+    $profile    = $profile_id ? $core->profiles()->get( $profile_id ) : null;
+
+    if ( ! is_array( $profile ) ) {
+        return;
+    }
+
+    if ( empty( $profile['modules'] ) || ! is_array( $profile['modules'] ) ) {
+        $profile['modules'] = array();
+    }
+    $profile_enabled = isset( $profile['modules']['enabled'] ) && is_array( $profile['modules']['enabled'] )
+        ? $profile['modules']['enabled']
+        : array();
+
+    $profile['modules']['enabled'] = update_enabled_list( $profile_enabled, (bool) $enable );
+    $core->profiles()->save( $profile );
+}
+
+/**
+ * Add or remove this module identifier without disturbing other modules.
+ *
+ * @param string[] $enabled Existing enabled module IDs.
+ * @param bool     $enable  Desired state.
+ * @return string[]
+ */
+function update_enabled_list( array $enabled, $enable ) {
+    $enabled = array_values( array_unique( array_filter( array_map( 'sanitize_key', $enabled ) ) ) );
+
+    if ( $enable ) {
+        if ( ! in_array( MODULE_ID, $enabled, true ) ) {
+            $enabled[] = MODULE_ID;
+        }
+        return $enabled;
+    }
+
+    return array_values(
         array_filter(
             $enabled,
             static function ( $module_id ) {
@@ -98,8 +133,6 @@ function deactivate() {
             }
         )
     );
-
-    $settings_repository->save( $settings );
 }
 
 /**
