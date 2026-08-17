@@ -4,6 +4,7 @@
   var root = null;
   var panel = null;
   var lastTrigger = null;
+  var refreshPromise = null;
   var focusableSelector = 'a[href], button:not([disabled]), input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])';
 
   function options() {
@@ -73,6 +74,15 @@
       return false;
     }
 
+    if (trigger.hasAttribute('download')) {
+      return false;
+    }
+
+    var target = trigger.getAttribute('target');
+    if (target && target.toLowerCase() !== '_self') {
+      return false;
+    }
+
     return !event.metaKey && !event.ctrlKey && !event.shiftKey && !event.altKey;
   }
 
@@ -129,16 +139,106 @@
     }
   }
 
-  function bindWooCommerceEvents() {
-    if (!window.jQuery) {
+  function replaceFragment(selector, html) {
+    var targets;
+
+    try {
+      targets = Array.prototype.slice.call(document.querySelectorAll(selector));
+    } catch (error) {
       return;
     }
 
-    window.jQuery(document.body).on('added_to_cart', function () {
-      if (options().openAfterAdd !== false) {
-        open(document.querySelector('.itk-header-action--cart, [data-itk-mini-cart-trigger]'));
+    targets.forEach(function (target) {
+      var template = document.createElement('template');
+      template.innerHTML = String(html || '').trim();
+      var replacement = template.content.firstElementChild;
+
+      if (replacement) {
+        target.replaceWith(replacement.cloneNode(true));
       }
     });
+  }
+
+  function applyFragments(data) {
+    if (!data || !data.fragments || typeof data.fragments !== 'object') {
+      return;
+    }
+
+    Object.keys(data.fragments).forEach(function (selector) {
+      replaceFragment(selector, data.fragments[selector]);
+    });
+  }
+
+  function refreshFragments() {
+    var refreshUrl = options().refreshUrl || '';
+
+    if (!refreshUrl || typeof window.fetch !== 'function') {
+      return Promise.resolve();
+    }
+
+    if (refreshPromise) {
+      return refreshPromise;
+    }
+
+    refreshPromise = window.fetch(refreshUrl, {
+      method: 'POST',
+      credentials: 'same-origin',
+      headers: {
+        'X-Requested-With': 'XMLHttpRequest'
+      }
+    }).then(function (response) {
+      if (!response.ok) {
+        throw new Error('Mini-cart fragment refresh failed with HTTP ' + response.status);
+      }
+
+      return response.json();
+    }).then(function (data) {
+      applyFragments(data);
+      return data;
+    }).catch(function () {
+      // Keep navigation and the existing WooCommerce cart usable if a refresh
+      // request fails. The next WooCommerce mutation/fragment refresh can retry.
+      return null;
+    });
+
+    refreshPromise = refreshPromise.then(function (result) {
+      refreshPromise = null;
+      return result;
+    }, function (error) {
+      refreshPromise = null;
+      throw error;
+    });
+
+    return refreshPromise;
+  }
+
+  function defaultTrigger() {
+    return document.querySelector('.itk-header-action--cart, [data-itk-mini-cart-trigger]');
+  }
+
+  function handleBlocksAddedToCart() {
+    refreshFragments().then(function () {
+      if (options().openAfterAdd !== false) {
+        open(defaultTrigger());
+      }
+    });
+  }
+
+  function handleBlocksRemovedFromCart() {
+    refreshFragments();
+  }
+
+  function bindWooCommerceEvents() {
+    if (window.jQuery) {
+      window.jQuery(document.body).on('added_to_cart', function () {
+        if (options().openAfterAdd !== false) {
+          open(defaultTrigger());
+        }
+      });
+    }
+
+    document.body.addEventListener('wc-blocks_added_to_cart', handleBlocksAddedToCart);
+    document.body.addEventListener('wc-blocks_removed_from_cart', handleBlocksRemovedFromCart);
   }
 
   function init() {
