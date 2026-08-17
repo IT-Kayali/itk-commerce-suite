@@ -19,11 +19,11 @@
     "filter_schema_version": 1,
     "filter_types": ["taxonomy", "price", "stock", "sale", "rating"],
     "attribute_filters": "supported through pa_* taxonomy definitions",
-    "profile_configuration": "foundation implemented",
+    "profile_configuration": "visual builder and bounded active-profile configuration implemented",
     "shareable_url_state": "bounded parser and serializer implemented",
     "woocommerce_query_adapter": "taxonomy, price, stock, sale and rating foundation implemented",
-    "server_rendered_ui": "planned",
-    "ajax_catalog": "planned",
+    "server_rendered_ui": "GET fallback, active chips, select/chips/radio/checkbox/range/toggle presentation and responsive UI implemented",
+    "ajax_catalog": "same-origin Fetch plus History progressive enhancement implemented for filters, active chips and pagination",
     "mobile_offcanvas": "planned",
     "ajax_search": "planned",
     "cache_index": "planned"
@@ -31,7 +31,8 @@
   "notes": [
     "WooCommerce minimum/tested ranges remain unset until the Phase 0 environment audit and compatibility matrix are completed.",
     "Public URL parameters are allow-listed from the normalized filter definition schema; arbitrary request keys are not converted into product queries.",
-    "The first query adapter slice uses public WooCommerce/WordPress tax and meta query APIs. Price lookup optimization is deferred to the Phase 4 cache/index workstream.",
+    "Server-rendered public catalog GET URLs remain authoritative. The browser enhancement fetches those same same-origin URLs, replaces only module-owned result/toolbar boundaries, updates History and falls back to normal navigation on failure.",
+    "No custom admin-ajax product-query endpoint is introduced for read-only filtering, so WooCommerce visibility and the existing server query adapter remain the single query implementation.",
     "The module does not patch WooCommerce or Theme source and remains optional/installable independently from presentation packages."
   ]
 }
