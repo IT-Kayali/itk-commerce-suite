@@ -24,6 +24,7 @@
     "directory_routing": "directory-style storefront routing and safe current-path language URLs implemented",
     "wordpress_locale_switching": "public locale filters and switch_to_locale bridge implemented for storefront requests",
     "language_switcher": "accessible style-neutral shortcode/public filter surface implemented",
+    "multilingual_seo": "localized canonical targets plus hreflang alternates and x-default implemented for indexable frontend routes",
     "translation_repository": "versioned entry/revision tables with published lookup and source hashes implemented",
     "translation_workflow": "append-only draft/review/published workflow with published-revision isolation implemented",
     "woocommerce_entity_mapping": "product text, product category/tag/attribute term text and attribute labels mapped to translation keys without commercial-data duplication",
@@ -32,20 +33,19 @@
     "order_language_snapshot": "language code, WordPress locale and text direction frozen on the order for later rendering",
     "order_language_rendering_scope": "isolated locale/translation scope implemented for WooCommerce transactional order notifications, manual resend and programmatic document rendering",
     "historical_language_rendering": "stored order locale and translation code can render historical orders even after a language is disabled",
-    "seo_hreflang": "planned follow-up slice",
+    "translated_slugs": "planned separate routing slice",
     "import_export": "planned follow-up slice"
   },
   "notes": [
     "WordPress minimum/tested ranges will be finalized with the Phase 0 environment audit and compatibility matrix.",
-    "Language directories are resolved before normal WordPress route parsing so WordPress and WooCommerce remain authoritative for the internal storefront route.",
-    "WooCommerce session state carries the explicit storefront language into AJAX and Store API requests; invalid/unknown session codes are ignored.",
-    "Classic checkout and Store API checkout persist language context only through WC_Order CRUD metadata; no direct post/order-table writes are used.",
-    "WooCommerce order notification actions are wrapped before the email trigger so the order is known before WC_Email::setup_locale runs; the previous locale is restored after notification rendering.",
-    "WooCommerce's own site-locale setup/restore is disabled only while an explicit order-language scope is active.",
-    "Manual order-email resend uses WooCommerce's before/after resend hooks; arbitrary integrations can use the public order-language scope service.",
-    "Programmatic document renderers can obtain itk_commerce_order_language_scope and call run(order, callback) with guaranteed finally-based restoration.",
-    "Historical disabled languages retain their frozen order locale and scoped translation lookup code without being globally re-enabled.",
-    "WooCommerce product IDs, variation IDs, taxonomy/term IDs, SKU, prices, stock, tax, slugs, cart and order state remain WooCommerce-owned.",
+    "WordPress Core's singular canonical is localized through get_canonical_url; non-singular indexable frontend views receive a filterable Multilingual canonical in wp_head.",
+    "Every enabled language receives a same-route hreflang alternate and x-default points to the configured default language rather than the fallback language.",
+    "Canonical and hreflang targets are generated from the route path only; current tracking, filter, nonce and action query parameters are never copied into SEO URLs.",
+    "Unprefixed default-language routes canonicalize into the configured language directory while redirect policy remains a separate routing concern.",
+    "Search, 404, feed, trackback, preview, admin, AJAX and REST requests do not receive Multilingual canonical/hreflang output from this module.",
+    "Third-party SEO integrations can disable or replace Multilingual head output through the public manage/render filters without changing routing or translation state.",
+    "Translated entity slugs/permalink resolution is intentionally separate so WooCommerce/WordPress rewrite identity is not silently changed by the SEO foundation.",
+    "WooCommerce product IDs, variation IDs, taxonomy/term IDs, SKU, prices, stock, tax, cart and order state remain WooCommerce-owned.",
     "Customer-specific language lists live in the versioned customer profile rather than generic package code."
   ]
 }

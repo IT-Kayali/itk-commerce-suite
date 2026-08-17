@@ -25,6 +25,9 @@ final class MultilingualModule implements ModuleInterface {
     /** @var LanguageSwitcher|null */
     private $switcher = null;
 
+    /** @var MultilingualSeo|null */
+    private $seo = null;
+
     /** @var TranslationSchema|null */
     private $translation_schema = null;
 
@@ -91,6 +94,9 @@ final class MultilingualModule implements ModuleInterface {
         $this->switcher = new LanguageSwitcher( $this->context, $this->router );
         $this->switcher->register();
 
+        $this->seo = new MultilingualSeo( $this->context, $this->router );
+        $this->seo->register();
+
         $this->translation_schema     = new TranslationSchema();
         $this->translation_repository = new TranslationRepository( $this->translation_schema );
         $this->translation_workflow   = new TranslationWorkflow(
@@ -148,6 +154,11 @@ final class MultilingualModule implements ModuleInterface {
     /** @return LanguageSwitcher|null */
     public function switcher() {
         return $this->switcher;
+    }
+
+    /** @return MultilingualSeo|null */
+    public function seo() {
+        return $this->seo;
     }
 
     /** @return TranslationSchema|null */

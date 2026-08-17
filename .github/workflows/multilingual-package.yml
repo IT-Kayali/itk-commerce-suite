@@ -42,6 +42,9 @@ jobs:
       - name: Multilingual routing smoke test
         run: php tests/multilingual/routing-smoke.php
 
+      - name: Multilingual SEO/hreflang smoke test
+        run: php tests/multilingual/seo-hreflang-smoke.php
+
       - name: Translation workflow smoke test
         run: php tests/multilingual/translation-workflow-smoke.php
 
