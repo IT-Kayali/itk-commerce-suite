@@ -5,6 +5,7 @@
  * Version: 0.1.0-dev
  * Author: IT-Kayali
  * Text Domain: itk-commerce-core
+ * Requires PHP: 8.1
  *
  * @package ITK_Commerce_Core
  */
@@ -17,13 +18,28 @@ const VERSION = '0.1.0-dev';
 const FILE    = __FILE__;
 const PATH    = __DIR__;
 
-require_once PATH . '/src/Core.php';
-require_once PATH . '/src/Contracts/ModuleInterface.php';
+if ( ! defined( 'ITK_COMMERCE_CORE_VERSION' ) ) {
+    define( 'ITK_COMMERCE_CORE_VERSION', VERSION );
+}
 
-add_action( 'plugins_loaded', __NAMESPACE__ . '\\bootstrap' );
+require_once PATH . '/src/Contracts/ModuleInterface.php';
+require_once PATH . '/src/Settings/SettingsRepository.php';
+require_once PATH . '/src/Profiles/ProfileSchema.php';
+require_once PATH . '/src/Profiles/ProfileRepository.php';
+require_once PATH . '/src/Security/Capabilities.php';
+require_once PATH . '/src/Lifecycle/Installer.php';
+require_once PATH . '/src/Modules/ModuleRegistry.php';
+require_once PATH . '/src/Core.php';
+
+\register_activation_hook( FILE, array( Lifecycle\Installer::class, 'activate' ) );
+\register_deactivation_hook( FILE, array( Lifecycle\Installer::class, 'deactivate' ) );
+
+add_action( 'plugins_loaded', __NAMESPACE__ . '\\bootstrap', 20 );
 
 /**
- * Bootstrap the core once all plugins are loaded.
+ * Bootstrap the core after plugins have had an opportunity to register hooks.
+ *
+ * @return void
  */
 function bootstrap() {
     Core::instance()->boot();
