@@ -52,17 +52,21 @@ $builder    = file_get_contents( $root . 'src/Admin/FilterBuilderPage.php' );
 $module     = file_get_contents( $root . 'src/SearchFilterModule.php' );
 $bootstrap  = file_get_contents( $root . 'itk-commerce-search-filter.php' );
 $normalizer = file_get_contents( $root . 'src/Admin/PostedDefinitionNormalizer.php' );
+$styles     = file_get_contents( $root . 'assets/css/filter-ui.css' );
 
 itk_sf_ui_assert( false !== strpos( $renderer, "add_action( 'itk_commerce_catalog_toolbar'" ), 'Filter UI must attach through the Phase 3 public catalog toolbar contract.' );
 itk_sf_ui_assert( false !== strpos( $renderer, 'method="get"' ), 'Catalog filtering must retain a normal GET fallback.' );
 itk_sf_ui_assert( false !== strpos( $renderer, 'render_active_chips' ), 'Active-filter chip rendering must remain available.' );
-itk_sf_ui_assert( false !== strpos( $renderer, "'chips' === \$definition['display']" ), 'Configured chip display mode must be rendered.' );
+itk_sf_ui_assert( false !== strpos( $renderer, 'itk-filter-option--chip' ), 'Configured chip display mode must render a stable chip control class.' );
+itk_sf_ui_assert( false !== strpos( $renderer, 'itk-filter-select' ), 'Configured select display mode must render a stable select control class.' );
+itk_sf_ui_assert( false !== strpos( $renderer, '<details class="<?php echo esc_attr( implode( \' \', $classes ) ); ?>"' ), 'Filter groups must use native details/summary progressive disclosure.' );
+itk_sf_ui_assert( false !== strpos( $styles, '.itk-filter-option--chip' ) && false !== strpos( $styles, '.itk-filter-select' ), 'Chip and select modes must have isolated frontend styling.' );
 itk_sf_ui_assert( false !== strpos( $builder, "check_admin_referer( 'itk_commerce_save_search_filters'" ), 'Builder save must remain nonce protected.' );
 itk_sf_ui_assert( false !== strpos( $builder, '$this->schema->normalize( $raw )' ), 'Builder saves must pass through the bounded filter schema.' );
 itk_sf_ui_assert( false !== strpos( $module, 'new Admin\\FilterBuilderPage' ), 'Search Filter module must register the profile-driven builder.' );
 itk_sf_ui_assert( false !== strpos( $module, "array_key_exists( 'definitions', \$filters )" ), 'Explicitly empty customer filter definitions must remain distinguishable from never-configured defaults.' );
 itk_sf_ui_assert( false !== strpos( $bootstrap, 'PostedDefinitionNormalizer.php' ), 'Bootstrap must load the unchecked-checkbox normalizer.' );
-itk_sf_ui_assert( false !== strpos( $bootstrap, "admin_post_itk_commerce_save_search_filters" ), 'Unchecked-checkbox normalization must run on the builder save action.' );
+itk_sf_ui_assert( false !== strpos( $bootstrap, 'admin_post_itk_commerce_save_search_filters' ), 'Unchecked-checkbox normalization must run on the builder save action.' );
 itk_sf_ui_assert( false !== strpos( $normalizer, "\$definition['enabled'] = ! empty" ), 'Unchecked Enabled controls must be normalized to explicit false values.' );
 itk_sf_ui_assert( false !== strpos( $normalizer, "\$definition['multiple'] = ! empty" ), 'Unchecked taxonomy Multiple controls must be normalized to explicit false values.' );
 
