@@ -15,13 +15,13 @@ defined( 'ABSPATH' ) || exit;
 function site_branding() {
     ?>
     <div class="itk-site-branding">
-        <a class="itk-site-branding__link" href="<?php echo esc_url( home_url( '/' ) ); ?>" rel="home">
-            <?php if ( has_custom_logo() ) : ?>
-                <?php echo wp_kses_post( get_custom_logo() ); ?>
-            <?php else : ?>
+        <?php if ( has_custom_logo() ) : ?>
+            <?php echo wp_kses_post( get_custom_logo() ); ?>
+        <?php else : ?>
+            <a class="itk-site-branding__link" href="<?php echo esc_url( home_url( '/' ) ); ?>" rel="home">
                 <span class="itk-site-branding__name"><?php bloginfo( 'name' ); ?></span>
-            <?php endif; ?>
-        </a>
+            </a>
+        <?php endif; ?>
     </div>
     <?php
 }
