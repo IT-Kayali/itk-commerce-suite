@@ -20,6 +20,7 @@ require_once DIR . '/inc/woocommerce.php';
 require_once DIR . '/inc/commerce-models.php';
 require_once DIR . '/inc/product-cards.php';
 require_once DIR . '/inc/mini-cart.php';
+require_once DIR . '/inc/account.php';
 require_once DIR . '/inc/mobile-navigation.php';
 
 /**
