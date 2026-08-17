@@ -4,7 +4,7 @@ Modular, scalable WooCommerce commerce platform by IT-Kayali with a reusable the
 
 ## Status
 
-Phase 1 foundation is complete. Phase 2 layout builders are in progress with the first installable `itk-commerce-layouts` foundation implemented.
+Phase 1 foundation is complete. Phase 2 now includes the first visual Layout Builder, profile-driven Header/Footer assignments, responsive navigation controls and the installable `itk-commerce-layouts` module.
 
 ## Product ownership
 
@@ -20,19 +20,20 @@ The suite is split into clear layers:
 2. **IT-Kayali theme** — UI, design tokens, patterns and responsive layouts.
 3. **IT-Kayali core** — settings, module management, import/export, roles and update coordination.
 4. **Installable modules** — optional commerce capabilities with explicit dependencies.
-5. **WordPress + WooCommerce** — customer data and commerce data remain in the supported platform APIs.
+5. **WordPress + WooCommerce** — customer data and commerce data remain in supported platform APIs.
 
 ## Theme baseline (`0.1.0-dev`)
 
-The reusable theme now provides:
+The reusable theme provides:
 
 - standard page, front-page, single, archive, search and 404 templates;
 - WooCommerce integration and product-gallery support;
-- customer-neutral header and footer rendering;
-- reusable Header models: Classic, Centered and Shop/Search-first;
-- reusable Footer models: Classic, Compact and Columns;
+- customer-neutral Header and Footer rendering;
+- reusable Header models: Classic, Centered, Shop/Search-first, Transparent, Dark, Luxury, Sticky and Vertical;
+- reusable Footer models: Classic, Compact, Columns, Simple, Luxury, Newsletter and Branches;
 - desktop primary navigation and mobile drawer navigation;
 - configurable mobile bottom navigation with a neutral commerce fallback;
+- responsive Mega-menu column presentation foundation;
 - responsive WooCommerce product-grid baseline;
 - accessible skip link, focus behavior, search form and keyboard-close navigation;
 - versioned `theme.json` design tokens;
@@ -42,7 +43,7 @@ The reusable theme now provides:
 
 ## Core baseline (`0.1.0-dev`)
 
-The Core now provides:
+The Core provides:
 
 - versioned suite settings;
 - versioned customer-profile schema and persistence;
@@ -57,14 +58,22 @@ The Core now provides:
 
 ## Layouts module (`0.1.0-dev`)
 
-The first optional module now provides:
+The optional Layouts module provides:
 
+- **Appearance > Commerce Layouts** visual builder;
+- visual Header/Footer model cards;
+- context overrides for Shop, Product and Checkout;
+- authenticated live storefront preview without saving first;
+- Desktop, Tablet and Mobile preview widths;
 - profile-driven Header/Footer model selection;
 - single-product, category, product-type and contextual assignment priority;
-- WordPress activation/deactivation bridge to Core module enablement;
+- WordPress activation/deactivation synchronization with Core and the active profile;
 - configurable mobile bottom-navigation visibility and fallback items;
-- portable mega-menu definition keys and responsive submenu column metadata;
+- portable Mega-menu definition keys, width and 1–6 column settings;
+- a WordPress menu-item field that binds local menu items to portable Mega-menu definitions;
 - safe Theme fallback when an unknown model is configured.
+
+Preview URLs require a logged-in user with the Commerce design capability and a valid nonce, and are marked `noindex,nofollow`.
 
 ## Packages
 
