@@ -1,0 +1,37 @@
+{
+  "schema_version": 1,
+  "package": "itk-commerce-multilingual",
+  "type": "wordpress-plugin",
+  "version": "0.1.0-dev",
+  "status": "development",
+  "minimum": {
+    "php": "8.1",
+    "wordpress": "6.6",
+    "woocommerce": null,
+    "itk_commerce_core": "0.1.0-dev"
+  },
+  "tested_up_to": {
+    "wordpress": null,
+    "woocommerce": null,
+    "itk_commerce_core": "0.1.0-dev"
+  },
+  "features": {
+    "language_schema_version": 1,
+    "profile_configuration": "bounded active-profile language configuration foundation implemented",
+    "default_fallback_language": "implemented",
+    "language_context": "public request language/locale/direction contracts implemented",
+    "rtl_ltr_context": "html attributes and stable body classes implemented",
+    "directory_routing": "planned follow-up slice",
+    "translation_repository": "planned follow-up slice",
+    "woocommerce_language_context": "planned follow-up slice",
+    "seo_hreflang": "planned follow-up slice",
+    "import_export": "planned follow-up slice"
+  },
+  "notes": [
+    "WordPress minimum/tested ranges will be finalized with the Phase 0 environment audit and compatibility matrix.",
+    "The foundation does not rewrite URLs or switch locale globally yet; it first establishes the bounded language schema and public request context contracts.",
+    "Customer-specific language lists live in the versioned customer profile rather than generic package code.",
+    "The Theme consumes language and direction through public contracts and does not become the translation data store.",
+    "WooCommerce commercial data ownership is unchanged."
+  ]
+}
