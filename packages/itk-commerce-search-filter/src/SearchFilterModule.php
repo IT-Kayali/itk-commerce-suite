@@ -25,6 +25,12 @@ final class SearchFilterModule implements ModuleInterface {
     /** @var FilterRenderer|null */
     private $renderer = null;
 
+    /** @var CatalogAsyncNavigation|null */
+    private $async_navigation = null;
+
+    /** @var CatalogNoResultsToolbar|null */
+    private $no_results_toolbar = null;
+
     /** @return string */
     public function id() {
         return MODULE_ID;
@@ -47,9 +53,9 @@ final class SearchFilterModule implements ModuleInterface {
     }
 
     /**
-     * Build the bounded filter schema, attach the WooCommerce query adapter and
-     * register a progressive server-rendered filter UI. AJAX remains an optional
-     * enhancement in the next isolated Phase 4 slice.
+     * Build the bounded schema/query layer, progressive server-rendered UI and
+     * optional Fetch/History enhancement. Server-rendered GET navigation remains
+     * authoritative whenever JavaScript or async navigation is unavailable.
      *
      * @return void
      */
@@ -80,27 +86,32 @@ final class SearchFilterModule implements ModuleInterface {
         $definitions = apply_filters( 'itk_commerce_search_filter_definitions', $definitions );
         $definitions = $this->schema->normalize( is_array( $definitions ) ? $definitions : array() );
 
-        $this->url_state     = new UrlState( $definitions );
-        $this->query_adapter = new WooQueryAdapter( $this->url_state );
-        $this->renderer      = new FilterRenderer( $definitions, $this->url_state );
+        $this->url_state          = new UrlState( $definitions );
+        $this->query_adapter      = new WooQueryAdapter( $this->url_state );
+        $this->renderer           = new FilterRenderer( $definitions, $this->url_state );
+        $this->async_navigation   = new CatalogAsyncNavigation();
+        $this->no_results_toolbar = new CatalogNoResultsToolbar( $this->renderer );
 
         $this->query_adapter->register();
         $this->renderer->register();
+        $this->async_navigation->register();
+        $this->no_results_toolbar->register();
 
         if ( is_admin() ) {
             ( new Admin\FilterBuilderPage( $this->schema ) )->register();
         }
 
         /**
-         * Fires after the Search/Filter foundation and progressive UI are ready.
+         * Fires after the Search/Filter services are ready.
          *
-         * @param SearchFilterModule $module Module instance.
-         * @param FilterSchema       $schema Schema service.
-         * @param UrlState           $url_state URL-state service.
-         * @param WooQueryAdapter    $query_adapter Query adapter.
-         * @param FilterRenderer     $renderer Progressive filter renderer.
+         * @param SearchFilterModule     $module Module instance.
+         * @param FilterSchema           $schema Schema service.
+         * @param UrlState               $url_state URL-state service.
+         * @param WooQueryAdapter        $query_adapter Query adapter.
+         * @param FilterRenderer         $renderer Progressive filter renderer.
+         * @param CatalogAsyncNavigation $async_navigation Fetch/History enhancement.
          */
-        do_action( 'itk_commerce_search_filter_loaded', $this, $this->schema, $this->url_state, $this->query_adapter, $this->renderer );
+        do_action( 'itk_commerce_search_filter_loaded', $this, $this->schema, $this->url_state, $this->query_adapter, $this->renderer, $this->async_navigation );
     }
 
     /** @return array<int,array<string,mixed>> */
@@ -121,6 +132,11 @@ final class SearchFilterModule implements ModuleInterface {
     /** @return FilterRenderer|null */
     public function renderer() {
         return $this->renderer;
+    }
+
+    /** @return CatalogAsyncNavigation|null */
+    public function async_navigation() {
+        return $this->async_navigation;
     }
 
     /**

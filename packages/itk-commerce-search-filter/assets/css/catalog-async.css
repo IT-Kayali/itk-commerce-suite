@@ -1,0 +1,21 @@
+/* Progressive Fetch/History enhancement for catalog filtering. */
+.itk-catalog-results {
+    min-width: 0;
+    transition: opacity 160ms ease;
+}
+
+.itk-catalog-results.is-loading,
+.itk-catalog-toolbar.is-loading {
+    opacity: .58;
+    pointer-events: none;
+}
+
+.itk-catalog-results[aria-busy='true'] {
+    cursor: progress;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .itk-catalog-results {
+        transition: none;
+    }
+}
