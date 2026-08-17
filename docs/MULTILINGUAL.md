@@ -12,49 +12,16 @@ Language configuration is versioned and stored under the active customer profile
   "default": "de",
   "fallback": "de",
   "languages": [
-    {
-      "code": "de",
-      "locale": "de_DE",
-      "label": "Deutsch",
-      "direction": "ltr",
-      "enabled": true
-    },
-    {
-      "code": "ar",
-      "locale": "ar",
-      "label": "العربية",
-      "direction": "rtl",
-      "enabled": true
-    },
-    {
-      "code": "en",
-      "locale": "en_US",
-      "label": "English",
-      "direction": "ltr",
-      "enabled": true
-    }
+    {"code":"de","locale":"de_DE","label":"Deutsch","direction":"ltr","enabled":true},
+    {"code":"ar","locale":"ar","label":"العربية","direction":"rtl","enabled":true},
+    {"code":"en","locale":"en_US","label":"English","direction":"ltr","enabled":true}
   ]
 }
 ```
 
-Generic package code contains no customer-specific language list.
-
-## Schema boundaries
-
-- maximum 20 configured languages;
-- duplicate public language codes are discarded;
-- unsafe language codes/locales are rejected;
-- at least one language is always enabled;
-- default/fallback must refer to enabled languages;
-- public codes use bounded lowercase URL form such as `de`, `ar`, `en`, `pt-br`;
-- WordPress locales remain separate values such as `de_DE`, `en_US` or `ar`;
-- direction is limited to `ltr` or `rtl`.
-
-If no Multilingual profile configuration exists, the module derives one neutral enabled language from the current WordPress locale.
+Generic package code contains no customer-specific language list. Public codes are bounded lowercase URL values such as `de`, `ar`, `en` or `pt-br`; WordPress locales remain separate values such as `de_DE`, `en_US` or `ar`.
 
 ## Public request context
-
-The module exposes normalized request state through these filters:
 
 ```php
 $context = apply_filters( 'itk_commerce_language_context', array() );
@@ -63,96 +30,122 @@ $dir     = apply_filters( 'itk_commerce_text_direction', 'ltr' );
 $route   = apply_filters( 'itk_commerce_language_route_context', array() );
 ```
 
-The language context contains the current public code, WordPress locale, direction, fallback language and enabled language definitions. The route context additionally exposes the internal storefront path, whether the public URL contained an explicit language prefix and whether the WordPress locale switcher was invoked successfully.
+The context exposes the selected language, locale, direction, fallback and enabled languages. Stable body classes such as `itk-language-ar` and `itk-direction-rtl` plus bounded HTML `lang` / `dir` attributes keep the Theme presentation-aware without making it the language store.
 
-When the selected request language changes the module fires:
+## Directory routing and locale
 
-```php
-do_action( 'itk_commerce_language_context_changed', $code, $previous_code, $language );
-```
+Configured languages can be addressed as directories such as `/de/`, `/ar/` and `/en/`. During normal WordPress request parsing, the routing service removes only the language prefix temporarily, lets existing WordPress/WooCommerce permalink rules resolve the remaining path, then restores the public localized request URI.
 
-## Directory-style routing
+Unprefixed routes remain valid in the configured default language. Canonical redirect policy is intentionally deferred to the SEO slice.
 
-Configured enabled languages can be addressed as directories:
+For storefront requests the module also attempts `switch_to_locale()` and aligns the public WordPress locale filters with the selected Commerce language. Admin, AJAX, cron, installation and already-declared REST requests are not forced into storefront locale state.
 
-```text
-/de/
-/ar/
-/en/
-/de/shop/
-/ar/produkt/beispiel/
-```
-
-The routing service resolves the language directory before WordPress performs its normal permalink matching. During `WP::parse_request()` it temporarily removes only the language prefix from `REQUEST_URI` / `PATH_INFO`, allowing the existing WordPress and WooCommerce rewrite rules to resolve the remaining route normally. The original localized request globals are restored immediately after parsing, with a shutdown safety net.
-
-This design intentionally avoids duplicating WordPress/WooCommerce rewrite semantics and does not create language-specific copies of product price, SKU, stock, cart state or order state.
-
-Unprefixed storefront URLs remain valid and use the configured default language context. Redirect/canonical policy for unprefixed URLs is intentionally deferred to the SEO/hreflang slice.
-
-## WordPress locale bridge
-
-For storefront requests, the selected Commerce language locale is applied through WordPress's public locale surfaces:
-
-- `switch_to_locale()` is attempted before the module forces locale filters, allowing WordPress to reload installed translations when possible;
-- `pre_determine_locale`, `determine_locale` and `locale` follow the selected storefront language context;
-- admin, AJAX, cron, installation and already-declared REST requests are not forced into the storefront locale.
-
-The module fires `itk_commerce_wordpress_locale_applied` with the locale, public language code and boolean switch result.
-
-## Safe language URLs
-
-Generate a language URL through the public filter:
+## Safe language URLs and switcher
 
 ```php
 $url = apply_filters( 'itk_commerce_language_url', '', 'ar', '' );
 ```
 
-The router preserves the same-origin storefront route and safe query state. Action/nonces such as `_wpnonce`, `add-to-cart`, `remove_item`, `wc-ajax` and generic action/security parameters are dropped to avoid repeating state-changing requests when a visitor changes language. External source URLs are never reflected into switcher destinations.
-
-## Language switcher
+Same-origin paths and non-action query state are preserved. Nonces and state-changing parameters such as `add-to-cart`, `remove_item`, `wc-ajax`, generic `action`/`security` values and language parameters are dropped before building another language URL.
 
 A style-neutral accessible switcher is available through:
 
 ```text
 [itk_language_switcher]
-```
-
-Optional shortcode values:
-
-```text
-[itk_language_switcher display="label"]
 [itk_language_switcher display="code"]
 [itk_language_switcher display="both" class="header-language"]
 ```
 
-The output uses stable `itk-language-switcher*` classes, `hreflang`, per-link `lang` / `dir` and `aria-current="page"` for the selected language. Theme, Elementor or other presentation packages may style this markup or replace it deliberately through `itk_commerce_language_switcher_html`. The normalized item list can be filtered with `itk_commerce_language_switcher_items`.
+Theme, Elementor or other presentation packages may style the stable `itk-language-switcher*` classes or replace the output through the public switcher filters.
 
-## Theme / document direction
+## Translation repository
 
-The request context adds stable body classes such as:
+Translations are **not** stored in the Theme and are not packed into one growing serialized customer-profile option. The Multilingual module owns two versioned WordPress-prefixed tables:
 
 ```text
-itk-language-ar
-itk-direction-rtl
+{prefix}itk_commerce_translation_entries
+{prefix}itk_commerce_translation_revisions
 ```
 
-It also aligns WordPress's public HTML language attributes with the Commerce context. The Theme should continue using logical CSS properties (`margin-inline`, `padding-inline`, `inset-inline`, etc.) rather than duplicated RTL stylesheets wherever possible.
+An entry represents one stable machine translation key + public language code. Example keys:
+
+```text
+commerce.checkout.pay
+commerce.header.welcome
+customer.footer.tagline
+```
+
+Each entry stores a deterministic hash of its current source/default string plus pointers to its current and published revisions. Revisions are append-only and contain the translated value, revision number, workflow status, author/reviewer IDs and timestamps.
+
+The storage schema is installed with an independent database schema version. Plugin updates check that version again because WordPress plugin activation hooks are not an update migration mechanism.
+
+## Draft / review / published workflow
+
+Customer-facing lookup reads **published revisions only**. Editing a live translation therefore creates a new draft revision without replacing the existing published value.
+
+Supported workflow:
+
+```text
+draft -> review -> published
+          |
+          +-> draft
+```
+
+Published revisions are immutable. When a newer reviewed revision is published, the previous published revision becomes archived history and the entry pointer switches to the newly published revision.
+
+This means:
+
+- an unfinished draft never appears in the storefront;
+- a review revision never appears in the storefront;
+- rejecting/returning a review does not alter the current live translation;
+- revision history remains available instead of overwriting previous text;
+- the previous live revision is archived only when the replacement successfully publishes.
+
+## Public translation lookup
+
+Reusable components can request a published translation without depending on repository internals:
+
+```php
+$text = apply_filters(
+    'itk_commerce_translate_text',
+    'Pay now',
+    'commerce.checkout.pay',
+    ''
+);
+```
+
+An empty language argument uses the current Commerce request language. Lookup order is:
+
+1. published translation for the requested/current language;
+2. published translation for the configured fallback language;
+3. caller-provided source/default string.
+
+Programmatic integrations can obtain the repository/workflow through `itk_commerce_translation_repository` and `itk_commerce_translation_workflow`. Workflow events are emitted when drafts are created, submitted for review, returned to draft and published.
+
+Persistence deliberately does not apply display-context escaping to translation values because the consuming component owns its output context. Consumers must escape/sanitize according to whether the value is plain text, controlled HTML, an attribute, JSON, email text, etc.
+
+## Source-change tracking
+
+Each translation entry stores a SHA-256 `source_hash`. This does not silently invalidate or remove a published translation. It provides a stable foundation for a later translation-management UI to flag translations as potentially stale when the source string changes.
+
+## Data ownership boundary
+
+This translation repository is currently for Commerce Suite strings and customer-owned textual values. Product/category/attribute translation mapping is the next isolated slice.
+
+The current repository does **not** duplicate or take ownership of WooCommerce commercial data. Price, SKU, stock, tax, cart and order state remain WooCommerce-owned.
 
 ## Remaining Phase 5 boundaries
 
 The current implementation does **not** yet:
 
-- store translated Commerce/customer strings;
-- implement draft/review/published translation workflow;
-- map translated product/category/attribute content;
+- map product/category/attribute translation fields;
 - persist cart/session language or capture order language;
 - switch WooCommerce email/document generation into stored order language;
 - emit canonical/hreflang tags;
 - import/export CSV/JSON/XLIFF translations;
-- create the translator role/capability boundary.
-
-These remain isolated follow-up slices so data ownership and WooCommerce lifecycle behavior can be tested independently.
+- create the translator role/capability/admin UI boundary;
+- provide final end-to-end RTL/accessibility browser coverage for translated commerce content.
 
 ## Next slice
 
-The next workstream introduces the translation repository/schema and draft/review/published workflow foundation without changing WooCommerce commercial data ownership.
+The next workstream adds product/category/attribute translation mapping while preserving one shared WooCommerce commercial identity for stock, SKU and price.

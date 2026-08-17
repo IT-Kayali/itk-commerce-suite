@@ -5,7 +5,7 @@ Requires at least: 6.6
 Requires PHP: 8.1
 Stable tag: 0.1.0-dev
 
-Reusable language context, translation workflow and RTL/LTR module for the IT-Kayali Commerce Suite.
+Reusable language routing, translation workflow and RTL/LTR module for the IT-Kayali Commerce Suite.
 
 == Description ==
 
@@ -15,27 +15,26 @@ The current development foundation provides:
 
 * versioned and bounded active-profile language configuration;
 * default and fallback language contracts;
-* neutral fallback from the current WordPress locale;
-* enabled-language request context;
-* public current-language / locale / direction contracts;
-* stable body language/direction classes;
-* HTML lang/dir alignment through the normal WordPress language-attributes filter;
+* enabled-language request context and RTL/LTR document state;
 * directory-style storefront routes such as /de/, /ar/ and /en/;
 * normal WordPress/WooCommerce route parsing after the language prefix is resolved;
 * storefront locale selection through public WordPress locale APIs;
-* safe same-origin language URLs that preserve non-action storefront query state;
-* accessible, style-neutral [itk_language_switcher] output and public switcher filters;
-* RTL/LTR direction foundation without customer-specific Theme code.
+* safe same-origin language URLs and an accessible [itk_language_switcher];
+* module-owned versioned translation entry/revision tables;
+* append-only draft/review/published translation workflow;
+* immutable published revisions while replacement drafts are edited;
+* published translation lookup with fallback-language/source fallback;
+* deterministic source hashes for later stale-translation detection.
 
-Translation storage/workflow, WooCommerce order/email language context, hreflang/canonical policy and import/export remain separate follow-up slices.
+Product/category/attribute mapping, WooCommerce order/email language context, hreflang/canonical policy, translator admin/capabilities and import/export remain separate follow-up slices.
 
 == Architecture ==
 
 The module depends on IT-Kayali Commerce Core and registers itself through the Commerce Suite module registry.
 
-Customer language lists and language settings belong to the active versioned customer profile. Generic package code contains no customer-specific language configuration.
+Customer language lists and language settings belong to the active versioned customer profile. Translation content is stored in module-owned WordPress-prefixed tables rather than Theme files or one growing serialized profile option.
 
-The Theme remains a presentation consumer. Translation data and language routing do not become Theme-owned state. WooCommerce continues to own products, prices, SKU, stock, cart state and order state.
+The Theme remains a presentation consumer. WooCommerce continues to own prices, SKU, stock, tax, cart state and order state.
 
 == Language switcher ==
 
@@ -43,7 +42,13 @@ Use the shortcode:
 
 [itk_language_switcher]
 
-Optional display modes are label, code and both. Themes/builders can also consume the public itk_commerce_language_switcher_html / itk_commerce_language_switcher_items filters and style the stable itk-language-switcher classes.
+Optional display modes are label, code and both. Themes/builders can consume the public switcher filters and style the stable itk-language-switcher classes.
+
+== Translation lookup ==
+
+Reusable components can use the itk_commerce_translate_text filter with a source/default string, stable machine key and optional explicit language code. Only published revisions are returned to customer-facing output. Missing target translations fall back to the configured fallback language and finally the caller-provided source string.
+
+Published text stays live while a newer draft or review revision exists. A replacement becomes visible only after review and explicit publish; the previous published revision is then archived as history.
 
 == Development status ==
 
