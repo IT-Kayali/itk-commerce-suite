@@ -46,7 +46,7 @@ final class UrlState {
                 continue;
             }
 
-            $value = $this->unslash( $request[ $key ] );
+            $value  = $this->unslash( $request[ $key ] );
             $parsed = $this->parse_value( $definition, $value );
 
             if ( null !== $parsed && array() !== $parsed && '' !== $parsed ) {
@@ -152,23 +152,27 @@ final class UrlState {
     }
 
     /**
-     * Parse `min-max`, allowing either side to be empty.
+     * Parse either canonical `min-max` URL state or progressive form input using
+     * `filter_price[min]` / `filter_price[max]`. Serialization always returns the
+     * canonical scalar URL form.
      *
      * @param mixed $value Raw price range.
      * @return array<string,float|null>|null
      */
     private function parse_price( $value ) {
-        if ( ! is_scalar( $value ) ) {
+        if ( is_array( $value ) ) {
+            $min = array_key_exists( 'min', $value ) ? $this->price_number( $value['min'] ) : null;
+            $max = array_key_exists( 'max', $value ) ? $this->price_number( $value['max'] ) : null;
+        } elseif ( is_scalar( $value ) ) {
+            $parts = explode( '-', (string) $value, 2 );
+            if ( 2 !== count( $parts ) ) {
+                return null;
+            }
+            $min = $this->price_number( $parts[0] );
+            $max = $this->price_number( $parts[1] );
+        } else {
             return null;
         }
-
-        $parts = explode( '-', (string) $value, 2 );
-        if ( 2 !== count( $parts ) ) {
-            return null;
-        }
-
-        $min = $this->price_number( $parts[0] );
-        $max = $this->price_number( $parts[1] );
 
         if ( null === $min && null === $max ) {
             return null;
@@ -188,6 +192,10 @@ final class UrlState {
      * @return float|null
      */
     private function price_number( $value ) {
+        if ( ! is_scalar( $value ) ) {
+            return null;
+        }
+
         $value = trim( (string) $value );
         if ( '' === $value || ! is_numeric( $value ) ) {
             return null;
