@@ -51,6 +51,9 @@ jobs:
       - name: WooCommerce language context smoke test
         run: php tests/multilingual/woocommerce-language-context-smoke.php
 
+      - name: Order language rendering scope smoke test
+        run: php tests/multilingual/order-language-scope-smoke.php
+
       - name: Guard generic Multilingual package from reference-customer coupling
         run: |
           if grep -RniE 'Al-Lord|al-lord' packages/itk-commerce-multilingual; then
