@@ -14,9 +14,9 @@ namespace ITK\Commerce\Layouts;
 
 defined( 'ABSPATH' ) || exit;
 
-const VERSION = '0.1.0-dev';
-const FILE    = __FILE__;
-const PATH    = __DIR__;
+const VERSION   = '0.1.0-dev';
+const FILE      = __FILE__;
+const PATH      = __DIR__;
 const MODULE_ID = 'itk-commerce-layouts';
 
 \register_activation_hook( FILE, __NAMESPACE__ . '\\activate' );
@@ -36,6 +36,13 @@ function prepare() {
 
     require_once PATH . '/src/LayoutResolver.php';
     require_once PATH . '/src/MegaMenuConfig.php';
+    require_once PATH . '/src/LivePreview.php';
+
+    if ( is_admin() ) {
+        require_once PATH . '/src/Admin/LayoutBuilderPage.php';
+        require_once PATH . '/src/Admin/MegaMenuFields.php';
+    }
+
     require_once PATH . '/src/LayoutsModule.php';
 
     add_action( 'itk_commerce_register_modules', __NAMESPACE__ . '\\register_module' );
