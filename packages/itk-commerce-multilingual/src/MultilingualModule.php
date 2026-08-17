@@ -19,6 +19,12 @@ final class MultilingualModule implements ModuleInterface {
     /** @var LanguageContext|null */
     private $context = null;
 
+    /** @var LanguageRouter|null */
+    private $router = null;
+
+    /** @var LanguageSwitcher|null */
+    private $switcher = null;
+
     /** @return string */
     public function id() {
         return MODULE_ID;
@@ -58,7 +64,21 @@ final class MultilingualModule implements ModuleInterface {
         $this->context = new LanguageContext( $config );
         $this->context->register();
 
-        do_action( 'itk_commerce_multilingual_loaded', $this, $this->schema, $this->context, $config );
+        $this->router = new LanguageRouter( $this->context );
+        $this->router->register();
+
+        $this->switcher = new LanguageSwitcher( $this->context, $this->router );
+        $this->switcher->register();
+
+        do_action(
+            'itk_commerce_multilingual_loaded',
+            $this,
+            $this->schema,
+            $this->context,
+            $config,
+            $this->router,
+            $this->switcher
+        );
     }
 
     /** @return LanguageSchema|null */
@@ -71,9 +91,19 @@ final class MultilingualModule implements ModuleInterface {
         return $this->context;
     }
 
+    /** @return LanguageRouter|null */
+    public function router() {
+        return $this->router;
+    }
+
+    /** @return LanguageSwitcher|null */
+    public function switcher() {
+        return $this->switcher;
+    }
+
     /** @return array<string,mixed> */
     private function profile_config() {
-        if ( ! class_exists( '\\ITK\\Commerce\\Core\\Core' ) ) {
+        if ( ! class_exists( '\ITK\Commerce\Core\Core' ) ) {
             return $this->schema->defaults();
         }
 
