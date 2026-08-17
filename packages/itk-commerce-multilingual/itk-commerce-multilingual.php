@@ -44,6 +44,7 @@ function prepare() {
     require_once PATH . '/src/LanguageContext.php';
     require_once PATH . '/src/LanguageRouter.php';
     require_once PATH . '/src/LanguageSwitcher.php';
+    require_once PATH . '/src/MultilingualSeo.php';
     require_once PATH . '/src/TranslationSchema.php';
     require_once PATH . '/src/TranslationRepository.php';
     require_once PATH . '/src/TranslationWorkflow.php';
