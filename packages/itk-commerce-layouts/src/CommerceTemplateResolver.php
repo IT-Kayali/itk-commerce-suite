@@ -127,19 +127,23 @@ final class CommerceTemplateResolver {
     }
 
     /**
+     * Product-card presentation belongs to the Layouts module configuration
+     * namespace so the Phase 2 Commerce page editor can continue saving its
+     * `layouts.commerce` page areas without erasing component configuration.
+     *
      * @param array<string,mixed>|null $profile Active profile.
      * @return array<string,mixed>
      */
     private function product_card_config( $profile ) {
         if (
             ! is_array( $profile ) ||
-            empty( $profile['layouts']['commerce']['components']['product_card'] ) ||
-            ! is_array( $profile['layouts']['commerce']['components']['product_card'] )
+            empty( $profile['modules']['configuration'][ MODULE_ID ]['product_card'] ) ||
+            ! is_array( $profile['modules']['configuration'][ MODULE_ID ]['product_card'] )
         ) {
             return array();
         }
 
-        return $profile['layouts']['commerce']['components']['product_card'];
+        return $profile['modules']['configuration'][ MODULE_ID ]['product_card'];
     }
 
     /**
