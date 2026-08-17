@@ -5,6 +5,7 @@
 
 $root      = dirname( __DIR__, 2 );
 $hub       = file_get_contents( $root . '/packages/itk-commerce-core/src/Admin/AdminHub.php' );
+$routes    = file_get_contents( $root . '/packages/itk-commerce-core/src/Admin/LegacyAdminRoutes.php' );
 $bootstrap = file_get_contents( $root . '/packages/itk-commerce-core/itk-commerce-core.php' );
 $css       = file_get_contents( $root . '/packages/itk-commerce-core/assets/admin/admin-hub.css' );
 
@@ -15,8 +16,13 @@ function itk_admin_hub_assert( $condition, $message ) {
     }
 }
 
-itk_admin_hub_assert( false !== strpos( $bootstrap, "src/Admin/AdminHub.php" ), 'Core bootstrap must load the central AdminHub class.' );
+itk_admin_hub_assert( false !== strpos( $bootstrap, 'src/Admin/AdminHub.php' ), 'Core bootstrap must load the central AdminHub class.' );
 itk_admin_hub_assert( false !== strpos( $bootstrap, 'new Admin\\AdminHub' ), 'Core bootstrap must register AdminHub in wp-admin.' );
+itk_admin_hub_assert( false !== strpos( $bootstrap, 'src/Admin/LegacyAdminRoutes.php' ), 'Core bootstrap must load backward-compatible admin routes.' );
+itk_admin_hub_assert( false !== strpos( $bootstrap, 'new Admin\\LegacyAdminRoutes' ), 'Core bootstrap must register backward-compatible admin routes.' );
+itk_admin_hub_assert( false !== strpos( $routes, "'itk-commerce-mega-menu-content' => 'itk-commerce-mega-content'" ), 'Old Mega Menu admin links must redirect to the canonical builder slug.' );
+itk_admin_hub_assert( false !== strpos( $routes, "current_user_can( 'itk_manage_design' )" ), 'Legacy design-route redirects must retain the design capability boundary.' );
+itk_admin_hub_assert( false !== strpos( $routes, 'wp_safe_redirect' ), 'Legacy admin routes must use safe WordPress redirects.' );
 itk_admin_hub_assert( false !== strpos( $hub, 'add_menu_page(' ), 'AdminHub must expose a top-level WordPress sidebar menu.' );
 itk_admin_hub_assert( false !== strpos( $hub, "'itk-commerce-settings'" ), 'Settings submenu must exist.' );
 itk_admin_hub_assert( false !== strpos( $hub, "'itk-commerce-modules'" ), 'Modules submenu must exist.' );
