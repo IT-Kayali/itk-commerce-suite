@@ -80,7 +80,8 @@ final class FilterSchema {
 
     /**
      * Normalize a customer/profile definition list. Unknown types, duplicate IDs,
-     * duplicate query keys and unsafe taxonomies are discarded.
+     * duplicate query keys, duplicate singleton scalar types and unsafe taxonomies
+     * are discarded. Multiple taxonomy filters remain supported.
      *
      * @param mixed $definitions Raw definitions.
      * @return array<int,array<string,mixed>>
@@ -90,9 +91,10 @@ final class FilterSchema {
             $definitions = $this->defaults();
         }
 
-        $normalized = array();
-        $ids        = array();
-        $query_keys = array();
+        $normalized      = array();
+        $ids             = array();
+        $query_keys      = array();
+        $singleton_types = array();
 
         foreach ( array_slice( $definitions, 0, 32 ) as $definition ) {
             $item = $this->normalize_definition( $definition );
@@ -104,9 +106,16 @@ final class FilterSchema {
                 continue;
             }
 
-            $ids[ $item['id'] ]              = true;
+            if ( 'taxonomy' !== $item['type'] && isset( $singleton_types[ $item['type'] ] ) ) {
+                continue;
+            }
+
+            $ids[ $item['id'] ]               = true;
             $query_keys[ $item['query_key'] ] = true;
-            $normalized[]                    = $item;
+            if ( 'taxonomy' !== $item['type'] ) {
+                $singleton_types[ $item['type'] ] = true;
+            }
+            $normalized[] = $item;
         }
 
         usort(
