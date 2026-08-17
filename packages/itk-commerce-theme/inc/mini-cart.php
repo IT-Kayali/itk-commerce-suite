@@ -120,14 +120,16 @@ function mini_cart_menu_link_attributes( $atts, $menu_item, $args, $depth ) {
 
     $atts['data-itk-mini-cart-trigger'] = '1';
     $atts['aria-controls']              = 'itk-mini-cart';
-    $atts['aria-haspopup']               = 'dialog';
-    $atts['aria-expanded']               = 'false';
+    $atts['aria-haspopup']              = 'dialog';
+    $atts['aria-expanded']              = 'false';
 
     return $atts;
 }
 
 /**
  * Load mini-cart assets only when WooCommerce and the component are enabled.
+ * WooCommerce's fragment script is explicitly enqueued because this Theme
+ * renders the same supported mini-cart surface used by the classic Cart widget.
  *
  * @return void
  */
@@ -143,6 +145,8 @@ function enqueue_mini_cart_assets() {
         asset_version( 'assets/css/mini-cart.css' )
     );
 
+    wp_enqueue_script( 'wc-cart-fragments' );
+
     wp_enqueue_script(
         'itk-commerce-mini-cart',
         get_template_directory_uri() . '/assets/js/mini-cart.js',
@@ -152,12 +156,17 @@ function enqueue_mini_cart_assets() {
     );
 
     $options = mini_cart_options();
+    $refresh_url = class_exists( 'WC_AJAX' )
+        ? \WC_AJAX::get_endpoint( 'get_refreshed_fragments' )
+        : add_query_arg( 'wc-ajax', 'get_refreshed_fragments', home_url( '/' ) );
+
     wp_localize_script(
         'itk-commerce-mini-cart',
         'ITKCommerceMiniCart',
         array(
             'openAfterAdd'    => (bool) $options['open_after_add'],
             'closeOnBackdrop' => (bool) $options['close_on_backdrop'],
+            'refreshUrl'      => esc_url_raw( $refresh_url ),
         )
     );
 }
@@ -211,7 +220,8 @@ function mini_cart_content() {
 }
 
 /**
- * Keep line items/totals synchronized after WooCommerce AJAX add/remove events.
+ * Keep line items/totals and every Theme cart-count badge synchronized through
+ * WooCommerce's supported refreshed-fragments response.
  *
  * @param array<string,string> $fragments Existing fragments.
  * @return array<string,string>
@@ -224,6 +234,10 @@ function mini_cart_fragment( $fragments ) {
     ob_start();
     mini_cart_content();
     $fragments['div[data-itk-mini-cart-content]'] = ob_get_clean();
+
+    ob_start();
+    cart_badge();
+    $fragments['span[data-itk-cart-count]'] = trim( (string) ob_get_clean() );
 
     return $fragments;
 }
