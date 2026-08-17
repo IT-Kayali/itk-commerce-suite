@@ -22,6 +22,9 @@ final class SearchFilterModule implements ModuleInterface {
     /** @var WooQueryAdapter|null */
     private $query_adapter = null;
 
+    /** @var FilterRenderer|null */
+    private $renderer = null;
+
     /** @return string */
     public function id() {
         return MODULE_ID;
@@ -44,8 +47,9 @@ final class SearchFilterModule implements ModuleInterface {
     }
 
     /**
-     * Build the bounded filter schema and attach the WooCommerce query adapter.
-     * UI/AJAX/search services are intentionally separate later Phase 4 slices.
+     * Build the bounded filter schema, attach the WooCommerce query adapter and
+     * register a progressive server-rendered filter UI. AJAX remains an optional
+     * enhancement in the next isolated Phase 4 slice.
      *
      * @return void
      */
@@ -78,22 +82,24 @@ final class SearchFilterModule implements ModuleInterface {
 
         $this->url_state     = new UrlState( $definitions );
         $this->query_adapter = new WooQueryAdapter( $this->url_state );
+        $this->renderer      = new FilterRenderer( $definitions, $this->url_state );
+
         $this->query_adapter->register();
+        $this->renderer->register();
 
         /**
-         * Fires after the Search/Filter foundation is ready.
+         * Fires after the Search/Filter foundation and progressive UI are ready.
          *
          * @param SearchFilterModule $module Module instance.
          * @param FilterSchema       $schema Schema service.
          * @param UrlState           $url_state URL-state service.
          * @param WooQueryAdapter    $query_adapter Query adapter.
+         * @param FilterRenderer     $renderer Progressive filter renderer.
          */
-        do_action( 'itk_commerce_search_filter_loaded', $this, $this->schema, $this->url_state, $this->query_adapter );
+        do_action( 'itk_commerce_search_filter_loaded', $this, $this->schema, $this->url_state, $this->query_adapter, $this->renderer );
     }
 
-    /**
-     * @return array<int,array<string,mixed>>
-     */
+    /** @return array<int,array<string,mixed>> */
     public function definitions() {
         return null !== $this->url_state ? $this->url_state->definitions() : array();
     }
@@ -106,6 +112,11 @@ final class SearchFilterModule implements ModuleInterface {
     /** @return WooQueryAdapter|null */
     public function query_adapter() {
         return $this->query_adapter;
+    }
+
+    /** @return FilterRenderer|null */
+    public function renderer() {
+        return $this->renderer;
     }
 
     /**
