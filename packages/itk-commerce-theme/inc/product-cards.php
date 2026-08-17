@@ -83,14 +83,15 @@ function product_card_model( $default_model = 'classic' ) {
  */
 function product_card_options() {
     $defaults = array(
-        'image_ratio'      => 'portrait',
-        'content_align'    => 'left',
-        'price_treatment'  => 'standard',
-        'action_treatment' => 'button',
-        'hover_behavior'   => 'lift',
-        'badge_style'      => 'pill',
-        'show_state_badges'=> true,
-        'new_days'         => 30,
+        'image_ratio'       => 'portrait',
+        'content_order'     => 'title-price',
+        'content_align'     => 'left',
+        'price_treatment'   => 'standard',
+        'action_treatment'  => 'button',
+        'hover_behavior'    => 'lift',
+        'badge_style'       => 'pill',
+        'show_state_badges' => true,
+        'new_days'          => 30,
     );
 
     /**
@@ -104,6 +105,9 @@ function product_card_options() {
     $options['image_ratio'] = in_array( $options['image_ratio'], array( 'portrait', 'square', 'landscape' ), true )
         ? $options['image_ratio']
         : 'portrait';
+    $options['content_order'] = in_array( $options['content_order'], array( 'title-price', 'price-title' ), true )
+        ? $options['content_order']
+        : 'title-price';
     $options['content_align'] = in_array( $options['content_align'], array( 'left', 'center' ), true )
         ? $options['content_align']
         : 'left';
@@ -126,23 +130,21 @@ function product_card_options() {
 }
 
 /**
- * Add stable product-card classes for catalog, related, upsell and cross-sell loops.
+ * Add stable product-card classes globally. The selectors only affect WooCommerce
+ * product loops, so shortcode/product-block loops on non-WooCommerce pages keep
+ * the same reusable card configuration as Shop/related/upsell surfaces.
  *
  * @param string[] $classes Body classes.
  * @return string[]
  */
 function product_card_body_classes( $classes ) {
     $classes = is_array( $classes ) ? $classes : array();
-
-    if ( ! function_exists( 'is_woocommerce' ) || ! is_woocommerce() ) {
-        return $classes;
-    }
-
     $model   = product_card_model();
     $options = product_card_options();
 
     $classes[] = 'itk-card-model-' . sanitize_html_class( $model );
     $classes[] = 'itk-card-image-' . sanitize_html_class( $options['image_ratio'] );
+    $classes[] = 'itk-card-order-' . sanitize_html_class( $options['content_order'] );
     $classes[] = 'itk-card-align-' . sanitize_html_class( $options['content_align'] );
     $classes[] = 'itk-card-price-' . sanitize_html_class( $options['price_treatment'] );
     $classes[] = 'itk-card-action-' . sanitize_html_class( $options['action_treatment'] );
