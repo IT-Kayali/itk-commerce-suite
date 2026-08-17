@@ -32,7 +32,7 @@ The Theme provides these extension points:
 
 `itk-commerce-layouts` owns selection and assignment rules. It reads the active versioned customer profile through Commerce Core public services and selects Theme models through the public hooks above.
 
-It must not patch Theme files and contains no customer branding.
+It must not patch Theme files and contains no customer branding. WordPress plugin activation enables the module in Core settings when Core is available; deactivation removes only the global enabled flag and preserves customer-profile configuration.
 
 ## Profile configuration
 
@@ -73,6 +73,17 @@ Example:
         {"label": "Cart", "target": "cart", "icon": "cart", "badge": true},
         {"label": "Account", "target": "myaccount", "icon": "user"}
       ]
+    },
+    "mega_menu": {
+      "definitions": {
+        "catalog": {
+          "label": "Catalog",
+          "width": "full",
+          "columns": 4,
+          "content_type": "menu",
+          "content_key": "catalog"
+        }
+      }
     }
   },
   "modules": {
@@ -119,6 +130,27 @@ Portable targets currently include:
 
 This keeps profile exports independent from a specific domain URL for the standard commerce destinations.
 
+## Mega-menu data model
+
+Mega-menu definitions are stored in the portable customer profile under `layouts.mega_menu.definitions` and are referenced by a stable key such as `catalog`.
+
+A WordPress menu item opts into a definition through menu-item meta `_itk_commerce_mega_menu_key`. This deliberately separates the local WordPress menu-item identity from the portable profile definition.
+
+The foundation currently normalizes:
+
+- width: `aligned` or `full`;
+- column count: 1–6;
+- content type;
+- content key;
+- optional label.
+
+Configured top-level primary-menu items receive safe CSS classes and data attributes. Existing WordPress submenu items can already be displayed in responsive multi-column layouts using this metadata. Rich panel contents such as product cards, banners, images, icons and Elementor content remain later work on top of the same definition key.
+
+Public mega-menu filters:
+
+- `itk_commerce_mega_menu_definitions`
+- `itk_commerce_mega_menu_definition`
+
 ## Safe fallback
 
 The Theme validates the selected model against its registered models. Unknown model IDs do not produce arbitrary template paths; rendering falls back to a known Theme model.
@@ -127,7 +159,7 @@ The Theme validates the selected model against its registered models. Unknown mo
 
 The current foundation intentionally does not yet claim completion of:
 
-- Mega-menu content/model management;
+- rich Mega-menu panel content such as products, banners, images and Elementor content;
 - the full visual builder/editor UI;
 - browser-based responsive/RTL/accessibility regression tests;
 - additional Header/Footer model families such as transparent, dark, Luxury, vertical, newsletter and branch layouts;
