@@ -41,12 +41,13 @@ final class MegaMenuConfig {
 
         $classes[] = 'itk-menu-item--mega';
         $classes[] = 'itk-mega-menu--' . sanitize_html_class( isset( $definition['width'] ) ? $definition['width'] : 'aligned' );
+        $classes[] = 'itk-mega-menu-columns-' . absint( isset( $definition['columns'] ) ? $definition['columns'] : 1 );
 
         return array_values( array_unique( $classes ) );
     }
 
     /**
-     * Add accessible/data attributes used by the future interactive mega-menu renderer.
+     * Add accessible/data attributes used by the interactive mega-menu layer.
      *
      * @param array<string,string> $atts  Link attributes.
      * @param object               $item  WordPress menu item.
@@ -68,8 +69,10 @@ final class MegaMenuConfig {
             return $atts;
         }
 
-        $atts['data-itk-mega-menu'] = $key;
-        $atts['aria-haspopup']       = 'true';
+        $atts['data-itk-mega-menu']         = $key;
+        $atts['data-itk-mega-menu-width']   = $definition['width'];
+        $atts['data-itk-mega-menu-columns'] = (string) $definition['columns'];
+        $atts['aria-haspopup']               = 'true';
 
         return $atts;
     }
@@ -166,8 +169,8 @@ final class MegaMenuConfig {
     }
 
     /**
-     * Keep the data model portable and bounded while leaving rich rendering to
-     * later Theme/module slices.
+     * Keep the data model portable and bounded while leaving rich content
+     * rendering to later Theme/module slices.
      *
      * @param array<string,mixed> $definition Raw definition.
      * @return array<string,mixed>
