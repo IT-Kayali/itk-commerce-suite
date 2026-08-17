@@ -126,7 +126,8 @@
     }
 
     if (controller) controller.abort();
-    controller = new AbortController();
+    var requestController = new AbortController();
+    controller = requestController;
     setBusy(true);
 
     try {
@@ -137,7 +138,7 @@
           'X-Requested-With': 'XMLHttpRequest',
           'X-ITK-Commerce-Request': 'catalog'
         },
-        signal: controller.signal
+        signal: requestController.signal
       });
 
       if (!response.ok) throw new Error('Catalog request failed with HTTP ' + response.status);
@@ -160,7 +161,7 @@
       setBusy(false);
       fallback(requested);
     } finally {
-      controller = null;
+      if (controller === requestController) controller = null;
     }
   }
 
