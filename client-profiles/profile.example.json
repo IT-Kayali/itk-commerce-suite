@@ -122,6 +122,19 @@
     ],
     "configuration": {
       "itk-commerce-layouts": {
+        "product_card": {
+          "model": "classic",
+          "options": {
+            "image_ratio": "portrait",
+            "content_align": "left",
+            "price_treatment": "standard",
+            "action_treatment": "button",
+            "hover_behavior": "lift",
+            "badge_style": "pill",
+            "show_state_badges": true,
+            "new_days": 30
+          }
+        },
         "mega_content": {
           "catalog": {
             "blocks": [
