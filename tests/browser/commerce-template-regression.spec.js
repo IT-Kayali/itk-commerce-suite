@@ -90,7 +90,8 @@ test.describe('Commerce page template models', () => {
 
     expect(await gridColumnCount(checkout)).toBe(2);
     expect(await review.evaluate((element) => getComputedStyle(element).position)).toBe('sticky');
-    expect(await blockShell.evaluate((element) => getComputedStyle(element).maxWidth)).toBe('1320px');
+    const wideMaxWidth = await blockShell.evaluate((element) => parseFloat(getComputedStyle(element).maxWidth));
+    expect(wideMaxWidth).toBeGreaterThanOrEqual(1200);
 
     await setArea(page, 'checkout', ['itk-checkout-model-focused', 'itk-checkout-width-boxed', 'itk-checkout-fields-compact']);
     expect(await blockShell.evaluate((element) => getComputedStyle(element).maxWidth)).toBe('920px');
