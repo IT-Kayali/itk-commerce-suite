@@ -3,12 +3,13 @@
  * Dependency-light contract smoke test for progressive catalog Fetch/History.
  */
 
-$root      = dirname( __DIR__, 2 ) . '/packages/itk-commerce-search-filter/';
-$bootstrap = file_get_contents( $root . 'itk-commerce-search-filter.php' );
-$module    = file_get_contents( $root . 'src/SearchFilterModule.php' );
-$service   = file_get_contents( $root . 'src/CatalogAsyncNavigation.php' );
-$script    = file_get_contents( $root . 'assets/js/catalog-async.js' );
-$styles    = file_get_contents( $root . 'assets/css/catalog-async.css' );
+$root       = dirname( __DIR__, 2 ) . '/packages/itk-commerce-search-filter/';
+$bootstrap  = file_get_contents( $root . 'itk-commerce-search-filter.php' );
+$module     = file_get_contents( $root . 'src/SearchFilterModule.php' );
+$service    = file_get_contents( $root . 'src/CatalogAsyncNavigation.php' );
+$no_results = file_get_contents( $root . 'src/CatalogNoResultsToolbar.php' );
+$script     = file_get_contents( $root . 'assets/js/catalog-async.js' );
+$styles     = file_get_contents( $root . 'assets/css/catalog-async.css' );
 
 function itk_sf_ajax_assert( $condition, $message ) {
     if ( ! $condition ) {
@@ -18,16 +19,20 @@ function itk_sf_ajax_assert( $condition, $message ) {
 }
 
 itk_sf_ajax_assert( false !== strpos( $bootstrap, 'src/CatalogAsyncNavigation.php' ), 'Plugin bootstrap must load the async navigation service.' );
+itk_sf_ajax_assert( false !== strpos( $bootstrap, 'src/CatalogNoResultsToolbar.php' ), 'Plugin bootstrap must load the no-results filter recovery service.' );
 itk_sf_ajax_assert( false !== strpos( $module, 'new CatalogAsyncNavigation()' ), 'Search Filter module must instantiate async navigation.' );
+itk_sf_ajax_assert( false !== strpos( $module, 'new CatalogNoResultsToolbar' ), 'Search Filter module must keep filters available for empty result sets.' );
 itk_sf_ajax_assert( false !== strpos( $service, "add_action( 'woocommerce_before_shop_loop'" ), 'Product result boundary must use public WooCommerce before-loop hooks.' );
 itk_sf_ajax_assert( false !== strpos( $service, "add_action( 'woocommerce_after_shop_loop'" ), 'Product result boundary must use public WooCommerce after-loop hooks.' );
 itk_sf_ajax_assert( false !== strpos( $service, "add_action( 'woocommerce_no_products_found'" ), 'No-results responses must still expose a replaceable result boundary.' );
+itk_sf_ajax_assert( false !== strpos( $no_results, "add_action( 'woocommerce_no_products_found'" ) && false !== strpos( $no_results, 'data-itk-catalog-toolbar' ), 'No-results pages must retain a filter toolbar so restrictive filters can be removed.' );
 itk_sf_ajax_assert( false !== strpos( $service, 'data-itk-catalog-results' ), 'Async replacement boundary must have a stable module-owned selector.' );
 itk_sf_ajax_assert( false !== strpos( $service, 'aria-live="polite"' ), 'Async product updates must expose a polite live region.' );
 itk_sf_ajax_assert( false !== strpos( $service, 'wp_localize_script' ), 'Browser status messages must remain translation-ready.' );
 
 itk_sf_ajax_assert( false !== strpos( $script, "credentials: 'same-origin'" ), 'Catalog Fetch must send same-origin credentials only.' );
 itk_sf_ajax_assert( false !== strpos( $script, 'new AbortController()' ), 'Stale catalog requests must be cancellable.' );
+itk_sf_ajax_assert( false !== strpos( $script, 'controller === requestController' ), 'An aborted stale request must not clear the newest active request controller.' );
 itk_sf_ajax_assert( false !== strpos( $script, 'window.history.pushState' ), 'Successful filter navigation must update browser history.' );
 itk_sf_ajax_assert( false !== strpos( $script, "window.addEventListener('popstate'" ), 'Back/forward navigation must restore catalog state asynchronously.' );
 itk_sf_ajax_assert( false !== strpos( $script, "rawKey.match(/^(.*)\\[\\]$/" ), 'Multiple checkbox values must canonicalize to the bounded scalar URL contract.' );
