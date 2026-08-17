@@ -4,7 +4,7 @@ Modular, scalable WooCommerce commerce platform by IT-Kayali with a reusable the
 
 ## Status
 
-Phase 1 foundation is complete. Phase 2 now includes the visual Layout Builder, profile-driven Header/Footer assignments, responsive navigation controls, rich Mega-menu panels and the installable `itk-commerce-layouts` module.
+Phase 1 foundation is complete. Phase 2 now includes the visual Layout Builder, profile-driven Header/Footer assignments, responsive navigation controls, rich Mega-menu panels, automated Chromium responsive/RTL/accessibility regression coverage and the installable `itk-commerce-layouts` module.
 
 ## Product ownership
 
@@ -81,6 +81,12 @@ Existing basic Mega-menu definitions keep their previous submenu behavior until 
 
 Preview URLs require a logged-in user with the Commerce design capability and a valid nonce, and are marked `noindex,nofollow`.
 
+## Browser regression gate
+
+A customer-neutral Playwright fixture exercises the real Theme/Layouts CSS and rich Mega-menu JavaScript in Chromium. The gate checks Desktop/Tablet/Mobile grid changes, mobile horizontal overflow, RTL logical positioning, ARIA state, keyboard open/Escape behavior, focus restoration, click-outside closing, skip-link/ID/`aria-controls` contracts and interactive accessible names.
+
+The installable ZIP build now depends on both static validation and the browser regression job. Failure diagnostics retain Playwright traces, screenshots and an HTML report.
+
 ## Packages
 
 Implemented:
@@ -119,7 +125,7 @@ tools/
 
 ## Validation and development ZIPs
 
-GitHub Actions validates PHP and JavaScript syntax, `theme.json`, all package compatibility manifests, Core lifecycle smoke tests, the Layouts module contract, rich Mega-menu normalization and the generic/customer separation rule. It then builds development artifacts:
+GitHub Actions validates PHP and JavaScript syntax, `theme.json`, all package compatibility manifests, Core lifecycle smoke tests, the Layouts module contract, rich Mega-menu normalization, the generic/customer separation rule and the Chromium responsive/RTL/accessibility browser suite. It then builds development artifacts only after both validation layers pass:
 
 - `itk-commerce-theme.zip`
 - `itk-commerce-core.zip`
@@ -144,6 +150,7 @@ GitHub Actions validates PHP and JavaScript syntax, `theme.json`, all package co
 - [`docs/CORE-FOUNDATION.md`](docs/CORE-FOUNDATION.md)
 - [`docs/UPDATE-ROLLBACK.md`](docs/UPDATE-ROLLBACK.md)
 - [`docs/LAYOUT-BUILDERS.md`](docs/LAYOUT-BUILDERS.md)
+- [`docs/BROWSER-REGRESSION.md`](docs/BROWSER-REGRESSION.md)
 
 ## Versioning
 
