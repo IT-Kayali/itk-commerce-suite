@@ -15,6 +15,7 @@ const DIR     = __DIR__;
 require_once DIR . '/inc/setup.php';
 require_once DIR . '/inc/assets.php';
 require_once DIR . '/inc/template-tags.php';
+require_once DIR . '/inc/layouts.php';
 require_once DIR . '/inc/woocommerce.php';
 require_once DIR . '/inc/mobile-navigation.php';
 
