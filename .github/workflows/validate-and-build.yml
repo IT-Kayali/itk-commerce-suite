@@ -60,6 +60,9 @@ jobs:
       - name: Public component extension contract smoke test
         run: php tests/layouts/component-extension-contract-smoke.php
 
+      - name: Elementor Theme Builder contract smoke test
+        run: php tests/layouts/elementor-theme-builder-smoke.php
+
       - name: Search Filter foundation smoke test
         run: php tests/search-filter/foundation-smoke.php
 
