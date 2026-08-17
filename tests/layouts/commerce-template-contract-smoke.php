@@ -59,6 +59,7 @@ $card_options = \ITK\Commerce\Theme\product_card_options();
 itk_commerce_template_assert( isset( $card_models['classic'], $card_models['minimal'], $card_models['boxed'], $card_models['overlay'] ), 'Product-card model catalog is complete.' );
 itk_commerce_template_assert( 'classic' === \ITK\Commerce\Theme\product_card_model(), 'Product-card default model is stable.' );
 itk_commerce_template_assert( 'portrait' === $card_options['image_ratio'], 'Product-card image ratio default is stable.' );
+itk_commerce_template_assert( 'title-price' === $card_options['content_order'], 'Product-card content order default is stable.' );
 itk_commerce_template_assert( 'lift' === $card_options['hover_behavior'], 'Product-card hover default is stable.' );
 itk_commerce_template_assert( true === $card_options['show_state_badges'], 'Product-card state badges default on.' );
 itk_commerce_template_assert( 30 === $card_options['new_days'], 'Product-card new badge window is stable.' );
