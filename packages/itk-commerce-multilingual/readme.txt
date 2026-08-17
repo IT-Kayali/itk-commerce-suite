@@ -27,9 +27,13 @@ The current development foundation provides:
 * deterministic source hashes for later stale-translation detection;
 * read-only WooCommerce product/variation name and description mapping;
 * product category/tag and global attribute-term text mapping by existing taxonomy + term ID;
-* global and product-local attribute label translation mapping without changing WooCommerce identity.
+* global and product-local attribute label translation mapping without changing WooCommerce identity;
+* WooCommerce customer-session language persistence for localized storefront requests;
+* explicit session-language restore for AJAX and Store API requests;
+* classic Checkout and Checkout Block/Store API order-language capture through WC_Order CRUD meta;
+* historical order snapshots for public language code, WordPress locale and text direction.
 
-WooCommerce cart/session/order/email language context, hreflang/canonical policy, translator admin/capabilities and import/export remain separate follow-up slices.
+WooCommerce email/document language rendering, hreflang/canonical policy, translator admin/capabilities and translation import/export remain separate follow-up slices.
 
 == Architecture ==
 
@@ -37,7 +41,7 @@ The module depends on IT-Kayali Commerce Core and registers itself through the C
 
 Customer language lists and language settings belong to the active versioned customer profile. Translation content is stored in module-owned WordPress-prefixed tables rather than Theme files or one growing serialized profile option.
 
-The Theme remains a presentation consumer. WooCommerce continues to own product and variation IDs, prices, SKU, stock, tax, slugs, cart state and order state. The multilingual mapper changes only customer-facing textual view values on the existing WooCommerce identities.
+The Theme remains a presentation consumer. WooCommerce continues to own product and variation IDs, prices, SKU, stock, tax, slugs, cart contents/totals, payment state and order state. The multilingual module stores only translation content and bounded language-context metadata.
 
 == Language switcher ==
 
@@ -72,7 +76,25 @@ woocommerce.attribute.pa_color.label
 
 Product-local attribute labels include the original product ID. Product/category/attribute slugs and all commercial values remain unchanged in this slice.
 
-Admin, AJAX and REST mapping is intentionally deferred until the next slice provides an explicit persisted cart/session/order language context.
+Normal storefront pages use the language selected by the localized URL. AJAX/REST entity mapping is allowed only when the WooCommerce language-context service restores a valid persisted customer-session language; the mapper never guesses an async language from the default route context.
+
+== WooCommerce language context ==
+
+The selected storefront language is persisted in the WooCommerce customer session under:
+
+itk_commerce_language
+
+Classic checkout and Checkout Block/Store API capture the same language snapshot on the existing WC_Order object through WooCommerce CRUD metadata:
+
+_itk_commerce_language
+_itk_commerce_locale
+_itk_commerce_direction
+
+These values are language context only. They do not duplicate or replace WooCommerce order ownership, items, totals, stock, taxes, payment state or HPOS data.
+
+The current persisted session language is exposed through itk_commerce_woocommerce_session_language. Historical order context is exposed through itk_commerce_order_language_context and remains readable even if a language is later disabled, because locale and direction are frozen with the order.
+
+WooCommerce email and Commerce document rendering will consume this order snapshot in the next isolated slice and restore the previous WordPress locale after each rendering scope.
 
 == Development status ==
 
