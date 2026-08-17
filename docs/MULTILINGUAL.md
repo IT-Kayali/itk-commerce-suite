@@ -1,6 +1,6 @@
 # IT-Kayali Commerce Multilingual
 
-`itk-commerce-multilingual` is an optional installable Commerce Suite module. It owns language context, translation workflow and language-specific routing contracts so the reusable Theme does not become a translation database.
+`itk-commerce-multilingual` is an optional installable Commerce Suite module. It owns language context, translation workflow, language-aware SEO and language-specific rendering contracts so the reusable Theme does not become a translation database.
 
 ## Language profile schema
 
@@ -30,15 +30,15 @@ $dir     = apply_filters( 'itk_commerce_text_direction', 'ltr' );
 $route   = apply_filters( 'itk_commerce_language_route_context', array() );
 ```
 
-The context exposes the selected language, locale, direction, fallback and enabled languages. Stable body classes such as `itk-language-ar` and `itk-direction-rtl` plus bounded HTML `lang` / `dir` attributes keep the Theme presentation-aware without making it the language store.
+The context exposes selected language, locale, direction, configured default, fallback and enabled languages. Stable body classes such as `itk-language-ar` and `itk-direction-rtl` plus bounded HTML `lang` / `dir` attributes keep the Theme presentation-aware without making it the language store.
 
 ## Directory routing and locale
 
 Configured languages can be addressed as directories such as `/de/`, `/ar/` and `/en/`. During normal WordPress request parsing, the routing service removes only the language prefix temporarily, lets existing WordPress/WooCommerce permalink rules resolve the remaining path, then restores the public localized request URI.
 
-Unprefixed routes remain valid in the configured default language. Canonical redirect policy is intentionally deferred to the SEO slice.
+Unprefixed routes remain valid in the configured default language. The SEO foundation canonicalizes those duplicates into the configured default language directory; redirect policy remains a separate routing concern.
 
-For normal storefront requests the module attempts `switch_to_locale()` and aligns public WordPress locale filters with the selected Commerce language. WooCommerce async requests use the separately persisted customer-session language described below instead of guessing from an unprefixed AJAX/REST URL.
+For normal storefront requests the module attempts `switch_to_locale()` and aligns public WordPress locale filters with the selected Commerce language. WooCommerce async requests use the separately persisted customer-session language instead of guessing from an unprefixed AJAX/REST URL.
 
 ## Safe language URLs and switcher
 
@@ -46,7 +46,7 @@ For normal storefront requests the module attempts `switch_to_locale()` and alig
 $url = apply_filters( 'itk_commerce_language_url', '', 'ar', '' );
 ```
 
-Same-origin paths and non-action query state are preserved. Nonces and state-changing parameters such as `add-to-cart`, `remove_item`, `wc-ajax`, generic `action`/`security` values and language parameters are dropped before building another language URL.
+Same-origin paths and non-action query state may be preserved for interactive language switching. Nonces and state-changing parameters such as `add-to-cart`, `remove_item`, `wc-ajax`, generic `action`/`security` values and language parameters are dropped.
 
 A style-neutral accessible switcher is available through:
 
@@ -56,7 +56,88 @@ A style-neutral accessible switcher is available through:
 [itk_language_switcher display="both" class="header-language"]
 ```
 
-Theme, Elementor or other presentation packages may style the stable `itk-language-switcher*` classes or replace the output through the public switcher filters.
+Theme, Elementor or other presentation packages may style the stable `itk-language-switcher*` classes or replace the output through public switcher filters.
+
+## Canonical and hreflang SEO
+
+SEO URLs deliberately differ from interactive switcher URLs: canonical and hreflang targets are generated from the **current route path only**. The current query string and fragment are never copied, so tracking parameters, catalog filters, nonces and actions do not create alternate SEO URL variants.
+
+### Canonical
+
+For singular WordPress content, the module localizes WordPress Core's canonical URL through `get_canonical_url`. Core remains responsible for printing its normal singular canonical element.
+
+For other indexable frontend views, the module prints one filterable canonical element from `wp_head`.
+
+Examples:
+
+```text
+Request:   /ar/produkt/duft/?utm_source=x&filter_note=rose
+Canonical: /ar/produkt/duft/
+
+Request:   /produkt/duft/          (default language = de)
+Canonical: /de/produkt/duft/
+```
+
+Public canonical contract:
+
+```php
+$canonical = apply_filters(
+    'itk_commerce_multilingual_canonical_url',
+    '',
+    '' // optional explicit language code
+);
+```
+
+The lower-level `itk_commerce_multilingual_canonical_target` filter can alter the generated target after the route has been normalized.
+
+### hreflang and x-default
+
+Every enabled language receives a same-route alternate URL. `x-default` always targets the **configured default language**, not the fallback translation language.
+
+Example for `de`, `ar`, `en` and `pt-br`:
+
+```html
+<link rel="alternate" hreflang="de" href=".../de/produkt/duft/" />
+<link rel="alternate" hreflang="ar" href=".../ar/produkt/duft/" />
+<link rel="alternate" hreflang="en" href=".../en/produkt/duft/" />
+<link rel="alternate" hreflang="pt-BR" href=".../pt-br/produkt/duft/" />
+<link rel="alternate" hreflang="x-default" href=".../de/produkt/duft/" />
+```
+
+Public alternate contract:
+
+```php
+$alternates = apply_filters(
+    'itk_commerce_multilingual_alternate_urls',
+    array(),
+    array()
+);
+```
+
+Internal normalized targets can be extended through `itk_commerce_multilingual_hreflang_targets`.
+
+### Head-output boundaries
+
+The module does not emit its own multilingual canonical/hreflang output for:
+
+- search results;
+- 404 views;
+- feeds;
+- trackbacks;
+- previews;
+- admin requests;
+- AJAX requests;
+- REST requests.
+
+Integrations/SEO plugins can deliberately replace or disable the default output with:
+
+```text
+itk_commerce_multilingual_manage_head_links
+itk_commerce_multilingual_render_canonical
+itk_commerce_multilingual_render_hreflang
+```
+
+Translated entity slugs and inbound translated-permalink resolution remain a separate workstream. This SEO layer therefore does not silently modify WordPress/WooCommerce rewrite identity.
 
 ## Translation repository and workflow
 
@@ -135,8 +216,6 @@ The current session language is exposed through:
 $code = apply_filters( 'itk_commerce_woocommerce_session_language', '' );
 ```
 
-This keeps mini-cart/cart/checkout async traffic aligned with the language the shopper explicitly selected, without encoding commercial state into translation storage.
-
 ## Order language capture
 
 Both classic checkout and Checkout Block/Store API capture the selected WooCommerce session language onto the existing `WC_Order` object through WooCommerce CRUD metadata.
@@ -151,8 +230,6 @@ _itk_commerce_direction
 
 The language code identifies the public Commerce language. Locale and direction are frozen as a historical snapshot so future removal/renaming of a configured language does not erase the language context of old orders.
 
-Classic checkout captures the snapshot while WooCommerce is constructing the order. Store API checkout uses its public order-meta hook. No direct `wp_posts`, postmeta or HPOS table access is used.
-
 Read the frozen order context through:
 
 ```php
@@ -163,34 +240,27 @@ $order_context = apply_filters(
 );
 ```
 
-Returned values include `code`, `locale`, `direction` and whether the language is still configured. Historical stored locale/direction remain available even if the language is no longer enabled.
-
 ## WooCommerce email language scope
 
-WooCommerce transactional order emails are rendered inside the frozen order language **before the actual email trigger executes**. This is necessary because WooCommerce customer email classes can call `setup_locale()` before assigning the current order object to the email instance.
-
-The Multilingual module wraps WooCommerce's `..._notification` actions for order-related transactional events. WooCommerce uses those notification actions both for immediate transactional email delivery and when its deferred email queue later processes an event, so the same language contract applies in both modes.
+WooCommerce transactional order emails are rendered inside the frozen order language before the actual email trigger executes. The module wraps order-related `..._notification` actions used by WooCommerce's transactional dispatcher.
 
 While the explicit order scope is active:
 
 - the Commerce language context is selected when the stored code is still enabled;
 - WordPress is switched to the order's frozen locale with `switch_to_locale()`;
-- `woocommerce_allow_switching_email_locale` is forced to false so `WC_Email::setup_locale()` cannot replace the order locale with the shop locale;
-- `woocommerce_allow_restoring_email_locale` is forced to false so WooCommerce does not restore a locale stack it does not own;
+- WooCommerce's own customer-email locale setup/restore is prevented from overwriting the explicit order scope;
 - Commerce translation lookup is scoped to the stored order language code;
 - after the notification, the previous WordPress locale and Commerce language are restored.
 
-Non-order notifications do not enter an active scope and therefore retain normal WooCommerce locale behavior.
+Non-order notifications retain normal WooCommerce locale behavior.
 
 ### Manual order-email resend
 
-WooCommerce's admin resend flow is wrapped with its public `woocommerce_before_resend_order_emails` and `woocommerce_after_resend_order_email` hooks. Customer invoice and new-order resends therefore use the same frozen order-language contract and restore the previous locale afterwards.
-
-Programmatic integrations that trigger email classes directly outside WooCommerce's transactional/resend flows should explicitly use the public order-language scope below.
+WooCommerce's admin resend flow is wrapped with its public before/after resend hooks. Customer invoice and new-order resends therefore use the same frozen order-language contract and restore the previous locale afterwards.
 
 ## Document / programmatic order-language scope
 
-The documents package is intentionally separate and may not be installed. The Multilingual module therefore exposes a reusable rendering service instead of hard-coding a dependency on `itk-commerce-documents`:
+The documents package is intentionally separate. Multilingual exposes a reusable rendering service instead of hard-coding that module:
 
 ```php
 $scope = apply_filters( 'itk_commerce_order_language_scope', null );
@@ -199,14 +269,13 @@ if ( $scope ) {
     $pdf = $scope->run(
         $order,
         function ( $order_context ) use ( $order ) {
-            // Render invoice / delivery note / return slip / pack list here.
             return render_document( $order, $order_context );
         }
     );
 }
 ```
 
-`run()` returns the callback result. Restoration is implemented with `finally`, so exceptions during PDF/email rendering cannot leak the order locale into subsequent operations in the same PHP process.
+`run()` returns the callback result. Restoration uses `finally`, so exceptions during PDF/email rendering cannot leak the order locale into subsequent operations in the same PHP process.
 
 Scope lifecycle actions:
 
@@ -215,18 +284,14 @@ itk_commerce_order_language_scope_entered
 itk_commerce_order_language_scope_left
 ```
 
-These allow later document/font/RTL integrations to react without duplicating locale handling.
-
 ## Historical disabled languages
 
-An old order may reference a language that is no longer enabled in the current customer profile. The order snapshot remains authoritative for historical rendering:
+An old order may reference a language that is no longer enabled in the active customer profile. The order snapshot remains authoritative for historical rendering:
 
-- its stored locale is still used for WordPress/WooCommerce strings when that locale is installed;
+- its stored locale can still be used for WordPress/WooCommerce strings when installed;
 - its stored language code temporarily scopes Commerce translation lookup;
-- its stored direction remains available to PDF/document renderers;
+- its stored direction remains available to document renderers;
 - the language is **not** globally re-enabled and normal storefront routing remains unchanged.
-
-This keeps old invoices/emails reproducible without changing current storefront language configuration.
 
 ## Commercial-data boundary
 
@@ -242,21 +307,17 @@ The multilingual layer deliberately does **not** translate or copy:
 - payment state;
 - WooCommerce order ownership/state.
 
-WooCommerce remains authoritative for all of those values. Multilingual stores only translation content and language-context metadata.
-
-## Output safety
-
-Translation persistence does not apply one global HTML sanitizer because output contexts differ. The consuming WooCommerce/Theme/document component remains responsible for escaping/sanitizing translated content correctly for plain text, controlled HTML, attributes, JSON, email text and documents.
+WooCommerce remains authoritative for all of those values. Multilingual stores only translation content and language/SEO-context metadata.
 
 ## Remaining Phase 5 boundaries
 
 The current implementation does **not** yet:
 
-- emit translated slugs/canonical/hreflang policy;
+- resolve translated entity slugs/permalinks inbound and outbound;
 - import/export CSV/JSON/XLIFF translations;
 - create the translator role/capability/admin UI boundary;
 - provide final end-to-end RTL/accessibility browser coverage for translated commerce content.
 
 ## Next slice
 
-The next workstream implements language-aware SEO/hreflang and translation import/export foundations while keeping localized route/canonical policy separate from WooCommerce commercial identities.
+The next workstream implements translated entity slug/permalink routing as an isolated mapping layer without creating language-specific WooCommerce product copies or changing shared SKU/price/stock ownership.
