@@ -18,6 +18,8 @@ require_once DIR . '/inc/template-tags.php';
 require_once DIR . '/inc/layouts.php';
 require_once DIR . '/inc/woocommerce.php';
 require_once DIR . '/inc/commerce-models.php';
+require_once DIR . '/inc/integrations.php';
+require_once DIR . '/inc/elementor.php';
 require_once DIR . '/inc/product-cards.php';
 require_once DIR . '/inc/mini-cart.php';
 require_once DIR . '/inc/account.php';
