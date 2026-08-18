@@ -58,6 +58,11 @@ function prepare() {
     require_once PATH . '/src/WooCommerceTranslationMapper.php';
     require_once PATH . '/src/MultilingualModule.php';
 
+    if ( is_admin() ) {
+        require_once PATH . '/src/Admin/TranslationAdminPage.php';
+        ( new Admin\TranslationAdminPage() )->register();
+    }
+
     add_action( 'itk_commerce_register_modules', __NAMESPACE__ . '\register_module' );
 }
 
