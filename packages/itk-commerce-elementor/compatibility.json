@@ -1,0 +1,28 @@
+{
+  "schema_version": 1,
+  "package": "itk-commerce-elementor",
+  "type": "wordpress-plugin",
+  "version": "0.1.0-dev",
+  "status": "development",
+  "minimum": {
+    "php": "8.1",
+    "wordpress": "6.6",
+    "woocommerce": null,
+    "itk_commerce_core": "0.1.0-dev"
+  },
+  "tested_up_to": {
+    "wordpress": null,
+    "woocommerce": null,
+    "itk_commerce_core": "0.1.0-dev"
+  },
+  "features": {
+    "theme_builder_locations": "uses the existing Commerce Theme Elementor location contract",
+    "widgets": ["product-summary", "extension-area"],
+    "woocommerce_context": true,
+    "optional_elementor_dependency": true
+  },
+  "notes": [
+    "The module does not make Elementor mandatory for the Commerce Suite.",
+    "Widgets are registered only when Elementor is available, preventing fatal coupling on non-Elementor shops."
+  ]
+}
