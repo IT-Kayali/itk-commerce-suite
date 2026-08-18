@@ -1,0 +1,32 @@
+{
+  "schema_version": 1,
+  "package": "itk-commerce-documents",
+  "type": "wordpress-plugin",
+  "version": "0.1.0-dev",
+  "status": "development",
+  "minimum": {
+    "php": "8.1",
+    "wordpress": "6.6",
+    "woocommerce": null,
+    "itk_commerce_core": "0.1.0-dev"
+  },
+  "tested_up_to": {
+    "wordpress": null,
+    "woocommerce": null,
+    "itk_commerce_core": "0.1.0-dev"
+  },
+  "features": {
+    "invoice": true,
+    "delivery_note": true,
+    "return_form": true,
+    "packing_list": true,
+    "order_language": "reads stored _itk_commerce_language and preserves RTL/LTR document direction",
+    "pdf": "Dompdf adapter or itk_commerce_documents_pdf_renderer integration",
+    "html": "standalone print-ready fallback"
+  },
+  "notes": [
+    "The module never mutates order commercial data while rendering documents.",
+    "PDF generation is adapter-based so customer installations can choose a renderer without coupling Core to a PDF library.",
+    "WooCommerce minimum/tested ranges remain unset until Phase 0 environment audit data is recorded."
+  ]
+}
