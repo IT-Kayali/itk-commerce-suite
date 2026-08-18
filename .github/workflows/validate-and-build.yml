@@ -89,6 +89,9 @@ jobs:
       - name: Phase 6-9 release contract smoke test
         run: php tests/hardening/release-contract-smoke.php
 
+      - name: Customer/generic boundary smoke test
+        run: php tests/hardening/customer-boundary-smoke.php
+
       - name: Guard generic packages from reference-customer coupling
         run: |
           if grep -RniE 'Al-Lord|al-lord' packages; then
