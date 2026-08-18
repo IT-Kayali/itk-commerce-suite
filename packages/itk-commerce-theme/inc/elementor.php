@@ -2,9 +2,10 @@
 /**
  * Elementor Theme Builder compatibility contracts.
  *
- * Header and Footer are registered as safe core locations. WooCommerce single
- * and archive rendering stays Theme-owned by default so Commerce page-model
- * contracts are not bypassed accidentally.
+ * Elementor remains optional. When present, Header/Footer/Single/Archive and
+ * explicit IT-Kayali extension locations can be fulfilled by Theme Builder;
+ * every location keeps a Theme/WooCommerce fallback when no Elementor template
+ * matches the current request.
  *
  * @package ITK_Commerce_Theme
  */
@@ -13,7 +14,7 @@ namespace ITK\Commerce\Theme;
 
 defined( 'ABSPATH' ) || exit;
 
-add_action( 'elementor/theme/register_locations', __NAMESPACE__ . '\\register_elementor_theme_locations' );
+add_action( 'elementor/theme/register_locations', __NAMESPACE__ . '\register_elementor_theme_locations' );
 
 /**
  * Return Elementor Theme Builder locations supported by default.
@@ -21,11 +22,20 @@ add_action( 'elementor/theme/register_locations', __NAMESPACE__ . '\\register_el
  * @return string[]
  */
 function elementor_theme_locations() {
-    $locations = array( 'header', 'footer' );
+    $locations = array(
+        'header',
+        'footer',
+        'single',
+        'archive',
+        'itk-before-header',
+        'itk-after-header',
+        'itk-before-content',
+        'itk-after-content',
+        'itk-before-footer',
+    );
 
     /**
      * Filter Elementor Theme Builder locations registered by the Theme.
-     * Advanced integrations may deliberately add other locations.
      *
      * @param string[] $locations Location IDs.
      */

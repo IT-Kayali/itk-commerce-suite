@@ -51,6 +51,9 @@ jobs:
       - name: Translation workflow smoke test
         run: php tests/multilingual/translation-workflow-smoke.php
 
+      - name: Translation import export smoke test
+        run: php tests/multilingual/translation-transfer-smoke.php
+
       - name: WooCommerce entity mapping smoke test
         run: php tests/multilingual/woocommerce-entity-mapping-smoke.php
 

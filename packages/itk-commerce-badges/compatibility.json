@@ -1,0 +1,11 @@
+{
+  "schema_version": 1,
+  "package": "itk-commerce-badges",
+  "type": "wordpress-plugin",
+  "version": "0.1.0-dev",
+  "status": "development",
+  "minimum": {"php": "8.1", "wordpress": "6.6", "woocommerce": null, "itk_commerce_core": "0.1.0-dev"},
+  "tested_up_to": {"wordpress": null, "woocommerce": null, "itk_commerce_core": "0.1.0-dev"},
+  "features": {"sale_percentage": true, "custom_badge": true, "theme_extension_filter": "itk_commerce_product_badges"},
+  "notes": ["Uses the Theme public badge contract and does not patch WooCommerce templates."]
+}

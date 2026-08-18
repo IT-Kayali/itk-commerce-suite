@@ -1,0 +1,40 @@
+{
+  "schema_version": 1,
+  "package": "itk-commerce-code-manager",
+  "type": "wordpress-plugin",
+  "version": "0.1.0-dev",
+  "status": "development",
+  "minimum": {
+    "php": "8.1",
+    "wordpress": "6.6",
+    "woocommerce": null,
+    "itk_commerce_core": "0.1.0-dev"
+  },
+  "tested_up_to": {
+    "wordpress": null,
+    "woocommerce": null,
+    "itk_commerce_core": "0.1.0-dev"
+  },
+  "features": {
+    "locations": ["head_start", "head_end", "body_open", "before_header", "after_header", "before_content", "after_content", "before_footer", "footer"],
+    "types": ["html", "css", "javascript", "shortcode", "elementor-template", "php"],
+    "conditions": ["language", "device", "role", "page-type", "product", "product-category"],
+    "php": {
+      "dedicated_capability": "itk_manage_code",
+      "syntax_validation": "token_get_all TOKEN_PARSE",
+      "forbidden_constructs": true,
+      "save_state": "disabled",
+      "safe_mode_constant": "ITK_COMMERCE_CODE_SAFE_MODE",
+      "fatal_error_auto_disable": true
+    },
+    "version_history": 20,
+    "audit_log": true,
+    "one_click_rollback": true
+  },
+  "notes": [
+    "Only the dedicated itk_manage_code capability can create, enable, disable, rollback or delete snippets; Core grants it to administrators only by default.",
+    "Every save is disabled and requires a separate enable action after validation.",
+    "PHP runs only through the dedicated versioned runtime and high-risk language constructs/functions are rejected; complex functionality should remain a real module.",
+    "Safe Mode disables all runtime snippets without deleting configuration."
+  ]
+}

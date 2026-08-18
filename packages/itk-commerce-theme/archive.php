@@ -7,6 +7,8 @@
 
 defined( 'ABSPATH' ) || exit;
 get_header();
+
+if ( ! ITK\Commerce\Theme\maybe_render_elementor_location( 'archive' ) ) :
 ?>
 <main id="primary" class="itk-site-main">
     <div class="itk-container">
@@ -26,4 +28,6 @@ get_header();
         <?php endif; ?>
     </div>
 </main>
-<?php get_footer(); ?>
+<?php
+endif;
+get_footer();

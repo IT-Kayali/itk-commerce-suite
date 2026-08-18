@@ -1,0 +1,32 @@
+{
+  "schema_version": 1,
+  "package": "itk-commerce-elementor",
+  "type": "wordpress-plugin",
+  "version": "0.1.0-dev",
+  "status": "development",
+  "minimum": {
+    "php": "8.1",
+    "wordpress": "6.6",
+    "woocommerce": null,
+    "itk_commerce_core": "0.1.0-dev"
+  },
+  "tested_up_to": {
+    "wordpress": null,
+    "woocommerce": null,
+    "elementor": null,
+    "itk_commerce_core": "0.1.0-dev"
+  },
+  "features": {
+    "theme_builder_locations": ["header", "footer", "single", "archive", "itk-before-header", "itk-after-header", "itk-before-content", "itk-after-content", "itk-before-footer"],
+    "widgets": ["product-summary", "products", "product-categories", "product-filters", "product-search", "hero-banner", "branches", "product-reviews", "contact-data", "mini-cart", "language-switcher", "menu", "extension-area"],
+    "dynamic_tags": ["product-name", "product-sku", "product-price", "product-stock", "product-short-description", "current-language", "profile-contact-data"],
+    "woocommerce_context": true,
+    "optional_elementor_dependency": true,
+    "local_fonts": "provided profile-wide by Commerce Core"
+  },
+  "notes": [
+    "The module does not make Elementor mandatory for the Commerce Suite.",
+    "Widgets and dynamic tags are registered only when the corresponding Elementor APIs are available.",
+    "Exact Elementor and Elementor Pro tested-up-to versions remain open until the Phase 0 target-environment audit."
+  ]
+}

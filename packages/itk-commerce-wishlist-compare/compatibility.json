@@ -1,0 +1,11 @@
+{
+  "schema_version": 1,
+  "package": "itk-commerce-wishlist-compare",
+  "type": "wordpress-plugin",
+  "version": "0.1.0-dev",
+  "status": "development",
+  "minimum": {"php": "8.1", "wordpress": "6.6", "woocommerce": null, "itk_commerce_core": "0.1.0-dev"},
+  "tested_up_to": {"wordpress": null, "woocommerce": null, "itk_commerce_core": "0.1.0-dev"},
+  "features": {"wishlist": true, "compare": true, "anonymous_storage": "browser localStorage", "compare_limit": 6, "shortcodes": ["itk_wishlist", "itk_compare"], "store_api": true},
+  "notes": ["The module uses public product-card extension hooks and WooCommerce Store API reads; it does not alter order/cart data."]
+}

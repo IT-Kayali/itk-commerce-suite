@@ -6,6 +6,7 @@ on:
       - main
       - 'foundation/**'
       - 'feature/**'
+      - 'agent/**'
   pull_request:
 
 permissions:
@@ -85,10 +86,29 @@ jobs:
       - name: Search Filter live search contract smoke test
         run: php tests/search-filter/live-search-contract-smoke.php
 
+      - name: Phase 6-7 module contract smoke test
+        run: php tests/hardening/phase6-7-contract-smoke.php
+
+      - name: Code Manager parser and safety gates
+        run: php tests/hardening/code-manager-validation-smoke.php
+
+      - name: Phase 6-9 release contract smoke test
+        run: php tests/hardening/release-contract-smoke.php
+
+      - name: Customer/generic boundary smoke test
+        run: php tests/hardening/customer-boundary-smoke.php
+
       - name: Guard generic packages from reference-customer coupling
         run: |
           if grep -RniE 'Al-Lord|al-lord' packages; then
             echo 'Reference-customer name detected in generic packages.'
+            exit 1
+          fi
+
+      - name: Guard committed secrets
+        run: |
+          if grep -RniE --exclude='*.md' --exclude='*.json' --exclude='*.lock' '(BEGIN (RSA |EC |OPENSSH )?PRIVATE KEY|api[_-]?secret[[:space:]]*=[[:space:]]*[^$]|access[_-]?token[[:space:]]*=[[:space:]]*[^$]' packages client-profiles; then
+            echo 'Potential committed secret detected.'
             exit 1
           fi
 
@@ -103,14 +123,14 @@ jobs:
       - name: Setup Node
         uses: actions/setup-node@v4
         with:
-          node-version: '20'
+          node-version: '24'
 
       - name: Install browser test tooling
         run: npm install --ignore-scripts --no-audit --no-fund
 
       - name: Install Playwright Chromium
-        run: npx playwright install --with-deps chromium
-        timeout-minutes: 8
+        run: npx playwright install chromium
+        timeout-minutes: 6
 
       - name: Responsive RTL accessibility browser regression
         run: npm run test:browser
@@ -138,11 +158,12 @@ jobs:
       - name: Build installable ZIP packages
         run: |
           mkdir -p dist
-          cd packages
-          zip -qr ../dist/itk-commerce-theme.zip itk-commerce-theme
-          zip -qr ../dist/itk-commerce-core.zip itk-commerce-core
-          zip -qr ../dist/itk-commerce-layouts.zip itk-commerce-layouts
-          zip -qr ../dist/itk-commerce-search-filter.zip itk-commerce-search-filter
+          for package in packages/itk-commerce-*; do
+            [ -d "$package" ] || continue
+            name="$(basename "$package")"
+            (cd packages && zip -qr "../dist/${name}.zip" "$name")
+          done
+          test -n "$(find dist -maxdepth 1 -name 'itk-commerce-*.zip' -print -quit)"
 
       - name: Upload development packages
         uses: actions/upload-artifact@v4

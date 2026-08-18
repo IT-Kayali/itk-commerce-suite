@@ -21,6 +21,7 @@ final class Capabilities {
             'itk_manage_profiles',
             'itk_manage_translations',
             'itk_manage_documents',
+            'itk_manage_code',
         );
     }
 
@@ -58,6 +59,9 @@ final class Capabilities {
             )
         );
 
+        // The code capability is intentionally granted only through the full
+        // administrator grant below. Designers, translators, document managers
+        // and shop managers never receive PHP/custom-code access by default.
         self::grant_all_to_role( 'administrator' );
         self::grant_shop_manager_capabilities();
     }

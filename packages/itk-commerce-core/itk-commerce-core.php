@@ -32,6 +32,7 @@ require_once PATH . '/src/Modules/ModuleRegistry.php';
 require_once PATH . '/src/Core.php';
 require_once PATH . '/src/Admin/AdminHub.php';
 require_once PATH . '/src/Admin/LegacyAdminRoutes.php';
+require_once PATH . '/src/Design/LocalFonts.php';
 
 \register_activation_hook( FILE, array( Lifecycle\Installer::class, 'activate' ) );
 \register_deactivation_hook( FILE, array( Lifecycle\Installer::class, 'deactivate' ) );
@@ -39,13 +40,18 @@ require_once PATH . '/src/Admin/LegacyAdminRoutes.php';
 add_action( 'plugins_loaded', __NAMESPACE__ . '\\bootstrap', 20 );
 
 /**
- * Bootstrap the Core and register the central admin control center.
+ * Bootstrap the Core and register the central admin/design services.
  *
  * @return void
  */
 function bootstrap() {
+    Lifecycle\Installer::maybe_upgrade();
+
     $core = Core::instance();
     $core->boot();
+
+    $local_fonts = new Design\LocalFonts( $core );
+    $local_fonts->register();
 
     if ( is_admin() ) {
         $routes = new Admin\LegacyAdminRoutes();

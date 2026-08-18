@@ -18,8 +18,20 @@ function itk_elementor_assert( $condition, $message ) {
     }
 }
 
+$expected_locations = array(
+    'header',
+    'footer',
+    'single',
+    'archive',
+    'itk-before-header',
+    'itk-after-header',
+    'itk-before-content',
+    'itk-after-content',
+    'itk-before-footer',
+);
+
 $locations = \ITK\Commerce\Theme\elementor_theme_locations();
-itk_elementor_assert( array( 'header', 'footer' ) === $locations, 'Header/Footer are the safe default Elementor locations.' );
+itk_elementor_assert( $expected_locations === $locations, 'Header/Footer/Single/Archive and IT-Kayali extension locations are registered by default.' );
 
 final class ITK_Elementor_Location_Manager {
     public $locations = array();
@@ -28,8 +40,9 @@ final class ITK_Elementor_Location_Manager {
 
 $manager = new ITK_Elementor_Location_Manager();
 \ITK\Commerce\Theme\register_elementor_theme_locations( $manager );
-itk_elementor_assert( array( 'header', 'footer' ) === $manager->locations, 'Elementor manager receives Header/Footer registrations.' );
+itk_elementor_assert( $expected_locations === $manager->locations, 'Elementor manager receives all Commerce Theme Builder registrations.' );
 itk_elementor_assert( false === \ITK\Commerce\Theme\maybe_render_elementor_location( 'header' ), 'Theme fallback remains active when Elementor renderer is unavailable.' );
-itk_elementor_assert( false === \ITK\Commerce\Theme\maybe_render_elementor_location( 'archive' ), 'Unregistered locations cannot replace Commerce output by default.' );
+itk_elementor_assert( false === \ITK\Commerce\Theme\maybe_render_elementor_location( 'archive' ), 'Archive fallback remains active when Elementor renderer is unavailable.' );
+itk_elementor_assert( false === \ITK\Commerce\Theme\maybe_render_elementor_location( 'not-registered' ), 'Unknown locations cannot replace Theme output.' );
 
 echo "Elementor Theme Builder smoke test passed.\n";
