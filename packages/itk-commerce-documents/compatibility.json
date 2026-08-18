@@ -30,7 +30,9 @@
     "branding_templates": "active customer profile with per-document/per-language template overrides",
     "pdf": "local Dompdf when installed or itk_commerce_documents_pdf_renderer integration",
     "html": "standalone print-ready fallback",
-    "barcode_qr": "local renderer integration through itk_commerce_document_code_markup with document-code fallback"
+    "barcode": "built-in local Code 39 SVG renderer with itk_commerce_document_code_markup override",
+    "batch_packing": "consolidated picking plus per-order packing output for up to 100 orders",
+    "warehouse_location": "product metadata _itk_warehouse_location or itk_commerce_packing_location filter"
   },
   "notes": [
     "The renderer reads WooCommerce orders through WC_Order CRUD and does not modify commercial amounts, items or payment state.",
