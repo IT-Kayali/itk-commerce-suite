@@ -15,7 +15,7 @@ do_action( 'itk_commerce_after_content' );
 ITK\Commerce\Theme\maybe_render_elementor_location( 'itk-before-footer' );
 do_action( 'itk_commerce_before_footer' );
 
-if ( ! ITK\Commerce\Theme\maybe_render_elementor_location( 'footer' ) ) {
+if ( ! ITK\Commerce\Theme\maybe_render_layout_override( 'footer' ) ) {
     ITK\Commerce\Theme\render_layout( 'footer', 'classic' );
 }
 ITK\Commerce\Theme\mobile_bottom_navigation();
