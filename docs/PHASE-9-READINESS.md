@@ -1,6 +1,6 @@
 # Phase 9 repository-side readiness
 
-This file distinguishes what the repository can complete from what requires access to the real customer environments.
+This file distinguishes what the repository can complete from what requires access to the real customer environment.
 
 ## Implemented in repository
 
@@ -12,20 +12,39 @@ This file distinguishes what the repository can complete from what requires acce
 - controlled code manager;
 - customer-neutral hardening/CI gates;
 - Al-Lord portable profile without credentials or production data;
-- Phase 0 audit template;
-- staging, cutover and rollback runbook.
+- Phase 0 environment audit template;
+- staging, activation and rollback runbook.
 
-## Requires real WordPress/WooCommerce access before production sign-off
+## Supported rollout paths
 
-- fill the Phase 0 source/target environment inventory;
-- verify exact WooCommerce, WordPress, PHP, Elementor and plugin versions;
+### Fresh installation
+
+For a new WordPress/WooCommerce installation without legacy data migration, Phase 0 is reduced to the target-environment acceptance check. No source-shop inventory, HPOS synchronization backlog, historic order reconciliation or migration rehearsal is required.
+
+Before production sign-off, verify the real target installation:
+
+- exact WordPress, WooCommerce and PHP versions;
+- Elementor/Elementor Pro versions when Elementor is used;
+- HTTPS, permalinks and WooCommerce system pages;
+- HPOS state on the new installation;
+- payment, shipping, tax and SMTP/email configuration;
+- activation of Theme, Core and selected Commerce Suite modules;
+- desktop/tablet/mobile, RTL/LTR and accessibility smoke tests;
+- cart, checkout, order creation, email, refund and document generation;
+- backup/restore and rollback procedure.
+
+### Existing-shop migration
+
+Only when an existing shop is actually being migrated, also perform the source-side work:
+
+- fill the source/target environment inventory;
 - verify HPOS authoritative storage and synchronization backlog;
 - capture actual product/customer/order/refund counts;
-- run staging migration against current production data;
-- configure payment/shipping/SMTP credentials outside Git;
-- execute payment, shipping, email, refund and document tests;
+- run a staging migration against current production data;
 - reconcile the final order delta;
-- perform DNS/domain/SSL cutover where applicable;
-- observe production orders after go-live.
+- preserve customer/product/order identities where required;
+- perform DNS/domain/SSL cutover where applicable.
 
-The source repository must never claim those environment checks succeeded until evidence from the actual customer installations exists.
+Credentials, customer data and production database dumps must never be committed to Git.
+
+The source repository must never claim real-environment checks succeeded until evidence from the actual WordPress/WooCommerce installation exists.
