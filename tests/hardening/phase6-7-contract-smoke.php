@@ -32,7 +32,8 @@ $expectations = array(
     'packages/itk-commerce-code-manager/src/ConditionMatcher.php' => array( 'itk_commerce_current_language', 'wp_is_mobile', 'is_product', 'is_product_category', 'roles' ),
     'packages/itk-commerce-code-manager/src/SnippetRuntime.php' => array( 'ITK_COMMERCE_CODE_SAFE_MODE', 'shutdown_guard', 'disable_after_error', 'itk_commerce_before_header', 'itk_commerce_before_content', 'eval' ),
     'packages/itk-commerce-code-manager/src/AdminPage.php' => array( 'itk_manage_code', 'Create disabled snippet', 'Rollback', 'Audit log' ),
-    'packages/itk-commerce-badges/itk-commerce-badges.php' => array( 'itk_commerce_product_badges', '_itk_custom_badge' ),
+    'packages/itk-commerce-badges/itk-commerce-badges.php' => array( 'Requires Plugins: itk-commerce-core, woocommerce', "'/src/BadgesModule.php'", 'itk_commerce_register_modules' ),
+    'packages/itk-commerce-badges/src/BadgesModule.php' => array( 'itk_commerce_product_badges', '_itk_custom_badge', 'ModuleInterface' ),
     'packages/itk-commerce-wishlist-compare/itk-commerce-wishlist-compare.php' => array( 'itk_wishlist', 'itk_compare', 'itk_commerce_product_card_actions' ),
     'packages/itk-commerce-gift-boxes/itk-commerce-gift-boxes.php' => array( 'woocommerce_add_to_cart_validation', 'woocommerce_add_cart_item_data', 'woocommerce_checkout_create_order_line_item' ),
 );
