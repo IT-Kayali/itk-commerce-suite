@@ -1,0 +1,28 @@
+{
+  "schema_version": 1,
+  "package": "itk-commerce-code-manager",
+  "type": "wordpress-plugin",
+  "version": "0.1.0-dev",
+  "status": "development",
+  "minimum": {
+    "php": "8.1",
+    "wordpress": "6.6",
+    "woocommerce": null,
+    "itk_commerce_core": "0.1.0-dev"
+  },
+  "tested_up_to": {
+    "wordpress": null,
+    "woocommerce": null,
+    "itk_commerce_core": "0.1.0-dev"
+  },
+  "features": {
+    "locations": ["head", "body_open", "footer"],
+    "types": ["html", "css", "javascript", "php"],
+    "php_default": "disabled unless ITK_COMMERCE_ALLOW_PHP_SNIPPETS is true"
+  },
+  "notes": [
+    "Only administrators with manage_options can persist snippets.",
+    "PHP execution has a second filter gate and is disabled by default.",
+    "The module avoids editing Theme, WooCommerce or WordPress core files."
+  ]
+}
