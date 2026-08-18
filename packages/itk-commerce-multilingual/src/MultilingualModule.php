@@ -37,6 +37,9 @@ final class MultilingualModule implements ModuleInterface {
     /** @var TranslationWorkflow|null */
     private $translation_workflow = null;
 
+    /** @var TranslationTransfer|null */
+    private $translation_transfer = null;
+
     /** @var TranslatedRouteRepository|null */
     private $translated_route_repository = null;
 
@@ -112,6 +115,13 @@ final class MultilingualModule implements ModuleInterface {
         );
         $this->translation_workflow->register();
 
+        $this->translation_transfer = new TranslationTransfer(
+            $this->translation_schema,
+            $this->translation_repository,
+            $this->translation_workflow
+        );
+        $this->translation_transfer->register();
+
         $this->translated_route_repository = new TranslatedRouteRepository();
         $this->translated_permalink_service = new TranslatedPermalinkService(
             $this->context,
@@ -145,6 +155,7 @@ final class MultilingualModule implements ModuleInterface {
             $this->router,
             $this->switcher,
             $this->translation_workflow,
+            $this->translation_transfer,
             $this->translated_permalink_service,
             $this->woocommerce_language_context,
             $this->order_language_scope,
@@ -190,6 +201,11 @@ final class MultilingualModule implements ModuleInterface {
     /** @return TranslationWorkflow|null */
     public function translation_workflow() {
         return $this->translation_workflow;
+    }
+
+    /** @return TranslationTransfer|null */
+    public function translation_transfer() {
+        return $this->translation_transfer;
     }
 
     /** @return TranslatedRouteRepository|null */
