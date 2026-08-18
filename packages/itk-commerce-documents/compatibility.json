@@ -16,17 +16,27 @@
     "itk_commerce_core": "0.1.0-dev"
   },
   "features": {
-    "invoice": true,
-    "delivery_note": true,
-    "return_form": true,
-    "packing_list": true,
-    "order_language": "reads stored _itk_commerce_language and preserves RTL/LTR document direction",
-    "pdf": "Dompdf adapter or itk_commerce_documents_pdf_renderer integration",
-    "html": "standalone print-ready fallback"
+    "documents": ["invoice", "invoice-correction", "delivery-note", "return-form", "packing-list"],
+    "number_series": ["invoice", "correction", "return"],
+    "order_crud": true,
+    "tax_and_totals": true,
+    "billing_shipping_address_selection": true,
+    "delivery_note_optional_prices": true,
+    "return_case_status_history": true,
+    "generation_history": "hash-chained order metadata with content hashes",
+    "customer_downloads": true,
+    "email_attachments": true,
+    "order_language": "renders inside stored Commerce Suite order-language scope and preserves RTL/LTR direction",
+    "branding_templates": "active customer profile with per-document/per-language template overrides",
+    "pdf": "local Dompdf when installed or itk_commerce_documents_pdf_renderer integration",
+    "html": "standalone print-ready fallback",
+    "barcode_qr": "local renderer integration through itk_commerce_document_code_markup with document-code fallback"
   },
   "notes": [
-    "The module never mutates order commercial data while rendering documents.",
-    "PDF generation is adapter-based so customer installations can choose a renderer without coupling Core to a PDF library.",
+    "The renderer reads WooCommerce orders through WC_Order CRUD and does not modify commercial amounts, items or payment state.",
+    "Document numbers are assigned once and persisted separately from the WooCommerce order number.",
+    "PDF rendering is local/adapter-based and does not require a remote PDF service.",
+    "Jurisdiction-specific invoice wording, mandatory tax fields and final PDF output require Phase 0/8 target-environment approval before production sign-off.",
     "WooCommerce minimum/tested ranges remain unset until Phase 0 environment audit data is recorded."
   ]
 }
