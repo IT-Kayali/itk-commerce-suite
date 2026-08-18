@@ -32,6 +32,7 @@ final class ElementorModule implements ModuleInterface {
     public function register() {
         add_action( 'elementor/widgets/register', array( $this, 'register_widgets' ) );
         add_action( 'elementor/elements/categories_registered', array( $this, 'register_category' ) );
+        add_action( 'elementor/dynamic_tags/register', array( $this, 'register_dynamic_tags' ) );
         add_action( 'admin_notices', array( $this, 'elementor_notice' ) );
         add_filter( 'itk_commerce_elementor_available', array( $this, 'availability' ) );
         do_action( 'itk_commerce_elementor_loaded', $this );
@@ -62,8 +63,40 @@ final class ElementorModule implements ModuleInterface {
             return;
         }
         require_once PATH . '/src/Widgets.php';
-        $widgets_manager->register( new Widgets\ProductSummaryWidget() );
-        $widgets_manager->register( new Widgets\CommerceHookWidget() );
+
+        $widgets = array(
+            new Widgets\ProductSummaryWidget(),
+            new Widgets\ProductsWidget(),
+            new Widgets\ProductCategoriesWidget(),
+            new Widgets\ProductFilterWidget(),
+            new Widgets\ProductSearchWidget(),
+            new Widgets\HeroBannerWidget(),
+            new Widgets\BranchesWidget(),
+            new Widgets\ReviewsWidget(),
+            new Widgets\ContactWidget(),
+            new Widgets\MiniCartWidget(),
+            new Widgets\LanguageSwitcherWidget(),
+            new Widgets\MenuWidget(),
+            new Widgets\CommerceHookWidget(),
+        );
+
+        foreach ( $widgets as $widget ) {
+            $widgets_manager->register( $widget );
+        }
+    }
+
+    /** @param object $dynamic_tags Elementor dynamic tag manager. @return void */
+    public function register_dynamic_tags( $dynamic_tags ) {
+        if ( ! class_exists( '\Elementor\Core\DynamicTags\Tag' ) || ! is_object( $dynamic_tags ) || ! method_exists( $dynamic_tags, 'register' ) ) {
+            return;
+        }
+
+        if ( method_exists( $dynamic_tags, 'register_group' ) ) {
+            $dynamic_tags->register_group( 'itk-commerce', array( 'title' => __( 'IT-Kayali Commerce', 'itk-commerce-elementor' ) ) );
+        }
+
+        require_once PATH . '/src/DynamicTags.php';
+        $dynamic_tags->register( new DynamicTags\CommerceTextTag() );
     }
 
     /** @return void */
