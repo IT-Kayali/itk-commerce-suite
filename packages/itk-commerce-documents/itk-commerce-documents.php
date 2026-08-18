@@ -1,7 +1,7 @@
 <?php
 /**
  * Plugin Name: IT-Kayali Commerce Documents
- * Description: Invoice, delivery-note, return-form and packing-list documents for WooCommerce orders.
+ * Description: Invoice, correction, delivery-note, return-form and packing-list documents for WooCommerce orders.
  * Version: 0.1.0-dev
  * Author: IT-Kayali
  * Text Domain: itk-commerce-documents
@@ -32,6 +32,9 @@ function prepare() {
         return;
     }
 
+    require_once PATH . '/src/DocumentNumberService.php';
+    require_once PATH . '/src/DocumentHistoryService.php';
+    require_once PATH . '/src/ReturnCaseService.php';
     require_once PATH . '/src/DocumentService.php';
     require_once PATH . '/src/DocumentsModule.php';
     add_action( 'itk_commerce_register_modules', __NAMESPACE__ . '\register_module' );
