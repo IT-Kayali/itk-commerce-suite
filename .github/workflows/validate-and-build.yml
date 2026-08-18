@@ -89,6 +89,9 @@ jobs:
       - name: Phase 6-7 module contract smoke test
         run: php tests/hardening/phase6-7-contract-smoke.php
 
+      - name: Code Manager parser and safety gates
+        run: php tests/hardening/code-manager-validation-smoke.php
+
       - name: Phase 6-9 release contract smoke test
         run: php tests/hardening/release-contract-smoke.php
 
