@@ -8,16 +8,21 @@
 defined( 'ABSPATH' ) || exit;
 get_header();
 
-if ( function_exists( 'woocommerce_content' ) ) {
-    woocommerce_content();
-} else {
-    ?>
-    <main id="primary" class="itk-site-main">
-        <div class="itk-container">
-            <?php while ( have_posts() ) : the_post(); the_content(); endwhile; ?>
-        </div>
-    </main>
-    <?php
+$elementor_location = function_exists( 'is_product' ) && is_product() ? 'single' : 'archive';
+$rendered_by_elementor = ITK\Commerce\Theme\maybe_render_elementor_location( $elementor_location );
+
+if ( ! $rendered_by_elementor ) {
+    if ( function_exists( 'woocommerce_content' ) ) {
+        woocommerce_content();
+    } else {
+        ?>
+        <main id="primary" class="itk-site-main">
+            <div class="itk-container">
+                <?php while ( have_posts() ) : the_post(); the_content(); endwhile; ?>
+            </div>
+        </main>
+        <?php
+    }
 }
 
 get_footer();
