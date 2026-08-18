@@ -1,0 +1,59 @@
+{
+  "schema_version": 1,
+  "profile_id": "al-lord",
+  "profile_version": "1.0.0",
+  "name": "Al-Lord Sweets",
+  "branding": {
+    "publisher": "IT-Kayali",
+    "customer_name": "Al-Lord Sweets"
+  },
+  "design": {
+    "direction_strategy": "language",
+    "fonts": "local",
+    "responsive": true
+  },
+  "contacts": {},
+  "languages": [
+    {"code": "de", "label": "Deutsch", "direction": "ltr"},
+    {"code": "ar", "label": "العربية", "direction": "rtl"},
+    {"code": "en", "label": "English", "direction": "ltr"}
+  ],
+  "layouts": {
+    "shop": "grid",
+    "product": "gallery-left",
+    "cart": "two-column",
+    "checkout": "two-column"
+  },
+  "modules": {
+    "enabled": [
+      "itk-commerce-layouts",
+      "itk-commerce-search-filter",
+      "itk-commerce-multilingual",
+      "itk-commerce-documents",
+      "itk-commerce-elementor",
+      "itk-commerce-badges",
+      "itk-commerce-wishlist-compare",
+      "itk-commerce-gift-boxes",
+      "itk-commerce-code-manager"
+    ],
+    "configuration": {
+      "itk-commerce-multilingual": {
+        "languages": {
+          "schema_version": 1,
+          "default": "de",
+          "fallback": "de",
+          "languages": [
+            {"code": "de", "locale": "de_DE", "label": "Deutsch", "direction": "ltr", "enabled": true},
+            {"code": "ar", "locale": "ar", "label": "العربية", "direction": "rtl", "enabled": true},
+            {"code": "en", "locale": "en_US", "label": "English", "direction": "ltr", "enabled": true}
+          ]
+        }
+      },
+      "itk-commerce-search-filter": {
+        "filters": {
+          "definitions": []
+        }
+      }
+    }
+  }
+}
