@@ -45,6 +45,8 @@ add_action( 'plugins_loaded', __NAMESPACE__ . '\\bootstrap', 20 );
  * @return void
  */
 function bootstrap() {
+    Lifecycle\Installer::maybe_upgrade();
+
     $core = Core::instance();
     $core->boot();
 
