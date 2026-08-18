@@ -7,6 +7,7 @@ on:
       - 'foundation/**'
       - 'feature/**'
       - 'agent/**'
+      - 'fix/**'
   pull_request:
 
 permissions:
@@ -88,6 +89,9 @@ jobs:
 
       - name: Phase 6-7 module contract smoke test
         run: php tests/hardening/phase6-7-contract-smoke.php
+
+      - name: Badges activation load-order smoke test
+        run: php tests/hardening/badges-load-order-smoke.php
 
       - name: Code Manager parser and safety gates
         run: php tests/hardening/code-manager-validation-smoke.php

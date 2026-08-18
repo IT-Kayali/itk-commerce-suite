@@ -142,6 +142,7 @@ test.describe('Search Filter progressive UI', () => {
 
     await expect(page.locator('[data-product-state="filtered"]')).toBeVisible();
     await expect(page.locator('.woocommerce-result-count')).toContainText('2 results');
+    await expect(page.locator('[data-itk-catalog-live-status]')).toHaveText('Products updated.');
 
     const state = await page.evaluate(() => ({
       marker: window.__itkFixtureMarker,
