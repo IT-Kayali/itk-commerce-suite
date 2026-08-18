@@ -48,6 +48,7 @@ function prepare() {
     require_once PATH . '/src/TranslationSchema.php';
     require_once PATH . '/src/TranslationRepository.php';
     require_once PATH . '/src/TranslationWorkflow.php';
+    require_once PATH . '/src/TranslationTransfer.php';
     require_once PATH . '/src/TranslatedRouteStoreInterface.php';
     require_once PATH . '/src/TranslatedRouteRepository.php';
     require_once PATH . '/src/TranslatedPermalinkService.php';
