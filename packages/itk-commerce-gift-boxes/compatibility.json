@@ -1,0 +1,11 @@
+{
+  "schema_version": 1,
+  "package": "itk-commerce-gift-boxes",
+  "type": "wordpress-plugin",
+  "version": "0.1.0-dev",
+  "status": "development",
+  "minimum": {"php": "8.1", "wordpress": "6.6", "woocommerce": null, "itk_commerce_core": "0.1.0-dev"},
+  "tested_up_to": {"wordpress": null, "woocommerce": null, "itk_commerce_core": "0.1.0-dev"},
+  "features": {"configurable_box_product": true, "category_bounded_choices": true, "selection_limit": 24, "cart_persistence": true, "order_line_meta": true},
+  "notes": ["Gift-box selections are validated server-side before cart insertion and are persisted as order-line metadata."]
+}
