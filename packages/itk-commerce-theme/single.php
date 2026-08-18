@@ -7,6 +7,8 @@
 
 defined( 'ABSPATH' ) || exit;
 get_header();
+
+if ( ! ITK\Commerce\Theme\maybe_render_elementor_location( 'single' ) ) :
 ?>
 <main id="primary" class="itk-site-main">
     <div class="itk-container itk-reading-width">
@@ -27,4 +29,6 @@ get_header();
         <?php endwhile; ?>
     </div>
 </main>
-<?php get_footer(); ?>
+<?php
+endif;
+get_footer();
