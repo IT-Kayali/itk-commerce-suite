@@ -17,7 +17,16 @@ defined( 'ABSPATH' ) || exit;
 <?php wp_body_open(); ?>
 <a class="itk-skip-link screen-reader-text" href="#primary"><?php esc_html_e( 'Skip to content', 'itk-commerce' ); ?></a>
 <?php
+/** Controlled extension location before the rendered site header. */
+do_action( 'itk_commerce_before_header' );
+
 if ( ! ITK\Commerce\Theme\maybe_render_elementor_location( 'header' ) ) {
     ITK\Commerce\Theme\render_layout( 'header', 'classic' );
 }
+
+/** Controlled extension location after the rendered site header. */
+do_action( 'itk_commerce_after_header' );
+
+/** Controlled extension location before the page's primary content. */
+do_action( 'itk_commerce_before_content' );
 ?>
