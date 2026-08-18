@@ -40,10 +40,17 @@ function prepare() {
     require_once PATH . '/src/RichMegaMenuRenderer.php';
     require_once PATH . '/src/LivePreview.php';
     require_once PATH . '/src/CustomLayoutRenderer.php';
+    require_once PATH . '/src/CombinedMarkupNormalizer.php';
 
     // Preserve module-owned HTML/CSS/JS during Core profile normalization even
     // when the Layouts module is temporarily disabled in the active profile.
     add_filter( 'itk_commerce_normalized_profile', array( CustomLayoutRenderer::class, 'normalize_profile' ), 20, 2 );
+
+    // Allow a complete HTML document fragment containing embedded <style> and
+    // <script> blocks to be pasted into the Primary HTML field. The blocks are
+    // separated after the normal security boundary so CSS/JS are not rendered
+    // as visible text and keep using their dedicated frontend containers.
+    add_filter( 'itk_commerce_normalized_profile', array( CombinedMarkupNormalizer::class, 'normalize_profile' ), 30, 2 );
 
     if ( is_admin() ) {
         require_once PATH . '/src/Admin/LayoutBuilderPage.php';
