@@ -21,7 +21,7 @@ defined( 'ABSPATH' ) || exit;
 ITK\Commerce\Theme\maybe_render_elementor_location( 'itk-before-header' );
 do_action( 'itk_commerce_before_header' );
 
-if ( ! ITK\Commerce\Theme\maybe_render_elementor_location( 'header' ) ) {
+if ( ! ITK\Commerce\Theme\maybe_render_layout_override( 'header' ) ) {
     ITK\Commerce\Theme\render_layout( 'header', 'classic' );
 }
 

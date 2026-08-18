@@ -26,6 +26,9 @@ final class LayoutsModule implements ModuleInterface {
     /** @var LivePreview|null */
     private $preview = null;
 
+    /** @var CustomLayoutRenderer|null */
+    private $custom_renderer = null;
+
     /** @return string */
     public function id() {
         return MODULE_ID;
@@ -61,8 +64,10 @@ final class LayoutsModule implements ModuleInterface {
         $this->mega_menu         = new MegaMenuConfig();
         $this->mega_renderer     = new RichMegaMenuRenderer( $this->mega_menu );
         $this->preview           = new LivePreview();
+        $this->custom_renderer   = new CustomLayoutRenderer();
 
         add_filter( 'itk_commerce_theme_layout_model', array( $this->resolver, 'resolve_theme_model' ), 10, 2 );
+        add_filter( 'itk_commerce_theme_layout_override', array( $this->custom_renderer, 'render_area' ), 10, 2 );
         add_filter( 'itk_commerce_mobile_bottom_enabled', array( $this->resolver, 'mobile_bottom_enabled' ) );
         add_filter( 'itk_commerce_mobile_bottom_items', array( $this->resolver, 'mobile_bottom_items' ) );
         add_filter( 'body_class', array( $this->resolver, 'body_classes' ) );
@@ -94,6 +99,7 @@ final class LayoutsModule implements ModuleInterface {
             ( new Admin\ProductCardPage() )->register();
             ( new Admin\MegaMenuFields() )->register();
             ( new Admin\MegaMenuContentPage() )->register();
+            ( new Admin\CustomHeaderFooterPage() )->register();
         }
 
         /**
@@ -104,8 +110,9 @@ final class LayoutsModule implements ModuleInterface {
          * @param LivePreview              $preview           Authenticated preview service.
          * @param RichMegaMenuRenderer     $mega_renderer     Rich panel renderer.
          * @param CommerceTemplateResolver $commerce_resolver Commerce page/component resolver.
+         * @param CustomLayoutRenderer     $custom_renderer   Manual source renderer.
          */
-        do_action( 'itk_commerce_layouts_loaded', $this->resolver, $this->mega_menu, $this->preview, $this->mega_renderer, $this->commerce_resolver );
+        do_action( 'itk_commerce_layouts_loaded', $this->resolver, $this->mega_menu, $this->preview, $this->mega_renderer, $this->commerce_resolver, $this->custom_renderer );
     }
 
     /**

@@ -54,6 +54,9 @@ jobs:
       - name: Layouts module contract smoke test
         run: php tests/layouts/module-contract-smoke.php
 
+      - name: Custom Header Footer source smoke test
+        run: php tests/layouts/custom-header-footer-source-smoke.php
+
       - name: Rich mega-menu normalization smoke test
         run: php tests/layouts/rich-mega-menu-smoke.php
 

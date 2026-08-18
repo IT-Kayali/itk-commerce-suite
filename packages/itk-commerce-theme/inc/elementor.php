@@ -91,3 +91,30 @@ function maybe_render_elementor_location( $location ) {
 
     return (bool) elementor_theme_do_location( $location );
 }
+
+/**
+ * Give optional modules first control over Header/Footer rendering. A null
+ * result means no module selected an explicit source, so legacy Elementor Theme
+ * Builder behavior is preserved. False means render the Theme model; true means
+ * the module already rendered the area or intentionally disabled it.
+ *
+ * @param string $location Header/footer location.
+ * @return bool True when no Theme model should be rendered.
+ */
+function maybe_render_layout_override( $location ) {
+    $location = sanitize_key( $location );
+
+    /**
+     * Filter the rendering source for a Theme layout area.
+     *
+     * @param bool|null $handled  Null when no explicit source owns the area.
+     * @param string    $location Layout location.
+     */
+    $handled = apply_filters( 'itk_commerce_theme_layout_override', null, $location );
+
+    if ( null !== $handled ) {
+        return (bool) $handled;
+    }
+
+    return maybe_render_elementor_location( $location );
+}

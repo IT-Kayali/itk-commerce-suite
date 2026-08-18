@@ -39,6 +39,11 @@ function prepare() {
     require_once PATH . '/src/MegaMenuConfig.php';
     require_once PATH . '/src/RichMegaMenuRenderer.php';
     require_once PATH . '/src/LivePreview.php';
+    require_once PATH . '/src/CustomLayoutRenderer.php';
+
+    // Preserve module-owned HTML/CSS/JS during Core profile normalization even
+    // when the Layouts module is temporarily disabled in the active profile.
+    add_filter( 'itk_commerce_normalized_profile', array( CustomLayoutRenderer::class, 'normalize_profile' ), 20, 2 );
 
     if ( is_admin() ) {
         require_once PATH . '/src/Admin/LayoutBuilderPage.php';
@@ -46,6 +51,7 @@ function prepare() {
         require_once PATH . '/src/Admin/ProductCardPage.php';
         require_once PATH . '/src/Admin/MegaMenuFields.php';
         require_once PATH . '/src/Admin/MegaMenuContentPage.php';
+        require_once PATH . '/src/Admin/CustomHeaderFooterPage.php';
     }
 
     require_once PATH . '/src/LayoutsModule.php';
