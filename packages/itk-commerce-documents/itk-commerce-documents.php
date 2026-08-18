@@ -37,9 +37,12 @@ function prepare() {
     require_once PATH . '/src/ReturnCaseService.php';
     require_once PATH . '/src/BarcodeService.php';
     require_once PATH . '/src/BatchPackingService.php';
+    require_once PATH . '/src/DocumentExtensions.php';
     require_once PATH . '/src/DocumentService.php';
     require_once PATH . '/src/DocumentsModule.php';
+
     add_action( 'itk_commerce_register_modules', __NAMESPACE__ . '\register_module' );
+    add_action( 'itk_commerce_documents_loaded', __NAMESPACE__ . '\register_document_extensions', 10, 4 );
 }
 
 /** @param object $registry Module registry. @return void */
@@ -47,6 +50,22 @@ function register_module( $registry ) {
     if ( is_object( $registry ) && method_exists( $registry, 'register' ) ) {
         $registry->register( new DocumentsModule() );
     }
+}
+
+/**
+ * Register optional document presentation/warehouse helpers only after Core has
+ * actually booted this module, preserving inactive-module isolation.
+ *
+ * @param object $module Documents module.
+ * @param object $service Document service.
+ * @param object $returns Return service.
+ * @param object $history History service.
+ * @return void
+ */
+function register_document_extensions( $module, $service, $returns, $history ) {
+    unset( $module, $service, $returns, $history );
+    $extensions = new DocumentExtensions();
+    $extensions->register();
 }
 
 /** @return void */
