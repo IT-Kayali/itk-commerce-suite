@@ -35,6 +35,8 @@ function prepare() {
     require_once PATH . '/src/DocumentNumberService.php';
     require_once PATH . '/src/DocumentHistoryService.php';
     require_once PATH . '/src/ReturnCaseService.php';
+    require_once PATH . '/src/BarcodeService.php';
+    require_once PATH . '/src/BatchPackingService.php';
     require_once PATH . '/src/DocumentService.php';
     require_once PATH . '/src/DocumentsModule.php';
     add_action( 'itk_commerce_register_modules', __NAMESPACE__ . '\register_module' );
