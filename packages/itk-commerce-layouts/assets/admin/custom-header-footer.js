@@ -8,11 +8,7 @@
     const refresh = () => {
       const source = select.value || 'theme';
       editor.querySelectorAll('[data-itk-source-panel]').forEach((panel) => {
-        const active = panel.dataset.itkSourcePanel === source;
-        panel.hidden = !active;
-        panel.querySelectorAll('input, textarea, select').forEach((field) => {
-          field.disabled = !active;
-        });
+        panel.hidden = panel.dataset.itkSourcePanel !== source;
       });
     };
 
