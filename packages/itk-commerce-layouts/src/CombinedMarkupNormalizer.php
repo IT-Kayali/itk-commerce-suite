@@ -11,9 +11,55 @@ defined( 'ABSPATH' ) || exit;
 
 final class CombinedMarkupNormalizer {
     /**
+     * Split complete Header/Footer bundles before the admin page sanitizes the
+     * submitted HTML field. This is intentionally request-local only; the
+     * existing save handler still performs capability, nonce and sanitization
+     * checks before anything is persisted.
+     *
+     * @return void
+     */
+    public static function preprocess_submission() {
+        if ( empty( $_POST['layout'] ) || ! is_array( $_POST['layout'] ) ) {
+            return;
+        }
+
+        $layout = wp_unslash( $_POST['layout'] );
+
+        foreach ( array( 'header', 'footer' ) as $area ) {
+            if ( empty( $layout[ $area ]['html'] ) || ! is_array( $layout[ $area ]['html'] ) ) {
+                continue;
+            }
+
+            $html       = $layout[ $area ]['html'];
+            $shared_raw = isset( $html['shared'] ) ? (string) $html['shared'] : '';
+
+            if ( false === stripos( $shared_raw, '<style' ) && false === stripos( $shared_raw, '<script' ) ) {
+                continue;
+            }
+
+            $parsed = self::split_bundle( $shared_raw );
+
+            $layout[ $area ]['html']['shared'] = $parsed['html'];
+            $layout[ $area ]['html']['css'] = self::join_code(
+                $parsed['css'],
+                isset( $html['css'] ) ? (string) $html['css'] : ''
+            );
+            $layout[ $area ]['html']['js'] = self::join_code(
+                $parsed['js'],
+                isset( $html['js'] ) ? (string) $html['js'] : ''
+            );
+        }
+
+        $_POST['layout'] = wp_slash( $layout );
+    }
+
+    /**
      * Re-normalize custom Header/Footer HTML from the original profile so users
      * may paste complete HTML + CSS + JavaScript bundles into Primary HTML.
      * Explicit CSS/JS fields are preserved and appended after extracted blocks.
+     *
+     * This remains as a second safety net for programmatic profile saves that
+     * bypass the normal Header/Footer admin form.
      *
      * @param array<string,mixed> $normalized Normalized profile.
      * @param array<string,mixed> $original   Original profile.
@@ -111,3 +157,9 @@ final class CombinedMarkupNormalizer {
         return $first . "\n\n" . $second;
     }
 }
+
+add_action(
+    'admin_post_itk_commerce_save_custom_header_footer',
+    array( CombinedMarkupNormalizer::class, 'preprocess_submission' ),
+    1
+);
