@@ -23,6 +23,14 @@ $expectations = array(
         'ProductSummaryWidget',
         'CommerceHookWidget',
     ),
+    'packages/itk-commerce-core/src/Design/LocalFonts.php' => array(
+        'itk_commerce_local_fonts',
+        'upload_mimes',
+        'wp_enqueue_media',
+        '@font-face',
+        'font-display:swap',
+        'itk_manage_design',
+    ),
     'packages/itk-commerce-code-manager/itk-commerce-code-manager.php' => array(
         'ITK_COMMERCE_ALLOW_PHP_SNIPPETS',
         'wp_head',
