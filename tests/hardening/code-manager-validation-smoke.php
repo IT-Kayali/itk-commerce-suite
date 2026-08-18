@@ -15,7 +15,7 @@ if ( ! class_exists( 'WP_Error' ) ) {
     }
 }
 
-if ( ! function_exists( '__' ) ) { function __( $text ) { return $text; } }
+if ( ! function_exists( '__' ) ) { function __( $text, $domain = '' ) { unset( $domain ); return $text; } }
 if ( ! function_exists( 'sanitize_key' ) ) { function sanitize_key( $value ) { return strtolower( preg_replace( '/[^a-z0-9_\-]/', '', (string) $value ) ); } }
 if ( ! function_exists( 'sanitize_title' ) ) { function sanitize_title( $value ) { return sanitize_key( str_replace( ' ', '-', (string) $value ) ); } }
 if ( ! function_exists( 'sanitize_text_field' ) ) { function sanitize_text_field( $value ) { return trim( (string) $value ); } }
@@ -27,15 +27,16 @@ $repository = new \ITK\Commerce\CodeManager\SnippetRepository();
 
 $valid_php = $repository->validate_code( 'php', "add_action( 'init', function () { return; } );" );
 if ( true !== $valid_php ) {
-    throw new RuntimeException( 'Safe PHP snippet did not pass validation.' );
+    $detail = is_wp_error( $valid_php ) ? $valid_php->get_error_code() . ': ' . $valid_php->get_error_message() : gettype( $valid_php );
+    throw new RuntimeException( 'Safe PHP snippet did not pass validation: ' . $detail );
 }
 
 $cases = array(
-    array( 'php', "eval( '$x = 1;' );", 'eval must be rejected' ),
+    array( 'php', 'eval( "$x = 1;" );', 'eval must be rejected' ),
     array( 'php', "system( 'id' );", 'system must be rejected' ),
     array( 'php', "include 'file.php';", 'include must be rejected' ),
-    array( 'php', "echo `id`;", 'backticks must be rejected' ),
-    array( 'php', "if (", 'syntax errors must be rejected' ),
+    array( 'php', 'echo `id`;', 'backticks must be rejected' ),
+    array( 'php', 'if (', 'syntax errors must be rejected' ),
     array( 'php', "<?php echo 'x';", 'PHP tags must be rejected' ),
     array( 'js', "console.log('x');</script><script>alert(1)</script>", 'script breakout must be rejected' ),
     array( 'css', "body{color:red}</style><script>alert(1)</script>", 'style breakout must be rejected' ),
