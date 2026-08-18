@@ -86,6 +86,9 @@ jobs:
       - name: Search Filter live search contract smoke test
         run: php tests/search-filter/live-search-contract-smoke.php
 
+      - name: Phase 6-7 module contract smoke test
+        run: php tests/hardening/phase6-7-contract-smoke.php
+
       - name: Phase 6-9 release contract smoke test
         run: php tests/hardening/release-contract-smoke.php
 
