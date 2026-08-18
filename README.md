@@ -1,176 +1,96 @@
 # IT-Kayali Commerce Suite
 
-Modular, scalable WooCommerce commerce platform by IT-Kayali with a reusable theme, core plugin, installable modules and white-label customer profiles.
+Modular, scalable WooCommerce commerce platform by IT-Kayali with a reusable Theme, Core plugin, installable modules and white-label customer profiles.
 
-## Status
+## Current implementation status
 
-Phase 1 foundation is complete. The Phase 2 layout scope now includes the visual Header/Footer Layout Builder, profile-driven responsive navigation, rich Mega-menu panels, visual Shop/Product/Cart/Checkout page models and automated Chromium responsive/RTL/accessibility regression coverage.
+The reusable product now contains the Phase 1–4 foundation/builders/commerce/search work, the Phase 5 multilingual stack, Phase 6 order documents, Phase 7 Elementor/code extension modules, the optional commerce modules defined in the product plan, and Phase 8 release/hardening automation. Phase 9 repository-side rollout assets for the first reference customer are also present.
+
+A real customer production rollout is **not** declared complete from source code alone. Phase 0 environment values and the Phase 9 staging/cutover checklist must be completed against the actual WordPress/WooCommerce installations before production sign-off.
 
 ## Product ownership
 
-The generic product architecture, source code, reusable layouts, modules, documentation and release process belong to IT-Kayali. Customer-specific branding, content, products, media and business data remain separate from the generic product core.
+The generic architecture, source code, reusable layouts, modules, documentation and release process belong to IT-Kayali. Customer-specific branding, content, products, media and business data remain separate from the generic product core.
 
-The first reference implementation is Al-Lord Sweets. Al-Lord-specific decisions must stay inside its customer profile and must not be hard-coded into the reusable product core.
+The first reference implementation is Al-Lord Sweets. Customer-specific configuration is isolated below `client-profiles/al-lord/` and must not be hard-coded into reusable packages.
 
 ## Architecture
 
-The suite is split into clear layers:
+1. **Customer profile** — branding, languages, layouts and enabled module configuration.
+2. **IT-Kayali Theme** — design system, responsive UI, product cards and public presentation extension points.
+3. **IT-Kayali Core** — settings, profiles, modules, capabilities and lifecycle coordination.
+4. **Installable modules** — independent optional commerce features with explicit dependencies.
+5. **WordPress + WooCommerce** — customer/product/order data remains in supported platform APIs and storage.
 
-1. **Customer profile** — branding, languages, layout rules, contacts and enabled modules.
-2. **IT-Kayali theme** — UI, design tokens, patterns and responsive layouts.
-3. **IT-Kayali core** — settings, module management, import/export, roles and update coordination.
-4. **Installable modules** — optional commerce capabilities with explicit dependencies.
-5. **WordPress + WooCommerce** — customer data and commerce data remain in supported platform APIs.
+## Package set
 
-## Theme baseline (`0.1.0-dev`)
+- `itk-commerce-theme` — responsive WooCommerce Theme, local-font policy and reusable commerce presentation.
+- `itk-commerce-core` — settings, profile schema, module registry, roles/capabilities and admin hub.
+- `itk-commerce-layouts` — Header/Footer/Mega-menu builders and Shop/Product/Cart/Checkout layout models.
+- `itk-commerce-search-filter` — filter builder, shareable URL state, asynchronous catalog navigation, mobile drawer and live search.
+- `itk-commerce-multilingual` — language routing, RTL/LTR, translation revisions, WooCommerce/order language, translated routes, SEO and JSON/CSV/XLIFF transfer.
+- `itk-commerce-documents` — invoice, delivery note, return form and packing list with print-ready HTML plus pluggable PDF rendering.
+- `itk-commerce-elementor` — optional Elementor Commerce category/widgets and extension-area integration.
+- `itk-commerce-badges` — sale-percentage and custom product badges through Theme extension contracts.
+- `itk-commerce-wishlist-compare` — browser wishlist and bounded comparison using WooCommerce Store API reads.
+- `itk-commerce-gift-boxes` — validated configurable gift-box selections persisted to cart and order line metadata.
+- `itk-commerce-code-manager` — controlled Head/Body/Footer HTML/CSS/JS and explicit opt-in PHP extension points.
 
-The reusable theme provides:
+See [`packages/README.md`](packages/README.md) for package-level status and responsibilities.
 
-- standard page, front-page, single, archive, search and 404 templates;
-- WooCommerce integration and product-gallery support;
-- customer-neutral Header and Footer rendering;
-- reusable Header models: Classic, Centered, Shop/Search-first, Transparent, Dark, Luxury, Sticky and Vertical;
-- reusable Footer models: Classic, Compact, Columns, Simple, Luxury, Newsletter and Branches;
-- reusable Shop models: Grid, Sidebar, Editorial and Compact;
-- reusable Product models: Classic, Gallery Left, Gallery Right, Centered and Compact;
-- reusable Cart models: Classic, Split and Compact;
-- reusable Checkout models: Classic, Split and Focused;
-- desktop primary navigation and mobile drawer navigation;
-- configurable mobile bottom navigation with a neutral commerce fallback;
-- responsive Mega-menu presentation;
-- Shop sidebar support through the Theme widget area rather than customer-specific markup;
-- WooCommerce-safe page-model hooks without patching WooCommerce core/templates;
-- public `render_block` outer shells for Cart/Checkout blocks while native block internals remain under WooCommerce ownership;
-- accessible skip link, focus behavior, search form and keyboard navigation;
-- versioned `theme.json` design tokens;
-- RTL-aware logical layout rules;
-- a local-font-only policy by default;
-- layered CSS/JS assets and public extension hooks for modules.
+## Multilingual workflow
 
-## Core baseline (`0.1.0-dev`)
+The Multilingual module supports directory language routing, language switching, WordPress locale switching, RTL/LTR direction, draft/review/published revisions, WooCommerce entity translations, stored order language, order-language rendering, canonical/hreflang, translated entity routes and JSON/CSV/XLIFF interchange.
 
-The Core provides:
+Translation imports are bounded and draft-only. The Commerce Suite admin surface lets translators create/import drafts and submit revisions for review; publication remains an administrative action.
 
-- versioned suite settings;
-- versioned customer-profile schema and persistence;
-- portable-profile secret rejection;
-- module registry with dependency and environment validation;
-- deterministic dependency-ordered module boot;
-- role/capability foundation;
-- activation/deactivation lifecycle handling;
-- CI lifecycle smoke testing;
-- compatibility manifests;
-- documented update/migration/rollback rules.
+## Documents
 
-## Layouts module (`0.1.0-dev`)
+`itk-commerce-documents` renders WooCommerce order data as invoice, delivery note, return form or packing list without mutating commercial order data. Stored Commerce Suite order language is reused for document direction. HTML is always available; PDF output uses an installed Dompdf renderer or the `itk_commerce_documents_pdf_renderer` adapter.
 
-The optional Layouts module provides:
+## Elementor and controlled custom code
 
-- **Appearance > Commerce Layouts** for Header/Footer, context rules, mobile navigation and portable Mega-menu definitions;
-- authenticated live storefront preview before saving with Desktop, Tablet and Mobile widths;
-- profile-driven Header/Footer selection and product/category/context priority rules;
-- configurable mobile bottom-navigation visibility and fallback items;
-- **Appearance > Commerce Mega Menu** for rich WordPress/WooCommerce/image/banner/optional Elementor panels;
-- accessible rich-panel toggles with ARIA state, focus behavior, Escape and click-outside closing;
-- **Appearance > Commerce Templates** for Shop, Product, Cart and Checkout page models;
-- Shop options for 2–6 columns, sidebar position and card density;
-- Product options for gallery weight, sticky summary and tabs/stacked details;
-- Cart options for split/compact presentation, density and classic-template sticky totals;
-- Checkout options for split/focused presentation, width, density and classic-template sticky order review;
-- customer-profile persistence under `layouts.commerce` without overwriting Header/Footer/Mega-menu configuration;
-- safe Theme fallback when an unknown model is configured.
+Elementor remains optional. Commerce Suite functionality does not depend on Elementor being active. The Elementor module registers reusable Commerce widgets only when Elementor is present.
 
-Existing basic Mega-menu definitions keep their previous submenu behavior until rich blocks are explicitly saved. Rich blocks do not accept executable PHP or JavaScript. Optional WooCommerce/Elementor content fails closed instead of breaking navigation.
-
-Cart and Checkout block models intentionally style only an IT-Kayali wrapper at WordPress's public block-render boundary. WooCommerce continues to own the block components, payment/validation behavior and their internal responsive markup.
-
-Preview URLs require a logged-in user with the Commerce design capability and a valid nonce, and are marked `noindex,nofollow`.
-
-## Browser regression gate
-
-Customer-neutral Playwright fixtures exercise the real reusable Theme/Layouts CSS and JavaScript in Chromium. The gate covers:
-
-- Desktop/Tablet/Mobile Header/Footer and Mega-menu behavior;
-- mobile horizontal overflow and RTL logical positioning;
-- Mega-menu ARIA state, keyboard open/Escape, focus restoration and click-outside closing;
-- Shop column/sidebar responsive behavior;
-- Product gallery ordering/sticky-summary collapse;
-- classic Cart/Checkout split-model collapse;
-- public Cart/Checkout block-shell widths;
-- skip-link/ID/`aria-controls` and accessible-name contracts.
-
-The installable ZIP build depends on both static validation and browser regression. Failure diagnostics retain Playwright traces, screenshots and an HTML report.
-
-## Packages
-
-Implemented:
-
-- `itk-commerce-theme`
-- `itk-commerce-core`
-- `itk-commerce-layouts`
-
-Planned:
-
-- `itk-commerce-multilingual`
-- `itk-commerce-elementor`
-- `itk-commerce-search-filter`
-- `itk-commerce-documents`
-- `itk-commerce-badges`
-- `itk-commerce-wishlist-compare`
-- `itk-commerce-gift-boxes`
-- `itk-commerce-code-manager`
-
-Packages are created when implementation starts; empty placeholder packages are intentionally avoided.
-
-## Repository layout
-
-```text
-packages/
-  itk-commerce-theme/
-  itk-commerce-core/
-  itk-commerce-layouts/
-client-profiles/
-  al-lord/
-docs/
-tests/
-tools/
-.github/
-```
+The Code Manager provides controlled extension locations instead of Theme/Core patches. PHP snippets are disabled unless `ITK_COMMERCE_ALLOW_PHP_SNIPPETS` is explicitly enabled by the installation owner.
 
 ## Validation and development ZIPs
 
-GitHub Actions validates PHP and JavaScript syntax, `theme.json`, all package compatibility manifests, Core lifecycle smoke tests, Layouts contracts, rich Mega-menu normalization, Commerce template contracts, the generic/customer separation rule and the Chromium browser suite. Development artifacts are built only after both validation layers pass:
+GitHub Actions validates PHP/JavaScript syntax, JSON compatibility manifests, Core/Layout/Search/Multilingual contracts, generic/customer separation, secret patterns and the Phase 6–9 release contract. Chromium browser regression covers responsive/RTL/accessibility fixtures. After validation, every `packages/itk-commerce-*` package is built as its own ZIP artifact.
 
-- `itk-commerce-theme.zip`
-- `itk-commerce-core.zip`
-- `itk-commerce-layouts.zip`
+## Phase 8 and Phase 9 gates
+
+- [`docs/HARDENING.md`](docs/HARDENING.md) defines security, accessibility, WooCommerce/HPOS, performance and rollback release gates.
+- [`docs/PHASE-0-AUDIT.md`](docs/PHASE-0-AUDIT.md) records the real source/target WordPress, WooCommerce, PHP, HPOS, plugins and data-volume environment.
+- [`docs/AL-LORD-ROLLOUT.md`](docs/AL-LORD-ROLLOUT.md) defines staging rehearsal, final data reconciliation, cutover and rollback for the first customer implementation.
+- `client-profiles/al-lord/profile.json` contains the customer profile without production data or credentials.
 
 ## Engineering rules
 
-- Namespace PHP code under `ITK\\Commerce` and use unique `itk_` prefixes where WordPress requires global identifiers.
-- Never modify WordPress or WooCommerce core files.
-- Prefer supported WooCommerce and WordPress APIs/hooks; use template overrides only when justified by layout requirements.
-- Do not couple generic packages to one reference customer.
-- New features must be modular, backwards-compatible and isolated from unrelated modules.
-- Database changes require versioned, repeatable migrations and an explicit rollback strategy where data changes are involved.
-- Inactive modules must not enqueue frontend assets or run background jobs.
-- Secrets, passwords, API keys and customer personal data must never be committed or exported by default.
-- Every release must be installable, testable, documented and recoverable.
+- Namespace PHP code under `ITK\\Commerce` and use unique `itk_` identifiers where WordPress needs global names.
+- Never modify WordPress, WooCommerce or Elementor core files.
+- Prefer supported WordPress/WooCommerce APIs and public extension contracts.
+- Keep reusable packages customer-neutral and customer configuration isolated under `client-profiles/`.
+- New functionality must remain modular and must not create unintended side effects in unrelated modules.
+- Database changes require versioned/repeatable migrations and rollback planning.
+- Inactive modules must not run frontend/background behavior.
+- Never commit secrets, credentials, production customer/order data or database dumps.
+- Every production deployment requires backups, staging verification and a defined rollback path.
 
 ## Documentation
 
 - [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md)
 - [`docs/DEVELOPMENT.md`](docs/DEVELOPMENT.md)
 - [`docs/ROADMAP.md`](docs/ROADMAP.md)
-- [`docs/CORE-FOUNDATION.md`](docs/CORE-FOUNDATION.md)
 - [`docs/UPDATE-ROLLBACK.md`](docs/UPDATE-ROLLBACK.md)
-- [`docs/LAYOUT-BUILDERS.md`](docs/LAYOUT-BUILDERS.md)
-- [`docs/COMMERCE-TEMPLATES.md`](docs/COMMERCE-TEMPLATES.md)
-- [`docs/BROWSER-REGRESSION.md`](docs/BROWSER-REGRESSION.md)
+- [`docs/MULTILINGUAL-TRANSFER.md`](docs/MULTILINGUAL-TRANSFER.md)
+- [`docs/HARDENING.md`](docs/HARDENING.md)
+- [`docs/PHASE-0-AUDIT.md`](docs/PHASE-0-AUDIT.md)
+- [`docs/AL-LORD-ROLLOUT.md`](docs/AL-LORD-ROLLOUT.md)
 
 ## Versioning
 
-Development starts at `0.1.0-dev`. Stable releases will use semantic versioning. Theme, Core and modules may be released independently while remaining subject to a documented compatibility matrix.
+Development packages remain at `0.1.0-dev`. Stable releases use semantic versioning. Theme, Core and modules may be released independently subject to their compatibility manifests and the tested customer environment.
 
 ---
 
