@@ -17,7 +17,7 @@ $expectations = array(
         '_itk_commerce_language',
         '_itk_commerce_direction',
     ),
-    'packages/itk-commerce-documents/src/DocumentNumberService.php' => array( 'INV-', 'CRN-', 'RET-', 'add_option', '_itk_document_number_' ),
+    'packages/itk-commerce-documents/src/DocumentNumberService.php' => array( "'invoice'    => 'INV'", "'correction' => 'CRN'", "'return'     => 'RET'", "sprintf( '%s-%s-%06d'", 'add_option', '_itk_document_number_' ),
     'packages/itk-commerce-documents/src/DocumentHistoryService.php' => array( 'content_hash', 'previous_hash', 'entry_hash' ),
     'packages/itk-commerce-documents/src/ReturnCaseService.php' => array( 'requested', 'received', 'approved', 'rejected', 'refunded', 'closed' ),
     'packages/itk-commerce-documents/src/BarcodeService.php' => array( 'Code 39', 'itk-document-barcode', '<svg', 'preserveAspectRatio' ),
